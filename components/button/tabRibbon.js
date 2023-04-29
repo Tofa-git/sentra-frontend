@@ -11,7 +11,6 @@ const TabRibbon = ({id, id_active, labels, clickRibbon}) => {
     )
 
 }
-
 export default TabRibbon
 
 const styles = Stylesheet.create({
