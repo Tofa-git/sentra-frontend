@@ -29,15 +29,17 @@ const Login = (props) => {
             }
         }
 
-        await axios(config)
-            .then(function (response) {
-                console.log(response.data.data.token);
-                localStorage.setItem('usrkey', response.data.data.token)
-                setToken(response.data.data.token)
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
+        // await axios(config)
+        //     .then(function (response) {
+        //         console.log(response.data.data.token);
+        //         localStorage.setItem('usrkey', response.data.data.token)
+        //         setToken(response.data.data.token)
+        //     })
+        //     .catch(function (error) {
+        //         console.log(error);
+        //     })
+        localStorage.setItem('usrkey', 'asd')
+        setToken('asd');
     }
 
     if(token !== null){
