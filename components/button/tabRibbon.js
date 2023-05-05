@@ -5,7 +5,7 @@ const TabRibbon = ({id, id_active, labels, clickRibbon}) => {
     return (
         <>
             <button className='d-flex align-items-center hover-dark px-3' style={(id !== id_active) ? styles.tabRibbon : styles.tabRibbonActive} onClick={()=>clickRibbon(id)}>
-            	<span className='small p-1'>{labels}</span>
+            	<span className='small p-1 text-dark'>{labels}</span>
             </button>
         </>
     )
