@@ -215,8 +215,8 @@ const DataMenu = [
     refid: "",
     headid: "3",
     type: "1",
-    caption: "Session Type",
-    target: "/code/session-type",
+    caption: "Season Type",
+    target: "/code/season-type",
     icon: "dashboard",
   },
   {
