@@ -126,7 +126,7 @@ const DataMenu = [
     headid: "3",
     type: "1",
     caption: "Region",
-    target: "/code/region",
+    target: "/code/region-code",
     icon: "dashboard",
   },
   {
