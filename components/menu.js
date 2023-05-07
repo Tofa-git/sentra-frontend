@@ -41,6 +41,7 @@ const DataMenu = [
     headid: "0",
     type: "1",
     caption: "XML Link Control",
+    target: "/link-control",
     icon: "dataset_linked",
   },
   {
