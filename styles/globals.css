@@ -149,3 +149,7 @@ a {
 .bg-blue {
   background: #2c539e !important;
 }
+
+.fs-10 {
+  font-size: 10px !important;
+}
