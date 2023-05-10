@@ -45,7 +45,51 @@ const Index = (props) => {
               arrow_right
             </i>
             <span className="ms-2 text-black">Local Code</span>
-            <div className="ms-2">
+            <div className="d-flex flex-column bg-light p-2 border">
+              <div className="d-flex flex-row align-items-center">
+                <div className="flex-fill input-group">
+                  <select
+                    className="form-select rounded-0"
+                    name="is_used"
+                    value={"-"}
+                  >
+                    <option value="-" selected disabled>
+                      Choose Country
+                    </option>
+                    <option value="1" selected>
+                      Agoda
+                    </option>
+                    <option value="2" selected>
+                      Dida
+                    </option>
+                  </select>
+                </div>
+                <span className="flex-shrink-1 small text-nowrap text-dark pe-2 ps-2">
+                  City Code
+                </span>
+                <div className="flex-fill input-group">
+                  <input
+                    name="q"
+                    type="text"
+                    className="form-control bg-white rounded-0"
+                    placeholder="City Code"
+                  />
+                </div>
+                <button
+                  className="btn btn-sm btn-primary bg-blue rounded-0 align-items-center shadow-sm d-flex flex-row ms-2"
+                  onClick={() => setIsEdit(false)}
+                >
+                  <i
+                    className="material-icons fs-6"
+                    style={{ verticalAlign: "middle" }}
+                  >
+                    search
+                  </i>
+                  <span className="ms-2">Search</span>
+                </button>
+              </div>
+            </div>
+            <div className="mt-2">
               <table className="table table-bordered table-hover table-striped">
                 <thead>
                   <tr>
@@ -53,7 +97,7 @@ const Index = (props) => {
                       Code
                     </th>
                     <th className="bg-blue text-white" width="70%">
-                      Country
+                      City
                     </th>
                   </tr>
                 </thead>
@@ -104,43 +148,96 @@ const Index = (props) => {
                   </option>
                 </select>
               </div>
+              <span className="flex-shrink-1 small text-nowrap text-dark ms-2 me-2">
+                City
+              </span>
+              <div className="flex-fill input-group">
+                <input
+                  name="q"
+                  type="text"
+                  className="form-control bg-white rounded-0"
+                  placeholder="City Code / Name"
+                />
+              </div>
             </div>
-
             <div className="d-flex flex-row align-items-center pt-2 pb-2">
               <span className="flex-shrink-1 small text-nowrap text-dark pe-2">
-                Master Code
+                Master Country Code
               </span>
               <div className="flex-fill input-group">
                 <input
                   name="q"
                   type="text"
-                  className="form-control bg-white rounded-0"
-                  placeholder="Master Code"
+                  className="form-control bg-white rounded-0 w-25"
                 />
-              </div>
-              <span className="flex-shrink-1 small text-nowrap text-dark ms-2 pe-2">
-                Supplier Code
-              </span>
-              <div className="flex-fill input-group">
                 <input
                   name="q"
                   type="text"
-                  className="form-control bg-white rounded-0"
-                  placeholder="Supplier Master"
-                />
-              </div>
-              <span className="flex-shrink-1 small text-nowrap text-dark ms-2 pe-2">
-                Country
-              </span>
-              <div className="flex-fill input-group">
-                <input
-                  name="q"
-                  type="text"
-                  className="form-control bg-white rounded-0"
-                  placeholder="Country"
+                  className="form-control bg-white rounded-0 w-75"
                 />
               </div>
             </div>
+            <div className="d-flex flex-row align-items-center pt-2 pb-2">
+              <span className="flex-shrink-1 small text-nowrap text-dark pe-2">
+                Master City Code
+              </span>
+              <div className="flex-fill input-group">
+                <input
+                  name="q"
+                  type="text"
+                  className="form-control bg-white rounded-0 w-75"
+                />
+              </div>
+            </div>
+            <div className="d-flex flex-row align-items-center pt-2 pb-2">
+              <span className="flex-shrink-1 small text-nowrap text-dark pe-2">
+                Supplier Country Name
+              </span>
+              <div className="flex-fill input-group">
+                <input
+                  name="q"
+                  type="text"
+                  className="form-control bg-white rounded-0 w-25"
+                />
+                <input
+                  name="q"
+                  type="text"
+                  className="form-control bg-white rounded-0 w-75"
+                />
+              </div>
+
+              <span className="flex-shrink-1 small text-nowrap text-dark pe-2 ps-2">
+                Supplier Country Name
+              </span>
+              <div className="flex-fill input-group">
+                <input
+                  name="q"
+                  type="text"
+                  className="form-control bg-white rounded-0 w-25"
+                />
+                <input
+                  name="q"
+                  type="text"
+                  className="form-control bg-white rounded-0 w-75"
+                />
+              </div>
+            </div>
+            <div className="d-flex flex-row align-items-center pt-2 pb-2">
+              <span className="flex-shrink-1 small text-nowrap text-dark pe-2">
+                XML Flag
+              </span>
+              <div className="">
+                <select className="form-select rounded-0" name="is_used">
+                  <option value="1" selected>
+                    Yes
+                  </option>
+                  <option value="2" selected>
+                    No
+                  </option>
+                </select>
+              </div>
+            </div>
+
             <button
               className="btn btn-sm btn-primary bg-blue rounded-0 align-items-center shadow-sm"
               data-bs-toggle="modal"
@@ -161,15 +258,13 @@ const Index = (props) => {
             <table className="table table-bordered table-hover table-striped">
               <thead>
                 <tr>
-                  <th className="bg-blue text-white" width="25%">
-                    Master Code
-                  </th>
-                  <th className="bg-blue text-white" width="25%">
-                    Supplier Code
-                  </th>
-                  <th className="bg-blue text-white" width="50%">
-                    Country
-                  </th>
+                  <th className="bg-blue text-white">Country Code</th>
+                  <th className="bg-blue text-white">City Code</th>
+                  <th className="bg-blue text-white">Country Code</th>
+                  <th className="bg-blue text-white">City Code</th>
+                  <th className="bg-blue text-white">City</th>
+                  <th className="bg-blue text-white">XML Flag</th>
+                  <th className="bg-blue text-white">Hotel Qty</th>
                 </tr>
               </thead>
               <tbody>
@@ -179,6 +274,10 @@ const Index = (props) => {
                       <td>{data.code}</td>
                       <td>{data.city_name_en}</td>
                       <td>{data.city_name_en}</td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
                     </tr>
                   );
                 })}
@@ -203,7 +302,7 @@ const Index = (props) => {
       <StdForm
         id={1}
         icon="grid_on"
-        caption="Country Mapping"
+        caption="City Mapping"
         toolbar={toolbarForm}
         body={bodyForm}
         footer={footers}
