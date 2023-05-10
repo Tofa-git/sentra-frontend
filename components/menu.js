@@ -253,7 +253,7 @@ const DataMenu = [
     headid: "4",
     type: "1",
     caption: "City Mapping",
-    target: "/code/city-mapping",
+    target: "/mapping/city",
     icon: "dashboard",
   },
   {
@@ -262,7 +262,7 @@ const DataMenu = [
     headid: "4",
     type: "1",
     caption: "Hotel Mapping",
-    target: "/code/hotel-mapping",
+    target: "/mapping/hotel",
     icon: "dashboard",
   },
   {
