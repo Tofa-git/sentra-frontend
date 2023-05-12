@@ -11,9 +11,8 @@ const Layout = ({ children, selectId }) => {
         style={{ backgroundColor: "#dddddd" }}
       >
         <Headers />
-        {console.log({ selectId })}
         <Ribbons selected={selectId} />
-        <main className="flex-grow-1 overflow-hidden">{children}</main>
+        <main className="flex-grow-1">{children}</main>
         <Footers />
       </div>
     </>
