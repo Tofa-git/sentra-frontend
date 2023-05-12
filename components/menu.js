@@ -73,9 +73,9 @@ const DataMenu = [
     refid: "002",
     headid: "0",
     type: "1",
-    caption: "Data Hotel",
-    target: "/data-hotel",
-    icon: "apartment",
+    caption: "Screen Translate",
+    target: "/screen-translate",
+    icon: "monitor",
   },
   {
     id: "10",
