@@ -7,7 +7,7 @@ const Layout = ({ children, selectId }) => {
   return (
     <>
       <div
-        className="d-flex flex-column flex-fill vh-100"
+        className="d-flex flex-column flex-fill min-vh-100"
         style={{ backgroundColor: "#dddddd" }}
       >
         <Headers />
