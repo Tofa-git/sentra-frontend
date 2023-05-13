@@ -13,6 +13,7 @@ const Login = (props) => {
   const [password, setPassword] = useState("");
   const [validation, setValidation] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState({ error: false, message: null });
 
   const loginHandler = async (e) => {
     e.preventDefault();
@@ -33,13 +34,12 @@ const Login = (props) => {
     setIsLoading(true);
     await axios(config)
       .then(function (response) {
-        router.push("/dashboard");
-        console.log(response.data.data.token);
         localStorage.setItem("usrkey", response.data.data.token);
+        router.push("/dashboard");
         setIsLoading(false);
       })
       .catch(function (error) {
-        console.log(error);
+        setIsError({ error: true, message: error?.response?.data?.message });
         setIsLoading(false);
       });
 
@@ -111,6 +111,11 @@ const Login = (props) => {
                 </i>
               </div>
             </div>
+            {isError.error ? (
+              <div className="text-danger">{isError.message}</div>
+            ) : (
+              <div />
+            )}
             <div className="d-flex flex-column mt-5">
               <button
                 type="submit"
