@@ -1,5 +1,4 @@
-import React, { Component, useState } from "react";
-import "material-icons/iconfont/material-icons.css";
+import React from "react";
 import Input from "../../../components/input";
 import Select from "../../../components/select";
 

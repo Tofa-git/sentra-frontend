@@ -2,6 +2,7 @@ import React, { Component, useState } from "react";
 import Layout from "../../layouts/default";
 import "material-icons/iconfont/material-icons.css";
 import Book from "./book";
+import Search from "./search";
 
 const bookingButton = [
   {
@@ -28,6 +29,18 @@ const bookingButton = [
 
 const Index = (props) => {
   const [mode, setMode] = useState(0);
+
+  const renderContent = () => {
+    switch (mode) {
+      case 0:
+        return <Book />;
+      case 1:
+        return <Search />;
+      default:
+        break;
+    }
+  };
+
   return (
     <Layout selectId={"001"}>
       <div className="d-flex flex-row pt-2 mx-3">
@@ -44,7 +57,7 @@ const Index = (props) => {
           );
         })}
       </div>
-      {mode === 0 ? <Book /> : <></>}
+      {renderContent()}
     </Layout>
   );
 };

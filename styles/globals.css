@@ -170,3 +170,8 @@ a {
   background: #0b2447 !important;
   color: #fff;
 }
+
+.dropdown-toggle {
+  /* background-color: #0b2447 !important; */
+  color: #aaaaaa;
+}
