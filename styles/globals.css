@@ -153,3 +153,20 @@ a {
 .fs-10 {
   font-size: 10px !important;
 }
+
+.react-calendar__month-view {
+  color: #2c539e;
+}
+
+.react-calendar__navigation button {
+  color: #0b2447;
+}
+
+.react-calendar__month-view__days__day {
+  color: #0b2447;
+}
+
+.react-calendar__tile--now {
+  background: #0b2447 !important;
+  color: #fff;
+}

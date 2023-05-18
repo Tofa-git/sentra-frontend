@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import "bootstrap/dist/css/bootstrap.css";
 import "../styles/globals.css";
+import "react-calendar/dist/Calendar.css";
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter();
@@ -10,7 +11,7 @@ function MyApp({ Component, pageProps }) {
   const checkToken = async () => {
     const myToken = await localStorage.getItem("usrkey");
     setToken(myToken);
-    if (token !== 0 && token == null) {
+    if (token == 0 && myToken == null) {
       router.push("/authentication/login");
     }
   };
