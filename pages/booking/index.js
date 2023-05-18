@@ -3,6 +3,7 @@ import Layout from "../../layouts/default";
 import "material-icons/iconfont/material-icons.css";
 import Book from "./book";
 import Search from "./search";
+import Offline from "./offline";
 
 const bookingButton = [
   {
@@ -36,6 +37,8 @@ const Index = (props) => {
         return <Book />;
       case 1:
         return <Search />;
+      case 3:
+        return <Offline />;
       default:
         break;
     }
