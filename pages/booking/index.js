@@ -4,6 +4,7 @@ import "material-icons/iconfont/material-icons.css";
 import Book from "./book";
 import Search from "./search";
 import Offline from "./offline";
+import QNA from "./qna";
 
 const bookingButton = [
   {
@@ -39,6 +40,8 @@ const Index = (props) => {
         return <Search />;
       case 3:
         return <Offline />;
+      case 4:
+        return <QNA />;
       default:
         break;
     }
