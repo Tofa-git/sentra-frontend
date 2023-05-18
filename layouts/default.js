@@ -1,9 +1,26 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import Headers from "../components/layouts/header";
 import Ribbons from "../components/layouts/ribbon";
 import Footers from "../components/layouts/footer";
+import { AuthContext } from "../context/auth/reducer";
+import { useRouter } from "next/router";
+import { AUTH_SUCCESS } from "../context/constant";
 
 const Layout = ({ children, selectId }) => {
+  const { state, dispatch } = useContext(AuthContext);
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem("AUTH_TOKEN");
+    if (token) {
+      dispatch({ type: AUTH_SUCCESS });
+    }
+
+    if (!state.isAuthenticated && !token) {
+      router.push("/authentication/login");
+    }
+  }, []);
+
   return (
     <>
       <div

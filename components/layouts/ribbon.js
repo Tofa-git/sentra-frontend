@@ -1,12 +1,15 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useRouter } from "next/navigation";
 import Stylesheet from "reactjs-stylesheet";
 import TabRibbons from "../button/tabRibbon";
 import SubRibbon from "../subRibbon/subRibbon";
 import tabMenu from "../menu.js";
+import { AuthContext } from "../../context/auth/reducer";
+import { AUTH_LOGOUT } from "../../context/constant";
 
 const Ribbons = (props) => {
   const router = useRouter();
+  const { dispatch } = useContext(AuthContext);
   const [selectId, setSelectId] = useState(props.selected);
   const [buildMenu, setBuildMenu] = useState(
     tabMenu.filter((menus) => menus.refid.includes(selectId))
@@ -58,7 +61,8 @@ const Ribbons = (props) => {
         </div>
         <button
           onClick={() => {
-            localStorage.removeItem("usrkey");
+            localStorage.removeItem("AUTH_TOKEN");
+            dispatch({ type: AUTH_LOGOUT });
             router.push("/authentication/login");
           }}
           className="btn btn-sm btn-primary bg-blue rounded shadow-sm mt-1 mt-1"

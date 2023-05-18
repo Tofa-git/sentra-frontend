@@ -1,51 +1,28 @@
 import Layout from "../../layouts/login";
 import Image from "next/image";
 import "material-icons/iconfont/material-icons.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
 import Logo from "../../assets/images/logo.png";
+import { AuthContext } from "../../context/auth/reducer";
+import { login } from "../../context/auth/actions";
 
 const Login = (props) => {
-  console.log({ props });
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [validation, setValidation] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isError, setIsError] = useState({ error: false, message: null });
+  const { state, dispatch } = useContext(AuthContext);
 
   const loginHandler = async (e) => {
     e.preventDefault();
-    var config = {
-      method: "post",
-      // url: 'https://103.117.56.247/api/login',
-      url: "https://api-azone.link-webid.com/api/login",
-      data: {
-        email: email,
-        password: password,
-      },
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    };
-
-    setIsLoading(true);
-    await axios(config)
-      .then(function (response) {
-        localStorage.setItem("usrkey", response.data.data.token);
-        router.push("/dashboard");
-        setIsLoading(false);
-      })
-      .catch(function (error) {
-        setIsError({ error: true, message: error?.response?.data?.message });
-        setIsLoading(false);
-      });
-
-    // localStorage.setItem("usrkey", "asd");
-    // router.push("/dashboard");
+    await login(dispatch, email, password);
   };
+
+  if (state.isAuthenticated) {
+    router.push("/dashboard");
+  }
 
   return (
     <Layout>
@@ -111,8 +88,9 @@ const Login = (props) => {
                 </i>
               </div>
             </div>
-            {isError.error ? (
-              <div className="text-danger">{isError.message}</div>
+            {console.log({ erorr: state.errorMessage })}
+            {state.isError ? (
+              <div className="text-danger">{state.errorMessage}</div>
             ) : (
               <div />
             )}
@@ -122,7 +100,7 @@ const Login = (props) => {
                 className="justify-content-center btn btn-primary bg-gradient d-flex align-items-center"
               >
                 <span className="px-2">Next</span>
-                {isLoading ? (
+                {state.isLoading ? (
                   <div
                     class="spinner-border text-light"
                     style={{ height: "24px", width: "24px" }}

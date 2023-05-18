@@ -1,24 +1,29 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useContext } from "react";
 import Layout from "../layouts/default";
-import styles from '../styles/Home.module.css'
-import 'material-icons/iconfont/material-icons.css'
-import { useRouter } from 'next/router'
+import styles from "../styles/Home.module.css";
+import "material-icons/iconfont/material-icons.css";
+import { useRouter } from "next/router";
+import { AuthContext } from "../context/auth/reducer";
+import { AUTH_SUCCESS } from "../context/constant";
 
 const Home = (props) => {
-    const router = useRouter()
+  const { state, dispatch } = useContext(AuthContext);
+  const router = useRouter();
 
-    useEffect(() => {
-        if(props.keys !== null){
-            router.push('/dashboard')
-        }
-    }, []);
+  useEffect(() => {
+    const token = localStorage.getItem("AUTH_TOKEN");
+    if (token) {
+      dispatch({ type: AUTH_SUCCESS });
+    }
 
-    return (
-        <>
-            <h1>Loading...</h1>
-        </>
-    )
+    if (state.isAuthenticated || token) {
+      router.push("/dashboard");
+    } else {
+      router.push("/authentication/login");
+    }
+  }, []);
 
-}
+  return <div>Loading</div>;
+};
 
-export default Home
+export default Home;
