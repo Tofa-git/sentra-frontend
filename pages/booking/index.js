@@ -3,6 +3,7 @@ import Layout from "../../layouts/default";
 import "material-icons/iconfont/material-icons.css";
 import Book from "./book";
 import Search from "./search";
+import Detail from "./detail";
 import Offline from "./offline";
 import QNA from "./qna";
 
@@ -38,6 +39,8 @@ const Index = (props) => {
         return <Book />;
       case 1:
         return <Search />;
+      case 2:
+        return <Detail />;
       case 3:
         return <Offline />;
       case 4:
