@@ -5,6 +5,7 @@ import Footers from "../components/layouts/footer";
 import { AuthContext } from "../context/auth/reducer";
 import { useRouter } from "next/router";
 import { AUTH_SUCCESS } from "../context/constant";
+import "material-icons/iconfont/material-icons.css";
 
 const Layout = ({ children, selectId }) => {
   const { state, dispatch } = useContext(AuthContext);

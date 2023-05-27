@@ -41,6 +41,12 @@ const Ribbons = (props) => {
             clickRibbon={clickRibbon}
           />
           <TabRibbons
+            labels="Hotel Info"
+            id="006"
+            id_active={selectId}
+            clickRibbon={() => router.push("/data-hotel")}
+          />
+          <TabRibbons
             labels="Management"
             id="003"
             id_active={selectId}
