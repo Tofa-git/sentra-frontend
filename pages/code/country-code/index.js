@@ -1,49 +1,52 @@
-import { useState } from "react";
-import { useRouter } from "next/router";
+import { useContext, useEffect, useState } from "react";
 import Layout from "../../../layouts/default";
 import StdForm from "../../../components/forms/stdForm";
 import CreateForm from "./createForm";
-import ImgButton from "../../../components/button/imgButton";
-import "material-icons/iconfont/material-icons.css";
-
-const dummyData = [
-  {
-    id: 1,
-    code: "ID",
-    country_name_en: "Indonesia",
-    country_name_ch: "阿富汗",
-    currency: "USD",
-    currency_mgj: "IDR",
-    rank: 1,
-    is_used: 1,
-  },
-  {
-    id: 2,
-    code: "AF",
-    country_name_en: "Afghanistan",
-    country_name_ch: "阿富汗",
-    currency: "USD",
-    currency_mgj: "IDR",
-    rank: 1,
-    is_used: 0,
-  },
-  {
-    id: 3,
-    code: "AL",
-    country_name_en: "Albania",
-    country_name_ch: "阿尔巴尼亚",
-    currency: "USD",
-    currency_mgj: "IDR",
-    rank: 1,
-    is_used: 1,
-  },
-];
+import { CountryContext } from "../../../context/country/reducer";
+import { AuthContext } from "../../../context/auth/reducer";
+import { deleteCountry, getAllCountry } from "../../../context/country/actions";
+import { AUTH_401, AUTH_LOGOUT } from "../../../context/constant";
+import Swal from "sweetalert2";
+import { useRouter } from "next/router";
 
 const Index = (props) => {
   const router = useRouter();
-  const [selectedId, setSelectedId] = useState("002");
+  const selectedId = useState("002");
   const [selectedData, setSelectedData] = useState();
   const [isEdit, setIsEdit] = useState(false);
+  const { state, dispatch } = useContext(CountryContext);
+  const { dispatch: authDispatch } = useContext(AuthContext);
+
+  useEffect(() => {
+    handleGet();
+  }, []);
+
+  const handleGet = async (page = 1, limit = 12) => {
+    const country = await getAllCountry(dispatch, page, limit);
+    if (country.status === 401) {
+      authDispatch({ type: AUTH_401 });
+      authDispatch({ type: AUTH_LOGOUT });
+      Swal.fire("Token has been Expired", "Please Login Again", "warning");
+      router.push("/authentication/login");
+    }
+  };
+
+  const handleDelete = async (id) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await deleteCountry(id);
+        handleGet();
+      }
+    });
+  };
 
   const toolbarForm = (
     <div
@@ -74,20 +77,6 @@ const Index = (props) => {
                 search
               </i>
             </a>
-            <a
-              className="btn btn-outline-secondary rounded-0"
-              id="filter_button"
-              role="button"
-              title="Search options"
-              style={{ padding: "2px 5px" }}
-              data-bs-toggle="offcanvas"
-              href="#searchOptions"
-              aria-controls="searchOptions"
-            >
-              <i className="material-icons" style={{ verticalAlign: "middle" }}>
-                filter_alt
-              </i>
-            </a>
           </div>
         </div>
       </div>
@@ -115,25 +104,28 @@ const Index = (props) => {
           <thead>
             <tr>
               <th className="bg-blue text-white" width="5%">
-                Code
+                ISO ID
+              </th>
+              <th className="bg-blue text-white" width="10%">
+                ISO 3
               </th>
               <th className="bg-blue text-white" width="15%">
-                Country (EN)
+                Name
               </th>
               <th className="bg-blue text-white" width="15%">
-                Country (CH)
+                Basic Currency
               </th>
               <th className="bg-blue text-white" width="15%">
-                Currency
-              </th>
-              <th className="bg-blue text-white" width="15%">
-                MGJ Currency
+                Desc Currency
               </th>
               <th className="bg-blue text-white" width="5%">
-                Rank
+                Dial
               </th>
               <th className="bg-blue text-white" width="5%">
-                Is Used
+                Sequence
+              </th>
+              <th className="bg-blue text-white" width="5%">
+                Status
               </th>
               <th className="bg-blue text-white" width="5%">
                 Action
@@ -141,28 +133,36 @@ const Index = (props) => {
             </tr>
           </thead>
           <tbody>
-            {dummyData.map((data) => {
+            {state?.data?.map((data) => {
               return (
-                <tr>
-                  <td>{data.code}</td>
-                  <td>{data.country_name_en}</td>
-                  <td>{data.country_name_ch}</td>
-                  <td>{data.currency}</td>
-                  <td>{data.currency_mgj}</td>
-                  <td>{data.rank}</td>
-                  <td>{data.is_used ? "Yes" : "No"}</td>
-                  <td>
+                <tr key={data.id}>
+                  <td>{data?.isoId}</td>
+                  <td>{data?.iso3 || "-"}</td>
+                  <td>{data?.name}</td>
+                  <td>{data?.basicCurrency}</td>
+                  <td>{data?.descCurrency}</td>
+                  <td>{data?.dial || "-"}</td>
+                  <td>{data?.sequence}</td>
+                  <td>{data?.status === "1" ? "Yes" : "No"}</td>
+                  <td className="d-flex flex-row">
                     <button
                       type="button"
-                      class="btn btn-primary bg-blue"
-                      data-bs-toggle="modal"
-                      data-bs-target="#createHotel"
+                      className="btn btn-primary bg-blue"
                       onClick={() => {
                         setIsEdit(true);
                         setSelectedData(data);
                       }}
                     >
                       Edit
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-danger ms-2"
+                      onClick={() => {
+                        handleDelete(data.id);
+                      }}
+                    >
+                      Delete
                     </button>
                   </td>
                 </tr>
@@ -175,10 +175,32 @@ const Index = (props) => {
   );
 
   const footers = (
-    <div>
-      <span className="p-1 px-2 small text-primary">
-        Row 0 to 0 of 0 Eow(s)
-      </span>
+    <div className="row justify-content-center">
+      <div className="col-3 d-flex align-items-center">
+        <span className="p-1 px-2 small text-primary">
+          Row 0 to 0 of 0 Eow(s)
+        </span>
+      </div>
+      <div className="col-3 d-flex justify-content-end">
+        <button
+          type="button"
+          className="btn btn-primary bg-blue w-100"
+          disabled={state?.pagination?.page == 1}
+          onClick={() => handleGet(state?.pagination?.page - 1)}
+        >
+          &lt;&lt; Previous
+        </button>
+      </div>
+      <div className="col-3">
+        <button
+          type="button"
+          className="btn btn-primary bg-blue ms-2 w-100"
+          onClick={() => handleGet(state?.pagination?.page + 1)}
+        >
+          Next &gt;&gt;
+        </button>
+      </div>
+      <div className="col-3" />
     </div>
   );
 
@@ -197,8 +219,9 @@ const Index = (props) => {
         size="modal-md"
         isEdit={isEdit}
         selectedData={selectedData}
+        handleGet={() => handleGet()}
       />
-      <div
+      {/* <div
         className="offcanvas offcanvas-end"
         tabIndex="-1"
         id="searchOptions"
@@ -221,7 +244,7 @@ const Index = (props) => {
             Lakukan Pencarian
           </button>
         </div>
-      </div>
+      </div> */}
     </Layout>
   );
 };

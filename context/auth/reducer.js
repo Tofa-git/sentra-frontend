@@ -5,6 +5,7 @@ import {
   AUTH_PROCESS,
   AUTH_SUCCESS,
   AUTH_LOGOUT,
+  AUTH_401,
 } from "../constant";
 
 const AuthContext = createContext();
@@ -14,6 +15,7 @@ const initialState = {
   isLoading: false,
   isError: false,
   errorMessage: null,
+  status: 200,
 };
 
 function reducer(state, action) {
@@ -30,6 +32,7 @@ function reducer(state, action) {
         isAuthenticated: true,
         isError: false,
         errorMessage: null,
+        status: 200,
       };
     case AUTH_FAILED:
       return {
@@ -40,13 +43,17 @@ function reducer(state, action) {
         errorMessage: action.payload,
       };
     case AUTH_LOGOUT:
+      localStorage.removeItem("AUTH_TOKEN");
       return {
         ...state,
         isLoading: false,
         isAuthenticated: false,
         isError: false,
         errorMessage: null,
+        status: 200,
       };
+    case AUTH_401:
+      return { ...state, status: 401 };
     default:
       return state;
   }

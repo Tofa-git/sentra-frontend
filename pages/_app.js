@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.css";
 import "../styles/globals.css";
 import "react-calendar/dist/Calendar.css";
-import { AuthContextProvider } from "../context/auth/reducer";
+import CombinedContextProvider from "../context/";
 
 function MyApp({ Component, pageProps }) {
   useEffect(() => {
@@ -10,9 +10,9 @@ function MyApp({ Component, pageProps }) {
   }, []);
 
   return (
-    <AuthContextProvider>
+    <CombinedContextProvider>
       <Component {...pageProps} />
-    </AuthContextProvider>
+    </CombinedContextProvider>
   );
 }
 

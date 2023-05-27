@@ -1,23 +1,72 @@
-import "material-icons/iconfont/material-icons.css";
+import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
+import { createCountry, updateCountry } from "../../../context/country/actions";
 
-const CreateForm = (options) => {
-  console.log({ options });
-  const { isEdit, selectedData } = options;
+const initForm = {
+  isoId: 0,
+  iso3: "",
+  sequence: 0,
+  name: "",
+  dial: "",
+  basicCurrency: "IDR",
+  descCurrency: "Rupiah",
+  status: 1,
+};
+
+const CreateForm = (props) => {
+  const { isEdit, selectedData } = props;
+  const [form, setForm] = useState(initForm);
+
+  useEffect(() => {
+    setForm(isEdit ? selectedData : initForm);
+  }, [selectedData, isEdit]);
+
+  const handleInputChange = (name, value) => {
+    setForm({ ...form, [name]: value });
+  };
+
+  const handleSubmit = async () => {
+    const requiredField = [
+      "isoId",
+      "iso3",
+      "name",
+      "basicCurrency",
+      "descCurrency",
+    ];
+    console.log(form);
+    const hasError = requiredField.filter(
+      (i) => form[i] === 0 || form[i]?.length === 0
+    );
+    if (hasError.length > 0) {
+      return Swal.fire(
+        "Validate",
+        `Field ${hasError.join(", ").toLocaleUpperCase()} can't empty or 0`,
+        "warning"
+      );
+    }
+
+    if (isEdit) {
+      await updateCountry(selectedData.id, form);
+    } else {
+      await createCountry(form);
+    }
+
+    await props.handleGet();
+    document.getElementById("cancelModal").click();
+  };
+
   return (
     <div
       className="modal fade"
-      id={options.id}
+      id={props.id}
       tabIndex="-1"
       aria-labelledby="exampleModalLabel"
       aria-hidden="true"
     >
-      <div className={options.size + " modal-dialog"}>
+      <div className={props.size + " modal-dialog"}>
         <div className="modal-content rounded-2 shadow">
           <div className="modal-header">
-            <h1
-              className="modal-title fs-5 text-black"
-              id={options.id + "Label"}
-            >
+            <h1 className="modal-title fs-5 text-black" id={props.id + "Label"}>
               {isEdit ? "Edit" : "Add"} Country
             </h1>
             <button
@@ -29,105 +78,132 @@ const CreateForm = (options) => {
           </div>
           <div className="modal-body p-3">
             <div className="row mt-2">
-              <div className="col-sm-4 text-black">Code</div>
+              <div className="col-sm-4 text-black">ISO ID</div>
               <div className="col-sm-4">
                 <input
                   className="form-control rounded-0"
-                  name="code"
-                  defaultValue={isEdit ? selectedData.code : null}
+                  required
+                  type="number"
+                  value={form.isoId}
+                  onChange={(val) =>
+                    handleInputChange("isoId", val.target.value)
+                  }
                 />
               </div>
             </div>
             <div className="row mt-2">
-              <div className="col-sm-4 text-black">Country (EN)</div>
+              <div className="col-sm-4 text-black">ISO 3</div>
               <div className="col-sm-8">
                 <input
                   type="text"
                   className="form-control rounded-0"
-                  name="country_name_en"
-                  defaultValue={isEdit ? selectedData.country_name_en : null}
+                  name="iso3"
+                  required
+                  value={form.iso3}
+                  onChange={(val) =>
+                    handleInputChange("iso3", val.target.value)
+                  }
                 />
               </div>
             </div>
             <div className="row mt-2">
-              <div className="col-sm-4 text-black">Country (CH)</div>
+              <div className="col-sm-4 text-black">Name</div>
               <div className="col-sm-8">
                 <input
                   type="text"
                   className="form-control rounded-0"
-                  name="country_name_ch"
-                  defaultValue={isEdit ? selectedData.country_name_ch : null}
+                  name="name"
+                  required
+                  value={form.name}
+                  onChange={(val) =>
+                    handleInputChange("name", val.target.value)
+                  }
                 />
               </div>
             </div>
             <div className="row mt-2">
-              <div className="col-sm-4 text-black">Currency</div>
+              <div className="col-sm-4 text-black">Basic Currency</div>
               <div className="col-sm-5">
                 <select
                   className="form-select rounded-0"
                   name="currency"
-                  defaultValue={isEdit ? selectedData.currency : null}
+                  value={form.basicCurrency}
+                  onChange={(val) =>
+                    handleInputChange("basicCurrency", val.target.value)
+                  }
+                  defaultValue="0"
                 >
-                  <option value="0" selected disabled>
+                  <option value="0" disabled>
                     Choose Currency
                   </option>
-                  <option value="USD" selected>
-                    USD
-                  </option>
-                  <option value="IDR" selected>
-                    IDR
-                  </option>
+                  <option value="USD">USD</option>
+                  <option value="IDR">IDR</option>
                 </select>
               </div>
             </div>
             <div className="row mt-2">
-              <div className="col-sm-4 text-black">MGJ Currency</div>
+              <div className="col-sm-4 text-black">Desc Currency</div>
               <div className="col-sm-5">
                 <select
                   className="form-select rounded-0"
-                  name="currency_mgj"
-                  value={isEdit ? selectedData.currency_mgj : null}
+                  name="descCurrency"
+                  value={form.descCurrency}
+                  onChange={(val) =>
+                    handleInputChange("descCurrency", val.target.value)
+                  }
                 >
-                  <option value="0" selected disabled>
+                  <option value="0" disabled>
                     Choose Currency
                   </option>
-                  <option value="USD" selected>
-                    USD
-                  </option>
-                  <option value="IDR" selected>
-                    IDR
-                  </option>
+                  <option value="Rupiah">Rupiah</option>
+                  <option value="Dollar">Dollar</option>
                 </select>
               </div>
             </div>
             <div className="row mt-2">
-              <div className="col-sm-4 text-black">Rank</div>
+              <div className="col-sm-4 text-black">Dial</div>
               <div className="col-sm-4">
                 <input
-                  type="number"
+                  type="text"
                   className="form-control rounded-0"
-                  name="rank"
-                  defaultValue={isEdit ? selectedData.rank : null}
+                  name="dial"
+                  value={form.dial}
+                  onChange={(val) =>
+                    handleInputChange("dial", val.target.value)
+                  }
                 />
               </div>
             </div>
             <div className="row mt-2">
-              <div className="col-sm-4 text-black">Is Used</div>
+              <div className="col-sm-4 text-black">Sequence</div>
+              <div className="col-sm-4">
+                <input
+                  type="number"
+                  className="form-control rounded-0"
+                  name="sequence"
+                  value={form.sequence}
+                  onChange={(val) =>
+                    handleInputChange("sequence", val.target.value)
+                  }
+                />
+              </div>
+            </div>
+            <div className="row mt-2">
+              <div className="col-sm-4 text-black">Status</div>
               <div className="col-sm-4">
                 <select
                   className="form-select rounded-0"
-                  name="is_used"
-                  value={isEdit ? selectedData.is_used : null}
+                  name="status"
+                  value={form.status}
+                  onChange={(val) =>
+                    handleInputChange("status", val.target.value)
+                  }
                 >
-                  <option value="-" selected disabled>
+                  <option value="-" disabled>
                     Choose Status
                   </option>
-                  <option value="1" selected>
-                    Yes
-                  </option>
-                  <option value="0" selected>
-                    No
-                  </option>
+                  <option value="1">Yes</option>
+                  <option value="0">No</option>
                 </select>
               </div>
             </div>
@@ -137,10 +213,17 @@ const CreateForm = (options) => {
               type="button"
               className="btn btn-danger rounded-0"
               data-bs-dismiss="modal"
+              id="cancelModal"
             >
               Cancel
             </button>
-            <button type="button" className="btn btn-primary rounded-0">
+            <button
+              onClick={() => {
+                handleSubmit();
+              }}
+              type="button"
+              className="btn btn-primary rounded-0"
+            >
               {isEdit ? "Edit" : "Add"}
             </button>
           </div>

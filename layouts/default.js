@@ -6,12 +6,13 @@ import { AuthContext } from "../context/auth/reducer";
 import { useRouter } from "next/router";
 import { AUTH_SUCCESS } from "../context/constant";
 import "material-icons/iconfont/material-icons.css";
+import Swal from "sweetalert2";
 
 const Layout = ({ children, selectId }) => {
   const { state, dispatch } = useContext(AuthContext);
   const router = useRouter();
 
-  useEffect(() => {
+  const recheckToken = () => {
     const token = localStorage.getItem("AUTH_TOKEN");
     if (token) {
       dispatch({ type: AUTH_SUCCESS });
@@ -20,6 +21,10 @@ const Layout = ({ children, selectId }) => {
     if (!state.isAuthenticated && !token) {
       router.push("/authentication/login");
     }
+  };
+
+  useEffect(() => {
+    recheckToken();
   }, []);
 
   return (

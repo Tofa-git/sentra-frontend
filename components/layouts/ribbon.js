@@ -67,7 +67,6 @@ const Ribbons = (props) => {
         </div>
         <button
           onClick={() => {
-            localStorage.removeItem("AUTH_TOKEN");
             dispatch({ type: AUTH_LOGOUT });
             router.push("/authentication/login");
           }}
