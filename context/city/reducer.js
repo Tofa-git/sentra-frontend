@@ -1,8 +1,8 @@
 import { createContext, useReducer } from "react";
 
-import { COUNTRY_FAILED, COUNTRY_PROCESS, COUNTRY_SUCCESS } from "../constant";
+import { CITY_FAILED, CITY_PROCESS, CITY_SUCCESS } from "../constant";
 
-const CountryContext = createContext();
+const CityContext = createContext();
 
 const initialState = {
   isLoading: false,
@@ -21,12 +21,12 @@ const initialState = {
 
 function reducer(state, action) {
   switch (action.type) {
-    case COUNTRY_PROCESS:
+    case CITY_PROCESS:
       return {
         ...state,
         isLoading: true,
       };
-    case COUNTRY_SUCCESS:
+    case CITY_SUCCESS:
       const changedState = {
         isLoading: false,
         isError: false,
@@ -45,7 +45,7 @@ function reducer(state, action) {
           data: action.payload.data,
         };
       }
-    case COUNTRY_FAILED:
+    case CITY_FAILED:
       return {
         ...state,
         isLoading: false,
@@ -57,14 +57,14 @@ function reducer(state, action) {
   }
 }
 
-function CountryContextProvider({ children }) {
+function CityContextProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   return (
-    <CountryContext.Provider value={{ state, dispatch }}>
+    <CityContext.Provider value={{ state, dispatch }}>
       {children}
-    </CountryContext.Provider>
+    </CityContext.Provider>
   );
 }
 
-export { CountryContext, CountryContextProvider };
+export { CityContext, CityContextProvider };

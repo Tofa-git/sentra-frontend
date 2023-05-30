@@ -1,23 +1,69 @@
-import "material-icons/iconfont/material-icons.css";
+import { useContext, useEffect, useState } from "react";
+import Swal from "sweetalert2";
+import { createCity, updateCity } from "../../../context/city/actions";
+import { CountryContext } from "../../../context/country/reducer";
 
-const CreateForm = (options) => {
-  const { isEdit, selectedData } = options;
+const initForm = {
+  countryId: 0,
+  sequence: 1,
+  code: "",
+  longName: "",
+  shortName: "",
+  latitude: "",
+  longitude: "",
+  status: "1",
+};
+
+const CreateForm = (props) => {
+  const { isEdit, selectedData } = props;
+  const { state: countryState } = useContext(CountryContext);
+  const [form, setForm] = useState(initForm);
+
+  useEffect(() => {
+    setForm(isEdit ? selectedData : initForm);
+  }, [selectedData, isEdit]);
+
+  const handleInputChange = (name, value) => {
+    setForm({ ...form, [name]: value });
+  };
+
+  const handleSubmit = async () => {
+    const requiredField = ["countryId", "code", "longName", "shortName"];
+    console.log(form);
+    const hasError = requiredField.filter(
+      (i) => form[i] === 0 || form[i]?.length === 0
+    );
+    if (hasError.length > 0) {
+      return Swal.fire(
+        "Validate",
+        `Field ${hasError.join(", ").toLocaleUpperCase()} can't empty or 0`,
+        "warning"
+      );
+    }
+
+    if (isEdit) {
+      await updateCity(form.id, form);
+    } else {
+      await createCity(form);
+    }
+
+    await props.handleGet();
+    document.getElementById("cancelModal").click();
+  };
+
   return (
     <div
       className="modal fade"
-      id={options.id}
+      id={props.id}
       tabIndex="-1"
       aria-labelledby="exampleModalLabel"
       aria-hidden="true"
     >
-      <div className={options.size + " modal-dialog"}>
+      <div className={props.size + " modal-dialog"}>
         <div className="modal-content rounded-2 shadow">
           <div className="modal-header">
-            <h1
-              className="modal-title fs-5 text-black"
-              id={options.id + "Label"}
-            >
-              {isEdit ? "Edit" : "Add"} City
+            <h1 className="modal-title fs-5 text-black" id={props.id + "Label"}>
+              {isEdit ? "Edit" : "City"}
             </h1>
             <button
               type="button"
@@ -32,18 +78,18 @@ const CreateForm = (options) => {
               <div className="col-sm-5">
                 <select
                   className="form-select rounded-0"
-                  name="country"
-                  value={isEdit ? selectedData.country : 0}
+                  name="countryId"
+                  value={form.countryId}
+                  onChange={(val) =>
+                    handleInputChange("countryId", val.target.value)
+                  }
                 >
-                  <option value="0" selected disabled>
+                  <option value="0" disabled>
                     Choose Country
                   </option>
-                  <option value="USD" selected>
-                    Indonesia
-                  </option>
-                  <option value="IDR" selected>
-                    Singapore
-                  </option>
+                  {countryState?.dropdownData?.map((country) => {
+                    return <option value={country.id}>{country.name}</option>;
+                  })}
                 </select>
               </div>
             </div>
@@ -53,29 +99,38 @@ const CreateForm = (options) => {
                 <input
                   className="form-control rounded-0"
                   name="code"
-                  defaultValue={isEdit ? selectedData.code : null}
+                  value={form.code}
+                  onChange={(val) =>
+                    handleInputChange("code", val.target.value)
+                  }
                 />
               </div>
             </div>
             <div className="row mt-2">
-              <div className="col-sm-4 text-black">City (EN)</div>
+              <div className="col-sm-4 text-black">Long Name</div>
               <div className="col-sm-8">
                 <input
                   type="text"
                   className="form-control rounded-0"
-                  name="city_name_en"
-                  defaultValue={isEdit ? selectedData.city_name_en : null}
+                  name="longName"
+                  value={form.longName}
+                  onChange={(val) =>
+                    handleInputChange("longName", val.target.value)
+                  }
                 />
               </div>
             </div>
             <div className="row mt-2">
-              <div className="col-sm-4 text-black">City (CH)</div>
+              <div className="col-sm-4 text-black">Short Name</div>
               <div className="col-sm-8">
                 <input
                   type="text"
                   className="form-control rounded-0"
-                  name="city_name_ch"
-                  defaultValue={isEdit ? selectedData.city_name_ch : null}
+                  name="shortName"
+                  value={form.shortName}
+                  onChange={(val) =>
+                    handleInputChange("shortName", val.target.value)
+                  }
                 />
               </div>
             </div>
@@ -86,6 +141,9 @@ const CreateForm = (options) => {
                   type="text"
                   className="form-control rounded-0"
                   name="latitude"
+                  onChange={(val) =>
+                    handleInputChange("latitude", val.target.value)
+                  }
                 />
               </div>
             </div>
@@ -96,27 +154,23 @@ const CreateForm = (options) => {
                   type="text"
                   className="form-control rounded-0"
                   name="longitude"
+                  onChange={(val) =>
+                    handleInputChange("longitude", val.target.value)
+                  }
                 />
               </div>
             </div>
             <div className="row mt-2">
-              <div className="col-sm-4 text-black">Rank</div>
+              <div className="col-sm-4 text-black">Sequence</div>
               <div className="col-sm-4">
                 <input
                   type="number"
                   className="form-control rounded-0"
-                  name="rank"
-                  defaultValue={isEdit ? selectedData.rank : null}
-                />
-              </div>
-            </div>
-            <div className="row mt-2">
-              <div className="col-sm-4 text-black">Search Keyword</div>
-              <div className="col-sm-8">
-                <textarea
-                  defaultValue={isEdit ? selectedData.search_keyword : null}
-                  class="form-control"
-                  id="floatingTextarea"
+                  name="sequence"
+                  value={form.sequence}
+                  onChange={(val) =>
+                    handleInputChange("code", val.target.value)
+                  }
                 />
               </div>
             </div>
@@ -126,17 +180,13 @@ const CreateForm = (options) => {
                 <select
                   className="form-select rounded-0"
                   name="is_used"
-                  value={isEdit ? selectedData.is_used : null}
+                  value={form.status}
                 >
-                  <option value="-" selected disabled>
+                  <option value="-" disabled>
                     Choose Status
                   </option>
-                  <option value="1" selected>
-                    Yes
-                  </option>
-                  <option value="0" selected>
-                    No
-                  </option>
+                  <option value="1">Yes</option>
+                  <option value="0">No</option>
                 </select>
               </div>
             </div>
@@ -146,10 +196,17 @@ const CreateForm = (options) => {
               type="button"
               className="btn btn-danger rounded-0"
               data-bs-dismiss="modal"
+              id="cancelModal"
             >
               Cancel
             </button>
-            <button type="button" className="btn btn-primary rounded-0">
+            <button
+              onClick={() => {
+                handleSubmit();
+              }}
+              type="button"
+              className="btn btn-primary rounded-0"
+            >
               {isEdit ? "Edit" : "Add"}
             </button>
           </div>

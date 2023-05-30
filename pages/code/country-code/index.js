@@ -66,7 +66,7 @@ const Index = (props) => {
           onChange={(val) => setKeyword(val.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
-              handleGet(1, 12, keyword);
+              handleGet(1, 12);
             }
           }}
         />
@@ -78,7 +78,7 @@ const Index = (props) => {
               role="button"
               title="Go Search"
               style={{ padding: "2px 5px" }}
-              onClick={() => handleGet(1, 12, keyword)}
+              onClick={() => handleGet(1, 12)}
             >
               <i className="material-icons" style={{ verticalAlign: "middle" }}>
                 search
@@ -214,7 +214,7 @@ const Index = (props) => {
               </li>
             );
           })}
-          <li class="page-item">
+          <li class={`page-item ${!state?.data?.hasNext && "disabled"}`}>
             <a
               class="page-link"
               onClick={() => handleGet(state?.data?.page + 1)}
