@@ -8,11 +8,15 @@ const initialState = {
   isLoading: false,
   isError: false,
   errorMessage: null,
-  data: [],
-  pagination: {
+  data: {
+    rows: [],
+    limit: 2,
     page: 1,
-    limit: 12,
+    totalPage: 0,
+    hasNext: false,
+    hasPreviouse: false,
   },
+  dropdownData: [],
 };
 
 function reducer(state, action) {
@@ -23,15 +27,25 @@ function reducer(state, action) {
         isLoading: true,
       };
     case COUNTRY_SUCCESS:
-      return {
-        ...state,
+      const changedState = {
         isLoading: false,
         isCountryenticated: true,
         isError: false,
         errorMessage: null,
-        data: action.payload.data,
-        pagination: action.payload.pagination,
       };
+      if (action.payload.isDropDown) {
+        return {
+          ...state,
+          ...changedState,
+          dropdownData: action.payload.data,
+        };
+      } else {
+        return {
+          ...state,
+          ...changedState,
+          data: action.payload.data,
+        };
+      }
     case COUNTRY_FAILED:
       return {
         ...state,

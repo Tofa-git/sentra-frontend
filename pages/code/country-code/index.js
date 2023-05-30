@@ -22,7 +22,7 @@ const Index = (props) => {
   }, []);
 
   const handleGet = async (page = 1, limit = 12) => {
-    const country = await getAllCountry(dispatch, page, limit);
+    const country = await getAllCountry(dispatch, false, page, limit);
     if (country.status === 401) {
       authDispatch({ type: AUTH_401 });
       authDispatch({ type: AUTH_LOGOUT });
@@ -95,98 +95,140 @@ const Index = (props) => {
   );
 
   const bodyForm = (
-    <div
-      className="table-wrapper rounded-0 d-flex h-100"
-      style={{ border: "1px solid #dddddd", backgroundColor: "#fff" }}
-    >
-      <div className="w-100">
-        <table className="table table-bordered table-hover table-striped">
-          <thead>
-            <tr>
-              <th className="bg-blue text-white" width="5%">
-                ISO ID
-              </th>
-              <th className="bg-blue text-white" width="10%">
-                ISO 3
-              </th>
-              <th className="bg-blue text-white" width="15%">
-                Name
-              </th>
-              <th className="bg-blue text-white" width="15%">
-                Basic Currency
-              </th>
-              <th className="bg-blue text-white" width="15%">
-                Desc Currency
-              </th>
-              <th className="bg-blue text-white" width="5%">
-                Dial
-              </th>
-              <th className="bg-blue text-white" width="5%">
-                Sequence
-              </th>
-              <th className="bg-blue text-white" width="5%">
-                Status
-              </th>
-              <th className="bg-blue text-white" width="5%">
-                Action
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {state?.data?.map((data) => {
-              return (
-                <tr key={data.id}>
-                  <td>{data?.isoId}</td>
-                  <td>{data?.iso3 || "-"}</td>
-                  <td>{data?.name}</td>
-                  <td>{data?.basicCurrency}</td>
-                  <td>{data?.descCurrency}</td>
-                  <td>{data?.dial || "-"}</td>
-                  <td>{data?.sequence}</td>
-                  <td>{data?.status === "1" ? "Yes" : "No"}</td>
-                  <td className="d-flex flex-row">
-                    <button
-                      type="button"
-                      className="btn btn-primary bg-blue"
-                      onClick={() => {
-                        setIsEdit(true);
-                        setSelectedData(data);
-                      }}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-danger ms-2"
-                      onClick={() => {
-                        handleDelete(data.id);
-                      }}
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+    <>
+      <div
+        className="table-wrapper rounded-0 d-flex h-100"
+        style={{ border: "1px solid #dddddd", backgroundColor: "#fff" }}
+      >
+        <div className="w-100">
+          <table className="table table-bordered table-hover table-striped">
+            <thead>
+              <tr>
+                <th className="bg-blue text-white" width="5%">
+                  ISO ID
+                </th>
+                <th className="bg-blue text-white" width="10%">
+                  ISO 3
+                </th>
+                <th className="bg-blue text-white" width="15%">
+                  Name
+                </th>
+                <th className="bg-blue text-white" width="15%">
+                  Basic Currency
+                </th>
+                <th className="bg-blue text-white" width="15%">
+                  Desc Currency
+                </th>
+                <th className="bg-blue text-white" width="5%">
+                  Dial
+                </th>
+                <th className="bg-blue text-white" width="5%">
+                  Sequence
+                </th>
+                <th className="bg-blue text-white" width="5%">
+                  Status
+                </th>
+                <th className="bg-blue text-white" width="5%">
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {state?.data?.rows?.map((data) => {
+                return (
+                  <tr key={data.id}>
+                    <td>{data?.isoId}</td>
+                    <td>{data?.iso3 || "-"}</td>
+                    <td>{data?.name}</td>
+                    <td>{data?.basicCurrency}</td>
+                    <td>{data?.descCurrency}</td>
+                    <td>{data?.dial || "-"}</td>
+                    <td>{data?.sequence}</td>
+                    <td>{data?.status === "1" ? "Yes" : "No"}</td>
+                    <td className="d-flex flex-row">
+                      <button
+                        type="button"
+                        className="btn btn-primary bg-blue"
+                        data-bs-toggle="modal"
+                        data-bs-target="#createHotel"
+                        onClick={() => {
+                          setIsEdit(true);
+                          setSelectedData(data);
+                        }}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-danger ms-2"
+                        onClick={() => {
+                          handleDelete(data.id);
+                        }}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
+      <div className="col-3 d-flex align-items-center">
+        <span className="p-1 px-2 small text-primary">
+          Total Data: {state?.data?.count}
+        </span>
+      </div>
+    </>
   );
 
   const footers = (
-    <div className="row justify-content-center">
-      <div className="col-3 d-flex align-items-center">
+    <div className="d-flex justify-content-center">
+      <nav aria-label="Page navigation example">
+        <ul class="pagination">
+          <li class={`page-item ${1 === state?.data?.page && "disabled"}`}>
+            <a
+              class="page-link"
+              onClick={() => handleGet(state?.data?.page - 1)}
+            >
+              Previous
+            </a>
+          </li>
+          {new Array(Number(state?.data?.totalPage)).fill().map((i, key) => {
+            const current = key + 1;
+            return (
+              <li
+                class={`page-item ${current === state?.data?.page && "active"}`}
+              >
+                <a class="page-link" onClick={() => handleGet(current)}>
+                  {current}
+                </a>
+              </li>
+            );
+          })}
+          <li class="page-item">
+            <a
+              class="page-link"
+              onClick={() => handleGet(state?.data?.page + 1)}
+            >
+              Next
+            </a>
+          </li>
+        </ul>
+      </nav>
+      {/* <div className="col-3 d-flex align-items-center">
         <span className="p-1 px-2 small text-primary">
-          Row 0 to 0 of 0 Eow(s)
+          Total Data: {state?.data?.count}
         </span>
-      </div>
-      <div className="col-3 d-flex justify-content-end">
+      </div> */}
+      {console.log(state.data)}
+      {/* <div className="col-3 d-flex justify-content-end">
         <button
           type="button"
           className="btn btn-primary bg-blue w-100"
-          disabled={state?.pagination?.page == 1}
-          onClick={() => handleGet(state?.pagination?.page - 1)}
+          disabled={state?.data?.page == 1}
+          onClick={() => handleGet(state?.data?.page - 1)}
         >
           &lt;&lt; Previous
         </button>
@@ -195,15 +237,17 @@ const Index = (props) => {
         <button
           type="button"
           className="btn btn-primary bg-blue ms-2 w-100"
-          onClick={() => handleGet(state?.pagination?.page + 1)}
+          onClick={() => handleGet(state?.data?.page + 1)}
+          disabled={!state?.data?.hasNext}
         >
           Next &gt;&gt;
         </button>
       </div>
-      <div className="col-3" />
+      <div className="col-3" /> */}
     </div>
   );
 
+  console.log({ selectedData });
   return (
     <Layout selectId={selectedId}>
       <StdForm

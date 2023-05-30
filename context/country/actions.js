@@ -1,6 +1,5 @@
 import Swal from "sweetalert2";
 import {
-  AUTH_LOGOUT,
   COUNTRY_FAILED,
   COUNTRY_PROCESS,
   COUNTRY_SUCCESS,
@@ -8,10 +7,25 @@ import {
 } from "../constant";
 import axios from "axios";
 
-export const getAllCountry = async (dispatch, page = 1, limit = 12) => {
+export const getAllCountry = async (
+  dispatch,
+  isDropDown = false,
+  page = 1,
+  limit = 12,
+  name
+) => {
   dispatch({ type: COUNTRY_PROCESS });
   try {
-    const url = `${baseUrl}/api/master/country-code?page=${page}&limit=${limit}`;
+    let url = `${baseUrl}/api/master/country-code?page=${page}&limit=${limit}`;
+
+    if (name) {
+      url += `&name=${name}`;
+    }
+
+    if (isDropDown) {
+      url = `${baseUrl}/api/master/country-code-dd`;
+    }
+
     const token = localStorage.getItem("AUTH_TOKEN");
     const config = {
       method: "GET",
@@ -25,7 +39,7 @@ export const getAllCountry = async (dispatch, page = 1, limit = 12) => {
 
     dispatch({
       type: COUNTRY_SUCCESS,
-      payload: { data: data?.data, pagination: { page, limit } },
+      payload: { data: data?.data, isDropDown },
     });
     return { data: data?.data, status: res.status };
   } catch (error) {

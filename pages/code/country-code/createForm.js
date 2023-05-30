@@ -3,7 +3,7 @@ import Swal from "sweetalert2";
 import { createCountry, updateCountry } from "../../../context/country/actions";
 
 const initForm = {
-  isoId: 0,
+  isoId: "",
   iso3: "",
   sequence: 0,
   name: "",
@@ -33,7 +33,6 @@ const CreateForm = (props) => {
       "basicCurrency",
       "descCurrency",
     ];
-    console.log(form);
     const hasError = requiredField.filter(
       (i) => form[i] === 0 || form[i]?.length === 0
     );
@@ -83,7 +82,6 @@ const CreateForm = (props) => {
                 <input
                   className="form-control rounded-0"
                   required
-                  type="number"
                   value={form.isoId}
                   onChange={(val) =>
                     handleInputChange("isoId", val.target.value)
