@@ -12,13 +12,13 @@ export const getAllCountry = async (
   isDropDown = false,
   page = 1,
   limit = 12,
-  name
+  name = ""
 ) => {
   dispatch({ type: COUNTRY_PROCESS });
   try {
     let url = `${baseUrl}/api/master/country-code?page=${page}&limit=${limit}`;
 
-    if (name) {
+    if (name.length > 0) {
       url += `&name=${name}`;
     }
 

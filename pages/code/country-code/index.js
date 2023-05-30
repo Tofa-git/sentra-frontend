@@ -14,6 +14,7 @@ const Index = (props) => {
   const selectedId = useState("002");
   const [selectedData, setSelectedData] = useState();
   const [isEdit, setIsEdit] = useState(false);
+  const [keyword, setKeyword] = useState("");
   const { state, dispatch } = useContext(CountryContext);
   const { dispatch: authDispatch } = useContext(AuthContext);
 
@@ -22,7 +23,7 @@ const Index = (props) => {
   }, []);
 
   const handleGet = async (page = 1, limit = 12) => {
-    const country = await getAllCountry(dispatch, false, page, limit);
+    const country = await getAllCountry(dispatch, false, page, limit, keyword);
     if (country.status === 401) {
       authDispatch({ type: AUTH_401 });
       authDispatch({ type: AUTH_LOGOUT });
@@ -62,6 +63,12 @@ const Index = (props) => {
           type="text"
           className="form-control bg-white rounded-0 p-0 px-1"
           placeholder="Country Name"
+          onChange={(val) => setKeyword(val.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleGet(1, 12, keyword);
+            }
+          }}
         />
         <div className="d-flex input-group-append">
           <div className="d-flex btn-group">
@@ -71,7 +78,7 @@ const Index = (props) => {
               role="button"
               title="Go Search"
               style={{ padding: "2px 5px" }}
-              href="#"
+              onClick={() => handleGet(1, 12, keyword)}
             >
               <i className="material-icons" style={{ verticalAlign: "middle" }}>
                 search
@@ -217,33 +224,6 @@ const Index = (props) => {
           </li>
         </ul>
       </nav>
-      {/* <div className="col-3 d-flex align-items-center">
-        <span className="p-1 px-2 small text-primary">
-          Total Data: {state?.data?.count}
-        </span>
-      </div> */}
-      {console.log(state.data)}
-      {/* <div className="col-3 d-flex justify-content-end">
-        <button
-          type="button"
-          className="btn btn-primary bg-blue w-100"
-          disabled={state?.data?.page == 1}
-          onClick={() => handleGet(state?.data?.page - 1)}
-        >
-          &lt;&lt; Previous
-        </button>
-      </div>
-      <div className="col-3">
-        <button
-          type="button"
-          className="btn btn-primary bg-blue ms-2 w-100"
-          onClick={() => handleGet(state?.data?.page + 1)}
-          disabled={!state?.data?.hasNext}
-        >
-          Next &gt;&gt;
-        </button>
-      </div>
-      <div className="col-3" /> */}
     </div>
   );
 
