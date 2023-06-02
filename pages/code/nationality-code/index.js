@@ -1,49 +1,62 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Layout from "../../../layouts/default";
 import StdForm from "../../../components/forms/stdForm";
 import CreateForm from "./createForm";
-import ImgButton from "../../../components/button/imgButton";
-import "material-icons/iconfont/material-icons.css";
-
-const dummyData = [
-  {
-    id: 1,
-    code: "ID",
-    nationality_name_en: "Indonesia",
-    nationality_name_ch: "阿富汗",
-    currency: "USD",
-    currency_mgj: "IDR",
-    rank: 1,
-    is_used: 1,
-  },
-  {
-    id: 2,
-    code: "AF",
-    nationality_name_en: "Afghanistan",
-    nationality_name_ch: "阿富汗",
-    currency: "USD",
-    currency_mgj: "IDR",
-    rank: 1,
-    is_used: 0,
-  },
-  {
-    id: 3,
-    code: "AL",
-    nationality_name_en: "Albania",
-    nationality_name_ch: "阿尔巴尼亚",
-    currency: "USD",
-    currency_mgj: "IDR",
-    rank: 1,
-    is_used: 1,
-  },
-];
+import { NationalityContext } from "../../../context/nationality/reducer";
+import { AuthContext } from "../../../context/auth/reducer";
+import {
+  deleteNationality,
+  getAllNationality,
+} from "../../../context/nationality/actions";
+import { AUTH_401, AUTH_LOGOUT } from "../../../context/constant";
+import Swal from "sweetalert2";
 
 const Index = (props) => {
   const router = useRouter();
-  const [selectedId, setSelectedId] = useState("002");
+  const selectedId = "002";
   const [selectedData, setSelectedData] = useState();
   const [isEdit, setIsEdit] = useState(false);
+  const [keyword, setKeyword] = useState("");
+  const { state, dispatch } = useContext(NationalityContext);
+  const { dispatch: authDispatch } = useContext(AuthContext);
+
+  useEffect(() => {
+    handleGet();
+  }, []);
+
+  const handleGet = async (page = 1, limit = 12) => {
+    const country = await getAllNationality(
+      dispatch,
+      false,
+      page,
+      limit,
+      keyword
+    );
+    if (country.status === 401) {
+      authDispatch({ type: AUTH_401 });
+      authDispatch({ type: AUTH_LOGOUT });
+      Swal.fire("Token has been Expired", "Please Login Again", "warning");
+      router.push("/authentication/login");
+    }
+  };
+
+  const handleDelete = async (id) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await deleteNationality(id);
+        handleGet();
+      }
+    });
+  };
 
   const toolbarForm = (
     <div
@@ -59,6 +72,12 @@ const Index = (props) => {
           type="text"
           className="form-control bg-white rounded-0 p-0 px-1"
           placeholder="Nationality Name"
+          onChange={(val) => setKeyword(val.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleGet(1, 12);
+            }
+          }}
         />
         <div className="d-flex input-group-append">
           <div className="d-flex btn-group">
@@ -68,24 +87,10 @@ const Index = (props) => {
               role="button"
               title="Go Search"
               style={{ padding: "2px 5px" }}
-              href="#"
+              onClick={() => handleGet(1, 12)}
             >
               <i className="material-icons" style={{ verticalAlign: "middle" }}>
                 search
-              </i>
-            </a>
-            <a
-              className="btn btn-outline-secondary rounded-0"
-              id="filter_button"
-              role="button"
-              title="Search options"
-              style={{ padding: "2px 5px" }}
-              data-bs-toggle="offcanvas"
-              href="#searchOptions"
-              aria-controls="searchOptions"
-            >
-              <i className="material-icons" style={{ verticalAlign: "middle" }}>
-                filter_alt
               </i>
             </a>
           </div>
@@ -118,10 +123,7 @@ const Index = (props) => {
                 Code
               </th>
               <th className="bg-blue text-white" width="30%">
-                Nationality (EN)
-              </th>
-              <th className="bg-blue text-white" width="30%">
-                Nationality (CH)
+                Name
               </th>
               <th className="bg-blue text-white" width="5%">
                 Rank
@@ -135,18 +137,17 @@ const Index = (props) => {
             </tr>
           </thead>
           <tbody>
-            {dummyData.map((data) => {
+            {state?.data?.rows?.map((data) => {
               return (
                 <tr>
                   <td>{data.code}</td>
-                  <td>{data.nationality_name_en}</td>
-                  <td>{data.nationality_name_ch}</td>
+                  <td>{data.name}</td>
                   <td>{data.rank}</td>
                   <td>{data.is_used ? "Yes" : "No"}</td>
-                  <td>
+                  <td className="d-flex flex-row">
                     <button
                       type="button"
-                      class="btn btn-primary bg-blue"
+                      className="btn btn-primary bg-blue"
                       data-bs-toggle="modal"
                       data-bs-target="#createHotel"
                       onClick={() => {
@@ -155,6 +156,15 @@ const Index = (props) => {
                       }}
                     >
                       Edit
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-danger ms-2"
+                      onClick={() => {
+                        handleDelete(data.id);
+                      }}
+                    >
+                      Delete
                     </button>
                   </td>
                 </tr>
@@ -167,10 +177,39 @@ const Index = (props) => {
   );
 
   const footers = (
-    <div>
-      <span className="p-1 px-2 small text-primary">
-        Row 0 to 0 of 0 Eow(s)
-      </span>
+    <div className="d-flex justify-content-center">
+      <nav aria-label="Page navigation example">
+        <ul class="pagination">
+          <li class={`page-item ${1 === state?.data?.page && "disabled"}`}>
+            <a
+              class="page-link"
+              onClick={() => handleGet(state?.data?.page - 1)}
+            >
+              Previous
+            </a>
+          </li>
+          {new Array(Number(state?.data?.totalPage)).fill().map((i, key) => {
+            const current = key + 1;
+            return (
+              <li
+                class={`page-item ${current === state?.data?.page && "active"}`}
+              >
+                <a class="page-link" onClick={() => handleGet(current)}>
+                  {current}
+                </a>
+              </li>
+            );
+          })}
+          <li class={`page-item ${!state?.data?.hasNext && "disabled"}`}>
+            <a
+              class="page-link"
+              onClick={() => handleGet(state?.data?.page + 1)}
+            >
+              Next
+            </a>
+          </li>
+        </ul>
+      </nav>
     </div>
   );
 
@@ -189,6 +228,7 @@ const Index = (props) => {
         size="modal-md"
         isEdit={isEdit}
         selectedData={selectedData}
+        handleGet={handleGet}
       />
       <div
         className="offcanvas offcanvas-end"

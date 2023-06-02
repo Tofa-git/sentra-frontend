@@ -1,23 +1,63 @@
-import "material-icons/iconfont/material-icons.css";
+import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
+import {
+  createNationality,
+  updateNationality,
+} from "../../../context/nationality/actions";
 
-const CreateForm = (options) => {
-  console.log({ options });
-  const { isEdit, selectedData } = options;
+const initForm = {
+  code: "",
+  name: "",
+  rank: 0,
+  status: "",
+};
+
+const CreateForm = (props) => {
+  const { isEdit, selectedData } = props;
+  const [form, setForm] = useState(initForm);
+
+  useEffect(() => {
+    setForm(isEdit ? selectedData : initForm);
+  }, [selectedData, isEdit]);
+
+  const handleInputChange = (name, value) => {
+    setForm({ ...form, [name]: value });
+  };
+
+  const handleSubmit = async () => {
+    const requiredField = ["code", "name", "rank", "status"];
+    const hasError = requiredField.filter(
+      (i) => form[i] === 0 || form[i]?.length === 0
+    );
+    if (hasError.length > 0) {
+      return Swal.fire(
+        "Validate",
+        `Field ${hasError.join(", ").toLocaleUpperCase()} can't empty or 0`,
+        "warning"
+      );
+    }
+
+    if (isEdit) {
+      await updateNationality(selectedData.id, form);
+    } else {
+      await createNationality(form);
+    }
+
+    await props.handleGet();
+    document.getElementById("cancelModal").click();
+  };
   return (
     <div
       className="modal fade"
-      id={options.id}
+      id={props.id}
       tabIndex="-1"
       aria-labelledby="exampleModalLabel"
       aria-hidden="true"
     >
-      <div className={options.size + " modal-dialog"}>
+      <div className={props.size + " modal-dialog"}>
         <div className="modal-content rounded-2 shadow">
           <div className="modal-header">
-            <h1
-              className="modal-title fs-5 text-black"
-              id={options.id + "Label"}
-            >
+            <h1 className="modal-title fs-5 text-black" id={props.id + "Label"}>
               {isEdit ? "Edit" : "Add"} Nationality
             </h1>
             <button
@@ -34,32 +74,23 @@ const CreateForm = (options) => {
                 <input
                   className="form-control rounded-0"
                   name="code"
-                  defaultValue={isEdit ? selectedData.code : null}
-                />
-              </div>
-            </div>
-            <div className="row mt-2">
-              <div className="col-sm-4 text-black">Nationality (EN)</div>
-              <div className="col-sm-8">
-                <input
-                  type="text"
-                  className="form-control rounded-0"
-                  name="nationality_name_en"
-                  defaultValue={
-                    isEdit ? selectedData.nationality_name_en : null
+                  value={form.code}
+                  onChange={(val) =>
+                    handleInputChange("code", val.target.value)
                   }
                 />
               </div>
             </div>
             <div className="row mt-2">
-              <div className="col-sm-4 text-black">Nationality (CH)</div>
+              <div className="col-sm-4 text-black">Nationality Name</div>
               <div className="col-sm-8">
                 <input
                   type="text"
                   className="form-control rounded-0"
-                  name="nationality_name_ch"
-                  defaultValue={
-                    isEdit ? selectedData.nationality_name_ch : null
+                  name="name"
+                  value={form.name}
+                  onChange={(val) =>
+                    handleInputChange("name", val.target.value)
                   }
                 />
               </div>
@@ -71,7 +102,10 @@ const CreateForm = (options) => {
                   type="number"
                   className="form-control rounded-0"
                   name="rank"
-                  defaultValue={isEdit ? selectedData.rank : null}
+                  value={form.rank}
+                  onChange={(val) =>
+                    handleInputChange("rank", val.target.value)
+                  }
                 />
               </div>
             </div>
@@ -81,17 +115,14 @@ const CreateForm = (options) => {
                 <select
                   className="form-select rounded-0"
                   name="is_used"
-                  value={isEdit ? selectedData.is_used : null}
+                  value={form.status}
+                  onChange={(val) =>
+                    handleInputChange("status", val.target.value)
+                  }
                 >
-                  <option value="-" selected disabled>
-                    Choose Status
-                  </option>
-                  <option value="1" selected>
-                    Yes
-                  </option>
-                  <option value="0" selected>
-                    No
-                  </option>
+                  <option value="-">Choose Status</option>
+                  <option value="1">Yes</option>
+                  <option value="0">No</option>
                 </select>
               </div>
             </div>
@@ -100,11 +131,18 @@ const CreateForm = (options) => {
             <button
               type="button"
               className="btn btn-danger rounded-0"
+              id="cancelModal"
               data-bs-dismiss="modal"
             >
               Cancel
             </button>
-            <button type="button" className="btn btn-primary rounded-0">
+            <button
+              onClick={() => {
+                handleSubmit();
+              }}
+              type="button"
+              className="btn btn-primary rounded-0"
+            >
               {isEdit ? "Edit" : "Add"}
             </button>
           </div>

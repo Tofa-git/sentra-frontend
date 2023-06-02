@@ -65,7 +65,7 @@ const Layout = ({ children, selectId }) => {
     recheckToken();
     setTimeout(() => {
       getMasterData();
-    }, 1000);
+    }, 3000);
   }, []);
 
   return (
