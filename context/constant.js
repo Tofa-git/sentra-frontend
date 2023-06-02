@@ -17,5 +17,9 @@ export const NATIONALITY_PROCESS = "NATIONALITY_PROCESS";
 export const NATIONALITY_SUCCESS = "NATIONALITY_SUCCESS";
 export const NATIONALITY_FAILED = "NATIONALITY_FAILED";
 
+export const CITY_LOCATION_PROCESS = "CITY_LOCATION_PROCESS";
+export const CITY_LOCATION_SUCCESS = "CITY_LOCATION_SUCCESS";
+export const CITY_LOCATION_FAILED = "CITY_LOCATION_FAILED";
+
 // Another constant
 export const baseUrl = "https://api-azone.link-webid.com";

@@ -36,9 +36,9 @@ const Layout = ({ children, selectId }) => {
       getMaster("country");
     }
 
-    // if (cityState.data.rows.length === 0) {
-    //  getMaster('city')
-    // }
+    if (cityState.dropdownData.length === 0) {
+      getMaster("city");
+    }
   };
 
   const getMaster = async (name) => {

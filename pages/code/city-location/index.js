@@ -1,40 +1,67 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Layout from "../../../layouts/default";
 import StdForm from "../../../components/forms/stdForm";
 import CreateForm from "./createForm";
-import ImgButton from "../../../components/button/imgButton";
-import "material-icons/iconfont/material-icons.css";
-
-const dummyData = [
-  {
-    id: 1,
-    location_code: "ALOR",
-    location_name_en: "Alor",
-    location_name_ch: "阿富汗",
-    is_used: 1,
-  },
-  {
-    id: 2,
-    location_code: "AMBA",
-    location_name_en: "Ambarawa",
-    location_name_ch: "阿富汗",
-    is_used: 1,
-  },
-  {
-    id: 3,
-    location_code: "AMQ",
-    location_name_en: "Ambon",
-    location_name_ch: "阿尔巴尼亚",
-    is_used: 0,
-  },
-];
+import { CityLocationContext } from "../../../context/cityLocation/reducer";
+import { AuthContext } from "../../../context/auth/reducer";
+import {
+  deleteCityLocation,
+  getAllCityLocation,
+} from "../../../context/cityLocation/actions";
+import { AUTH_401, AUTH_LOGOUT } from "../../../context/constant";
+import Swal from "sweetalert2";
+import { CountryContext } from "../../../context/country/reducer";
+import { CityContext } from "../../../context/city/reducer";
 
 const Index = (props) => {
   const router = useRouter();
-  const [selectedId, setSelectedId] = useState("002");
+  const selectedId = "002";
   const [selectedData, setSelectedData] = useState();
   const [isEdit, setIsEdit] = useState(false);
+
+  const [keyword, setKeyword] = useState("");
+  const { state, dispatch } = useContext(CityLocationContext);
+  const { dispatch: authDispatch } = useContext(AuthContext);
+  const { state: countryState } = useContext(CountryContext);
+  const { state: cityState } = useContext(CityContext);
+
+  useEffect(() => {
+    handleGet();
+  }, []);
+
+  const handleGet = async (page = 1, limit = 12) => {
+    const country = await getAllCityLocation(
+      dispatch,
+      false,
+      page,
+      limit,
+      keyword
+    );
+    if (country.status === 401) {
+      authDispatch({ type: AUTH_401 });
+      authDispatch({ type: AUTH_LOGOUT });
+      Swal.fire("Token has been Expired", "Please Login Again", "warning");
+      router.push("/authentication/login");
+    }
+  };
+
+  const handleDelete = async (id) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        await deleteCityLocation(id);
+        handleGet();
+      }
+    });
+  };
 
   const toolbarForm = (
     <div
@@ -46,26 +73,16 @@ const Index = (props) => {
       </span>
       <div className="flex-fill input-group">
         <select className="form-select rounded-0" name="is_used" value="-">
-          <option value="-" selected disabled>
-            Choose Country
-          </option>
-          <option value="1" selected>
-            Indonesia
-          </option>
-          <option value="0" selected>
-            Singapore
-          </option>
+          <option value="-">Choose Country</option>
+          {countryState?.dropdownData?.map((country) => {
+            return <option value={country.id}>{country.name}</option>;
+          })}
         </select>
         <select className="form-select rounded-0" name="is_used" value="-">
-          <option value="-" selected disabled>
-            Choose City
-          </option>
-          <option value="1" selected>
-            Indonesia
-          </option>
-          <option value="0" selected>
-            Singapore
-          </option>
+          <option value="-">Choose City</option>
+          {cityState?.dropdownData?.map((city) => {
+            return <option value={city.id}>{city.shortName}</option>;
+          })}
         </select>
       </div>
       <span className="flex-shrink-1 pe-1 ms-2 small text-nowrap text-dark">
@@ -77,6 +94,12 @@ const Index = (props) => {
           type="text"
           className="form-control bg-white rounded-0 p-0 px-1"
           placeholder="Location Name"
+          onChange={(val) => setKeyword(val.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleGet(1, 12);
+            }
+          }}
         />
         <div className="d-flex input-group-append">
           <div className="d-flex btn-group">
@@ -86,24 +109,10 @@ const Index = (props) => {
               role="button"
               title="Go Search"
               style={{ padding: "2px 5px" }}
-              href="#"
+              onClick={() => handleGet(1, 12)}
             >
               <i className="material-icons" style={{ verticalAlign: "middle" }}>
                 search
-              </i>
-            </a>
-            <a
-              className="btn btn-outline-secondary rounded-0"
-              id="filter_button"
-              role="button"
-              title="Search options"
-              style={{ padding: "2px 5px" }}
-              data-bs-toggle="offcanvas"
-              href="#searchOptions"
-              aria-controls="searchOptions"
-            >
-              <i className="material-icons" style={{ verticalAlign: "middle" }}>
-                filter_alt
               </i>
             </a>
           </div>
@@ -133,13 +142,13 @@ const Index = (props) => {
           <thead>
             <tr>
               <th className="bg-blue text-white" width="5%">
-                Location Code
+                Code
               </th>
               <th className="bg-blue text-white" width="20%">
-                Location (EN)
+                City Id
               </th>
               <th className="bg-blue text-white" width="20%">
-                Location (CH)
+                Name
               </th>
               <th className="bg-blue text-white" width="5%">
                 Is Used
@@ -150,17 +159,17 @@ const Index = (props) => {
             </tr>
           </thead>
           <tbody>
-            {dummyData.map((data) => {
+            {state?.data?.rows?.map((data) => {
               return (
                 <tr>
-                  <td>{data.location_code}</td>
-                  <td>{data.location_name_en}</td>
-                  <td>{data.location_name_ch}</td>
+                  <td>{data.code}</td>
+                  <td>{data.cityId}</td>
+                  <td>{data.name}</td>
                   <td>{data.is_used ? "Yes" : "No"}</td>
-                  <td>
+                  <td className="d-flex flex-row">
                     <button
                       type="button"
-                      class="btn btn-primary bg-blue"
+                      className="btn btn-primary bg-blue"
                       data-bs-toggle="modal"
                       data-bs-target="#createHotel"
                       onClick={() => {
@@ -169,6 +178,15 @@ const Index = (props) => {
                       }}
                     >
                       Edit
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-danger ms-2"
+                      onClick={() => {
+                        handleDelete(data.id);
+                      }}
+                    >
+                      Delete
                     </button>
                   </td>
                 </tr>
@@ -181,10 +199,39 @@ const Index = (props) => {
   );
 
   const footers = (
-    <div>
-      <span className="p-1 px-2 small text-primary">
-        Row 0 to 0 of 0 Eow(s)
-      </span>
+    <div className="d-flex justify-content-center">
+      <nav aria-label="Page navigation example">
+        <ul class="pagination">
+          <li class={`page-item ${1 === state?.data?.page && "disabled"}`}>
+            <a
+              class="page-link"
+              onClick={() => handleGet(state?.data?.page - 1)}
+            >
+              Previous
+            </a>
+          </li>
+          {new Array(Number(state?.data?.totalPage)).fill().map((i, key) => {
+            const current = key + 1;
+            return (
+              <li
+                class={`page-item ${current === state?.data?.page && "active"}`}
+              >
+                <a class="page-link" onClick={() => handleGet(current)}>
+                  {current}
+                </a>
+              </li>
+            );
+          })}
+          <li class={`page-item ${!state?.data?.hasNext && "disabled"}`}>
+            <a
+              class="page-link"
+              onClick={() => handleGet(state?.data?.page + 1)}
+            >
+              Next
+            </a>
+          </li>
+        </ul>
+      </nav>
     </div>
   );
 
@@ -203,6 +250,7 @@ const Index = (props) => {
         size="modal-md"
         isEdit={isEdit}
         selectedData={selectedData}
+        handleGet={handleGet}
       />
       <div
         className="offcanvas offcanvas-end"
