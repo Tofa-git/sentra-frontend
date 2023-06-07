@@ -7,7 +7,7 @@ import { useRouter } from "next/router";
 import { AUTH_401, AUTH_LOGOUT, AUTH_SUCCESS } from "../context/constant";
 import "material-icons/iconfont/material-icons.css";
 import { CountryContext } from "../context/country/reducer";
-import { getAllCountry } from "../context/country/actions";
+import { getAllCountry, getCurrencies } from "../context/country/actions";
 import { getAllCity } from "../context/city/actions";
 import { CityContext } from "../context/city/reducer";
 import Swal from "sweetalert2";
@@ -39,6 +39,10 @@ const Layout = ({ children, selectId }) => {
     if (cityState.dropdownData.length === 0) {
       getMaster("city");
     }
+
+    if (countryState.currencyData.length === 0) {
+      getMaster("currency");
+    }
   };
 
   const getMaster = async (name) => {
@@ -47,6 +51,8 @@ const Layout = ({ children, selectId }) => {
       data = await getAllCountry(countryDispatch, true);
     } else if (name === "city") {
       data = await getAllCity(cityDispatch, true);
+    } else if (name === "currency") {
+      data = await getCurrencies(countryDispatch);
     }
 
     if (data?.status === 401) {
@@ -65,7 +71,7 @@ const Layout = ({ children, selectId }) => {
     recheckToken();
     setTimeout(() => {
       getMasterData();
-    }, 3000);
+    }, 5000);
   }, []);
 
   return (

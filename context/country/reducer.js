@@ -1,6 +1,11 @@
 import { createContext, useReducer } from "react";
 
-import { COUNTRY_FAILED, COUNTRY_PROCESS, COUNTRY_SUCCESS } from "../constant";
+import {
+  COUNTRY_FAILED,
+  COUNTRY_PROCESS,
+  COUNTRY_SUCCESS,
+  CURRENCIES_SUCCESS,
+} from "../constant";
 
 const CountryContext = createContext();
 
@@ -17,6 +22,7 @@ const initialState = {
     hasPreviouse: false,
   },
   dropdownData: [],
+  currencyData: [],
 };
 
 function reducer(state, action) {
@@ -51,6 +57,11 @@ function reducer(state, action) {
         isLoading: false,
         isError: true,
         errorMessage: action.payload,
+      };
+    case CURRENCIES_SUCCESS:
+      return {
+        ...state,
+        currencyData: action.payload.data,
       };
     default:
       return state;

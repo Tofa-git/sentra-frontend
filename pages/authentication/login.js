@@ -88,7 +88,6 @@ const Login = (props) => {
                 </i>
               </div>
             </div>
-            {console.log({ erorr: state.errorMessage })}
             {state.isError ? (
               <div className="text-danger">{state.errorMessage}</div>
             ) : (
@@ -102,11 +101,11 @@ const Login = (props) => {
                 <span className="px-2">Next</span>
                 {state.isLoading ? (
                   <div
-                    class="spinner-border text-light"
+                    className="spinner-border text-light"
                     style={{ height: "24px", width: "24px" }}
                     role="status"
                   >
-                    <span class="visually-hidden">Loading...</span>
+                    <span className="visually-hidden">Loading...</span>
                   </div>
                 ) : (
                   <i className="material-icons align-self-center">

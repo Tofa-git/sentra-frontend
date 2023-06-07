@@ -3,6 +3,8 @@ import {
   COUNTRY_FAILED,
   COUNTRY_PROCESS,
   COUNTRY_SUCCESS,
+  CURRENCIES_SUCCESS,
+  CURRENCIES_FAILED,
   baseUrl,
 } from "../constant";
 import axios from "axios";
@@ -119,5 +121,33 @@ export const deleteCountry = async (id) => {
       "Error when delete country, please try again later",
       "error"
     );
+  }
+};
+
+export const getCurrencies = async (dispatch) => {
+  try {
+    let url = `${baseUrl}/api/master/currencies`;
+
+    const token = localStorage.getItem("AUTH_TOKEN");
+    const config = {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    const res = await fetch(url, config);
+    const data = await res.json();
+
+    dispatch({
+      type: CURRENCIES_SUCCESS,
+      payload: { data: data?.data },
+    });
+    return { data: data?.data, status: res.status };
+  } catch (error) {
+    dispatch({
+      type: CURRENCIES_FAILED,
+      payload: error?.response?.data?.message || "Error",
+    });
   }
 };

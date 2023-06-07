@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { createCountry, updateCountry } from "../../../context/country/actions";
+import { CountryContext } from "../../../context/country/reducer";
 
 const initForm = {
   isoId: "",
@@ -16,6 +17,7 @@ const initForm = {
 const CreateForm = (props) => {
   const { isEdit, selectedData } = props;
   const [form, setForm] = useState(initForm);
+  const { state } = useContext(CountryContext);
 
   useEffect(() => {
     setForm(isEdit ? selectedData : initForm);
@@ -131,11 +133,12 @@ const CreateForm = (props) => {
                   }
                   defaultValue="0"
                 >
-                  <option value="0" disabled>
-                    Choose Currency
-                  </option>
-                  <option value="USD">USD</option>
-                  <option value="IDR">IDR</option>
+                  <option value="0">Choose Currency</option>
+                  {state?.currencyData.map((i, key) => (
+                    <option key={key} value={i.basicCurrency}>
+                      {i.basicCurrency}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -150,11 +153,12 @@ const CreateForm = (props) => {
                     handleInputChange("descCurrency", val.target.value)
                   }
                 >
-                  <option value="0" disabled>
-                    Choose Currency
-                  </option>
-                  <option value="Rupiah">Rupiah</option>
-                  <option value="Dollar">Dollar</option>
+                  <option value="0">Choose Currency</option>
+                  {state?.currencyData.map((i, key) => (
+                    <option key={key} value={i.descCurrency || i.basicCurrency}>
+                      {i.descCurrency || i.basicCurrency}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
