@@ -1,23 +1,133 @@
+import { useContext, useEffect, useState } from "react";
 import Input from "../../components/input";
 import Select from "../../components/select";
+import { CityContext } from "../../context/city/reducer";
+import { CityLocationContext } from "../../context/cityLocation/reducer";
+import { CountryContext } from "../../context/country/reducer";
+import {
+  createHotel,
+  updateHotel,
+  uploadFile,
+} from "../../context/hotel/actions";
+import Map from "../../components/map";
+import Swal from "sweetalert2";
 
-const CreateForm = (options) => {
-  const { isEdit, selectedData } = options;
+// const Map = dynamic(() => import("../../components/map/index"), { ssr: false });
+
+const initForm = {
+  countryCode: "",
+  cityCode: "",
+  locationCode: "",
+  name: "",
+  code: "",
+  email: "",
+  phone: "",
+  website: "",
+  address: "",
+  zipCode: "",
+  latitude: "",
+  longitude: "",
+  checkInTime: "",
+  checkOutTime: "",
+  star: "",
+  totalRoom: "",
+  status: "1",
+  fileIds: [],
+};
+
+const statusData = [
+  { id: "1", name: "Yes" },
+  { id: "0", name: "No" },
+];
+
+const initImage = {
+  image1: null,
+  image2: null,
+  image3: null,
+  image4: null,
+};
+
+const CreateForm = (props) => {
+  const { isEdit, selectedData } = props;
+  const [form, setForm] = useState(initForm);
+  const { state: countryState } = useContext(CountryContext);
+  const { state: cityState } = useContext(CityContext);
+  const { state: cityLocationState } = useContext(CityLocationContext);
+
+  const [images, setImages] = useState(initImage);
+
+  useEffect(() => {
+    setForm(isEdit ? selectedData : initForm);
+  }, [selectedData, isEdit]);
+
+  const handleInputChange = (name, value) => {
+    setForm({ ...form, [name]: value });
+  };
+
+  const handleSubmit = async () => {
+    // const requiredField = ["name", "code", "latitude", "longitude"];
+    // const hasError = requiredField.filter(
+    //   (i) => form[i] === 0 || form[i]?.length === 0
+    // );
+    // if (hasError.length > 0) {
+    //   return Swal.fire(
+    //     "Validate",
+    //     `Field ${hasError.join(", ").toLocaleUpperCase()} can't empty or 0`,
+    //     "warning"
+    //   );
+    // }
+
+    if (isEdit) {
+      await updateHotel(selectedData.id, form);
+    } else {
+      let fileIds = [];
+      const uploadedImage = Object.values(images).filter((i) => i !== null);
+      if (uploadedImage.length > 0) {
+        const formData = new FormData();
+        Object.values(uploadedImage).map((i) => formData.append("image", i));
+        const files = await uploadFile(formData);
+        console.log({ files });
+      }
+      // await createHotel(form);
+    }
+
+    await props.handleGet();
+    document.getElementById("cancelModal").click();
+  };
+
+  const handleDeleteImage = (key) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        setImages({ ...images, [key]: null });
+      }
+    });
+  };
+
+  const handleCancel = () => {
+    setForm(initForm);
+    setImages(initImage);
+  };
+
   return (
     <div
       className="modal fade"
-      id={options.id}
+      id={props.id}
       tabIndex="-1"
       aria-labelledby="exampleModalLabel"
       aria-hidden="true"
     >
-      <div className={options.size + " modal-dialog"}>
+      <div className={props.size + " modal-dialog"}>
         <div className="modal-content rounded-2 shadow">
           <div className="modal-header">
-            <h1
-              className="modal-title fs-5 text-black"
-              id={options.id + "Label"}
-            >
+            <h1 className="modal-title fs-5 text-black" id={props.id + "Label"}>
               {isEdit ? "Edit" : "Add"} Hotel
             </h1>
             <button
@@ -25,7 +135,8 @@ const CreateForm = (options) => {
               className="btn-close"
               data-bs-dismiss="modal"
               aria-label="Close"
-            ></button>
+              onClick={() => handleCancel()}
+            />
           </div>
           <div className="modal-body p-3">
             <p className="text-blue fs-5 fw-bold border-bottom">
@@ -33,148 +144,223 @@ const CreateForm = (options) => {
             </p>
             <div className="row mt-2">
               <div className="col-6">
-                <Input label={"Hotel Name"} />
+                <Input
+                  label={"Hotel Name"}
+                  value={form.name}
+                  onChange={(val) =>
+                    handleInputChange("name", val.target.value)
+                  }
+                />
               </div>
               <div className="col-6">
-                <Input label={"Hotel Code"} />
+                <Input
+                  label={"Hotel Code"}
+                  value={form.code}
+                  onChange={(val) =>
+                    handleInputChange("code", val.target.value)
+                  }
+                />
               </div>
               <div className="col-6">
-                <Select label={"Country"} />
+                <Select
+                  label={"Country"}
+                  value={form.countryCode}
+                  options={countryState?.dropdownData}
+                  onChange={(val) =>
+                    handleInputChange("countryCode", val.target.value)
+                  }
+                />
               </div>
               <div className="col-6">
-                <Select label={"City"} />
+                <Select
+                  label={"City"}
+                  options={cityState?.dropdownData}
+                  value={form.cityCode}
+                  onChange={(val) =>
+                    handleInputChange("cityCode", val.target.value)
+                  }
+                />
               </div>
               <div className="col-6">
-                <Input label={"Phone"} />
+                <Input
+                  label={"Phone"}
+                  value={form.phone}
+                  onChange={(val) =>
+                    handleInputChange("phone", val.target.value)
+                  }
+                />
               </div>
               <div className="col-6">
-                <Input label={"Fax"} />
+                <Input
+                  label={"Address"}
+                  value={form.address}
+                  onChange={(val) =>
+                    handleInputChange("address", val.target.value)
+                  }
+                />
               </div>
               <div className="col-6">
-                <Input label={"Address 1"} />
+                <Input
+                  label={"Zip Code"}
+                  value={form.zipCode}
+                  onChange={(val) =>
+                    handleInputChange("zipCode", val.target.value)
+                  }
+                />
               </div>
               <div className="col-6">
-                <Input label={"Address 2"} />
+                <Input
+                  label={"Email"}
+                  value={form.email}
+                  onChange={(val) =>
+                    handleInputChange("email", val.target.value)
+                  }
+                />
               </div>
               <div className="col-6">
-                <Input label={"Address 3"} />
+                <Input
+                  label={"Check In Time"}
+                  value={form.checkInTime}
+                  onChange={(val) =>
+                    handleInputChange("checkInTime", val.target.value)
+                  }
+                  type="time"
+                />
               </div>
               <div className="col-6">
-                <Input label={"Address 4"} />
-              </div>
-              <div className="col-6">
-                <Input label={"Zip Code"} />
-              </div>
-              <div className="col-6" />
-              <div className="col-4">
-                <Input label={"Email"} />
-              </div>
-              <div className="col-4">
-                <Input label={"Rq to email"} />
-              </div>
-              <div className="col-4">
-                <Input label={"CC Email"} />
-              </div>
-              <div className="col-4">
-                <Input label={"Homepage"} />
-              </div>
-              <div className="col-4">
-                <Select label={"Star"} />
-              </div>
-              <div className="col-4">
-                <Input label={"Room"} />
+                <Input
+                  label={"Check Out Time"}
+                  value={form.checkOutTime}
+                  onChange={(val) =>
+                    handleInputChange("checkOutTime", val.target.value)
+                  }
+                  type="time"
+                />
               </div>
               <div className="col-3">
-                <Select label={"Location in City"} />
+                <Input
+                  label={"Homepage"}
+                  value={form.website}
+                  onChange={(val) =>
+                    handleInputChange("website", val.target.value)
+                  }
+                />
               </div>
               <div className="col-3">
-                <Input label={"Latitude"} />
+                <Input
+                  label={"Star"}
+                  value={form.star}
+                  onChange={(val) =>
+                    handleInputChange("star", val.target.value)
+                  }
+                />
               </div>
               <div className="col-3">
-                <Input label={"Longitude"} />
+                <Input
+                  label={"Room"}
+                  value={form.totalRoom}
+                  onChange={(val) =>
+                    handleInputChange("totalRoom", val.target.value)
+                  }
+                />
+              </div>
+              <div className="col-3">
+                <Select
+                  label={"Status"}
+                  options={statusData}
+                  value={form.status}
+                  onChange={(val) =>
+                    handleInputChange("status", val.target.value)
+                  }
+                />
+              </div>
+              <div className="col-3">
+                <Select
+                  label={"Location in City"}
+                  options={cityLocationState?.dropdownData}
+                  value={form.locationCode}
+                  onChange={(val) =>
+                    handleInputChange("locationCode", val.target.value)
+                  }
+                />
+              </div>
+              <div className="col-3">
+                <Input
+                  label={"Latitude"}
+                  value={form.latitude}
+                  onChange={(val) =>
+                    handleInputChange("latitude", val.target.value)
+                  }
+                />
+              </div>
+              <div className="col-3">
+                <Input
+                  label={"Longitude"}
+                  value={form.longitude}
+                  onChange={(val) =>
+                    handleInputChange("longitude", val.target.value)
+                  }
+                />
               </div>
               <div className="col-3 d-flex align-items-end">
                 <button className="btn btn-sm btn-primary bg-blue ms-2 rounded-0 d-flex flex-row align-items-center shadow-sm">
                   <span className="ms-2">Open Google Map</span>
                 </button>
               </div>
-              <div className="col-3">
-                <Input label={"Rank"} />
-              </div>
-              <div className="col-9" />
-              <div className="col-12">
-                <div className="row mt-2">
-                  <div className="col-4">
-                    <span className="d-flex flex-row align-items-center">
-                      <span className="text-dark">Event</span>
-                      <button className="btn btn-sm btn-primary bg-blue ms-2 rounded-0 align-items-center shadow-sm">
-                        <span className="ms-2">Remark History</span>
-                      </button>
-                    </span>
-                  </div>
-                  <div className="col-8" />
-                  <div className="col-8 mt-2 d-flex flex-row align-items-center">
-                    <input type="checkbox" />
-                    <span className="text-dark ms-2 w-25">Hot Deal</span>
-                    <input className="form-control" type="text" />
-                  </div>
-                  <div className="col-8 mt-2 d-flex flex-row align-items-center">
-                    <input type="checkbox" />
-                    <span className="text-dark ms-2 w-25">Recommended</span>
-                    <input className="form-control" type="text" />
-                  </div>
-                </div>
-              </div>
               <div className="col-12 mt-2">
-                <span className="text-dark">Event (EN)</span>
-                <textarea className="form-control" />
+                <Map height={"300px"} />
               </div>
-              <div className="col-12 mt-2">
-                <span className="text-dark">Youtube Link</span>
-                <textarea className="form-control" />
-                <span className="text-secondary">
-                  display video clip add part of sauce :
-                  https://www.youtube.com/embed/T4NueeuPL-Y this part only
-                </span>
-              </div>
-              <div className="col-12">
-                <Input label={"Manager"} />
-              </div>
-              <div className="col-12 mt-2">
-                <span className="text-dark">Internal Remark</span>
-                <textarea className="form-control" />
-              </div>
-              <div className="col-12 d-flex flex-row align-items-end">
-                <Select label={"Supplier"} />
-                <button className="btn btn-sm btn-primary bg-blue ms-2 rounded-0 h-50 d-flex flex-row align-items-center shadow-sm">
-                  <span>+</span>
-                </button>
-                <button className="btn btn-sm btn-primary bg-blue ms-2 rounded-0 h-50 d-flex flex-row align-items-center shadow-sm">
-                  <span>-</span>
-                </button>
-                <input className="form-control ms-2" />
-              </div>
-              <div className="col-12 mt-2 mb-2">
-                <Select label={"Cxl Policy"} />
-              </div>
-              <div className="col-3">
-                <span className="text-dark w-25">Pre Payment</span>
-                <input className="ms-2" type="checkbox" />
-              </div>
-              <div className="col-3">
-                <span className="text-dark w-25">Non XML</span>
-                <input className="ms-2" type="checkbox" />
-              </div>
-              <div className="col-3">
-                <span className="text-dark w-25">Non Tarif</span>
-                <input className="ms-2" type="checkbox" />
-              </div>
-              <div className="col-3">
-                <span className="text-dark w-25">Is Used</span>
-                <input className="ms-2" type="checkbox" />
-              </div>
-              <div className="col-12 mt-2 mb-2">
-                <Input label={"Last Update"} />
+              <div className="row">
+                <div className="form-label text-dark mt-4">Hotel Images</div>
+                {Object.keys(images).map((i, index) => {
+                  if (images[i] !== null) {
+                    return (
+                      <div className="col-3 mt-2 d-flex flex-column align-items-center">
+                        <img
+                          key={index}
+                          src={images[i]}
+                          alt={`Uploaded ${index + 1}`}
+                          className="image-hotel"
+                        />
+                        <span
+                          onClick={() => handleDeleteImage(i)}
+                          className="text-dark delete-image"
+                        >
+                          Hapus Gambar
+                        </span>
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <div key={index} className="col-3 mt-2">
+                        <label for="images" class="drop-container">
+                          <span class="drop-title">
+                            Hotel Image {index + 1}
+                          </span>
+                          <input
+                            type="file"
+                            id="images"
+                            accept="image/*"
+                            onChange={(e) => {
+                              const file = e.target.files[0];
+
+                              if (file) {
+                                const reader = new FileReader();
+
+                                reader.onloadend = () => {
+                                  const base64String = reader.result;
+                                  setImages({ ...images, [i]: base64String });
+                                };
+
+                                reader.readAsDataURL(file);
+                              }
+                            }}
+                          />
+                        </label>
+                      </div>
+                    );
+                  }
+                })}
               </div>
             </div>
           </div>
@@ -183,10 +369,18 @@ const CreateForm = (options) => {
               type="button"
               className="btn btn-danger rounded-0"
               data-bs-dismiss="modal"
+              id="cancelModal"
+              onClick={() => handleCancel()}
             >
               Cancel
             </button>
-            <button type="button" className="btn btn-primary rounded-0">
+            <button
+              onClick={() => {
+                handleSubmit();
+              }}
+              type="button"
+              className="btn btn-primary rounded-0"
+            >
               {isEdit ? "Edit" : "Add"}
             </button>
           </div>

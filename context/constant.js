@@ -24,5 +24,9 @@ export const CITY_LOCATION_PROCESS = "CITY_LOCATION_PROCESS";
 export const CITY_LOCATION_SUCCESS = "CITY_LOCATION_SUCCESS";
 export const CITY_LOCATION_FAILED = "CITY_LOCATION_FAILED";
 
+export const HOTEL_PROCESS = "HOTEL_PROCESS";
+export const HOTEL_SUCCESS = "HOTEL_SUCCESS";
+export const HOTEL_FAILED = "HOTEL_FAILED";
+
 // Another constant
 export const baseUrl = "https://api-azone.link-webid.com";

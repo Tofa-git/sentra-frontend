@@ -1,9 +1,13 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Layout from "../../layouts/default";
 import StdForm from "../../components/forms/stdForm";
 import CreateForm from "./createForm";
-import ImgButton from "../../components/button/imgButton";
+import { AuthContext } from "../../context/auth/reducer";
+import { CountryContext } from "../../context/country/reducer";
+import { CityContext } from "../../context/city/reducer";
+import { getAllHotel } from "../../context/hotel/actions";
+import { HotelContext } from "../../context/hotel/reducer";
 
 const dummyData = [
   {
@@ -34,9 +38,29 @@ const dummyData = [
 
 const Index = (props) => {
   const router = useRouter();
-  const [selectedId, setSelectedId] = useState("006");
+  const selectedId = "006";
   const [selectedData, setSelectedData] = useState();
   const [isEdit, setIsEdit] = useState(false);
+
+  const [keyword, setKeyword] = useState("");
+  const { state, dispatch } = useContext(HotelContext);
+  const { dispatch: authDispatch } = useContext(AuthContext);
+  const { state: countryState } = useContext(CountryContext);
+  const { state: cityState } = useContext(CityContext);
+
+  useEffect(() => {
+    handleGet();
+  }, []);
+
+  const handleGet = async (page = 1, limit = 12) => {
+    const country = await getAllHotel(dispatch, false, page, limit, keyword);
+    if (country.status === 401) {
+      authDispatch({ type: AUTH_401 });
+      authDispatch({ type: AUTH_LOGOUT });
+      Swal.fire("Token has been Expired", "Please Login Again", "warning");
+      router.push("/authentication/login");
+    }
+  };
 
   const toolbarForm = (
     <>
@@ -49,15 +73,10 @@ const Index = (props) => {
         </span>
         <div className="flex-fill input-group">
           <select className="form-select rounded-0" name="i_field">
-            <option value="-" selected disabled>
-              Choose Country
-            </option>
-            <option value="1" selected>
-              Indonesia
-            </option>
-            <option value="0" selected>
-              Singapore
-            </option>
+            <option value="-">Choose Country</option>
+            {countryState?.dropdownData?.map((country) => {
+              return <option value={country.id}>{country.name}</option>;
+            })}
           </select>
         </div>
         <span className="flex-shrink-1 pe-1 ms-2 small text-nowrap text-dark">
@@ -65,13 +84,10 @@ const Index = (props) => {
         </span>
         <div className="flex-fill input-group">
           <select className="form-select rounded-0" name="i_field">
-            <option value="-" selected disabled>
-              Choose City
-            </option>
-            <option value="1" selected>
-              Bandung
-            </option>
-            <option value="0">Malang</option>
+            <option value="-">Choose City</option>
+            {cityState?.dropdownData?.map((city) => {
+              return <option value={city.id}>{city.shortName}</option>;
+            })}
           </select>
         </div>
         <span className="flex-shrink-1 pe-1 ms-2 small text-nowrap text-dark">
@@ -141,13 +157,13 @@ const Index = (props) => {
                 Star
               </th>
               <th className="bg-blue text-white" width="20%">
-                Rank
+                Email
               </th>
               <th className="bg-blue text-white" width="5%">
-                P
+                Total Room
               </th>
               <th className="bg-blue text-white" width="5%">
-                L
+                Is Used
               </th>
               <th className="bg-blue text-white" width="5%">
                 Action
@@ -155,14 +171,14 @@ const Index = (props) => {
             </tr>
           </thead>
           <tbody>
-            {dummyData.map((data) => {
+            {state?.data?.rows?.map((data) => {
               return (
                 <tr>
                   <td>{data.code}</td>
-                  <td>{data.hotel_name}</td>
-                  <td>{data.rank}</td>
-                  <td>{data.p_field}</td>
-                  <td>{data.rank}</td>
+                  <td>{data.name}</td>
+                  <td>{data.star}</td>
+                  <td>{data.email}</td>
+                  <td>{data.totalRoom}</td>
                   <td>{data.i_field ? "Yes" : "No"}</td>
                   <td>
                     <button
@@ -188,10 +204,39 @@ const Index = (props) => {
   );
 
   const footers = (
-    <div>
-      <span className="p-1 px-2 small text-primary">
-        Row 0 to 0 of 0 Eow(s)
-      </span>
+    <div className="d-flex justify-content-center">
+      <nav aria-label="Page navigation example">
+        <ul class="pagination">
+          <li class={`page-item ${1 === state?.data?.page && "disabled"}`}>
+            <a
+              class="page-link"
+              onClick={() => handleGet(state?.data?.page - 1)}
+            >
+              Previous
+            </a>
+          </li>
+          {new Array(Number(state?.data?.totalPage)).fill().map((i, key) => {
+            const current = key + 1;
+            return (
+              <li
+                class={`page-item ${current === state?.data?.page && "active"}`}
+              >
+                <a class="page-link" onClick={() => handleGet(current)}>
+                  {current}
+                </a>
+              </li>
+            );
+          })}
+          <li class={`page-item ${!state?.data?.hasNext && "disabled"}`}>
+            <a
+              class="page-link"
+              onClick={() => handleGet(state?.data?.page + 1)}
+            >
+              Next
+            </a>
+          </li>
+        </ul>
+      </nav>
     </div>
   );
 
@@ -210,6 +255,7 @@ const Index = (props) => {
         size="modal-xl"
         isEdit={isEdit}
         selectedData={selectedData}
+        handleGet={handleGet}
       />
       <div
         className="offcanvas offcanvas-end"

@@ -9,6 +9,7 @@ import { deleteCity, getAllCity } from "../../../context/city/actions";
 import { AUTH_401, AUTH_LOGOUT } from "../../../context/constant";
 import Swal from "sweetalert2";
 import { CountryContext } from "../../../context/country/reducer";
+import Pagination from "../../../components/pagination";
 
 const Index = (props) => {
   const router = useRouter();
@@ -183,40 +184,41 @@ const Index = (props) => {
   );
 
   const footers = (
-    <div className="d-flex justify-content-center">
-      <nav aria-label="Page navigation example">
-        <ul class="pagination">
-          <li class={`page-item ${1 === state?.data?.page && "disabled"}`}>
-            <a
-              class="page-link"
-              onClick={() => handleGet(state?.data?.page - 1)}
-            >
-              Previous
-            </a>
-          </li>
-          {new Array(Number(state?.data?.totalPage)).fill().map((i, key) => {
-            const current = key + 1;
-            return (
-              <li
-                class={`page-item ${current === state?.data?.page && "active"}`}
-              >
-                <a class="page-link" onClick={() => handleGet(current)}>
-                  {current}
-                </a>
-              </li>
-            );
-          })}
-          <li class={`page-item ${!state?.data?.hasNext && "disabled"}`}>
-            <a
-              class="page-link"
-              onClick={() => handleGet(state?.data?.page + 1)}
-            >
-              Next
-            </a>
-          </li>
-        </ul>
-      </nav>
-    </div>
+    // <div className="d-flex justify-content-center">
+    //   <nav aria-label="Page navigation example">
+    //     <ul class="pagination">
+    //       <li class={`page-item ${1 === state?.data?.page && "disabled"}`}>
+    //         <a
+    //           class="page-link"
+    //           onClick={() => handleGet(state?.data?.page - 1)}
+    //         >
+    //           Previous
+    //         </a>
+    //       </li>
+    //       {new Array(Number(state?.data?.totalPage)).fill().map((i, key) => {
+    //         const current = key + 1;
+    //         return (
+    //           <li
+    //             class={`page-item ${current === state?.data?.page && "active"}`}
+    //           >
+    //             <a class="page-link" onClick={() => handleGet(current)}>
+    //               {current}
+    //             </a>
+    //           </li>
+    //         );
+    //       })}
+    //       <li class={`page-item ${!state?.data?.hasNext && "disabled"}`}>
+    //         <a
+    //           class="page-link"
+    //           onClick={() => handleGet(state?.data?.page + 1)}
+    //         >
+    //           Next
+    //         </a>
+    //       </li>
+    //     </ul>
+    //   </nav>
+    // </div>
+    <Pagination state={state} handleGet={handleGet} />
   );
 
   return (

@@ -1,25 +1,29 @@
 import Swal from "sweetalert2";
-import { CITY_FAILED, CITY_PROCESS, CITY_SUCCESS, baseUrl } from "../constant";
+import {
+  HOTEL_FAILED,
+  HOTEL_PROCESS,
+  HOTEL_SUCCESS,
+  baseUrl,
+} from "../constant";
 import axios from "axios";
 
-export const getAllCity = async (
+export const getAllHotel = async (
   dispatch,
   isDropDown = false,
   page = 1,
   limit = 12,
-  name = "",
-  countryId = 103
+  name = ""
 ) => {
-  dispatch({ type: CITY_PROCESS });
+  dispatch({ type: HOTEL_PROCESS });
   try {
-    let url = `${baseUrl}/api/master/city-code?page=${page}&limit=${limit}&countryId=${countryId}`;
+    let url = `${baseUrl}/api/master/hotel?page=${page}&limit=${limit}`;
 
     if (name.length > 0) {
       url += `&name=${name}`;
     }
 
     if (isDropDown) {
-      url = `${baseUrl}/api/master/city-code-dd?countryId=${countryId}`;
+      url = `${baseUrl}/api/master/hotel-dd`;
     }
 
     const token = localStorage.getItem("AUTH_TOKEN");
@@ -34,21 +38,21 @@ export const getAllCity = async (
     const data = await res.json();
 
     dispatch({
-      type: CITY_SUCCESS,
+      type: HOTEL_SUCCESS,
       payload: { data: data?.data, isDropDown },
     });
     return { data: data?.data, status: res.status };
   } catch (error) {
     dispatch({
-      type: CITY_FAILED,
+      type: HOTEL_FAILED,
       payload: error?.response?.data?.message || "Error",
     });
   }
 };
 
-export const createCity = async (body) => {
+export const createHotel = async (body) => {
   try {
-    const url = `${baseUrl}/api/master/city-code`;
+    const url = `${baseUrl}/api/master/hotel`;
     const token = localStorage.getItem("AUTH_TOKEN");
 
     await axios.post(url, body, {
@@ -58,21 +62,46 @@ export const createCity = async (body) => {
     });
     Swal.fire(
       "Create Success",
-      "City has been successfully created",
+      "Hotel has been successfully created",
       "success"
     );
   } catch (error) {
     Swal.fire(
       "Create Failed",
-      "Error when create city, please try again later",
+      "Error when create hotel, please try again later",
       "error"
     );
   }
 };
 
-export const updateCity = async (id, body) => {
+export const uploadFile = async (body) => {
   try {
-    const url = `${baseUrl}/api/master/city-code/${id}`;
+    const url = `${baseUrl}/api/master/file`;
+    const token = localStorage.getItem("AUTH_TOKEN");
+
+    await axios.post(url, body, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    Swal.fire(
+      "Create Success",
+      "Hotel has been successfully created",
+      "success"
+    );
+  } catch (error) {
+    Swal.fire(
+      "Create Failed",
+      "Error when create hotel, please try again later",
+      "error"
+    );
+  }
+};
+
+export const updateHotel = async (id, body) => {
+  try {
+    const url = `${baseUrl}/api/master/hotel/${id}`;
     const token = localStorage.getItem("AUTH_TOKEN");
 
     await axios.put(url, body, {
@@ -82,21 +111,21 @@ export const updateCity = async (id, body) => {
     });
     Swal.fire(
       "Update Success",
-      "City has been successfully updated",
+      "Hotel has been successfully updated",
       "success"
     );
   } catch (error) {
     Swal.fire(
       "Update Failed",
-      "Error when update city, please try again later",
+      "Error when update hotel, please try again later",
       "error"
     );
   }
 };
 
-export const deleteCity = async (id) => {
+export const deleteHotel = async (id) => {
   try {
-    const url = `${baseUrl}/api/master/city-code/${id}`;
+    const url = `${baseUrl}/api/master/hotel/${id}`;
     const token = localStorage.getItem("AUTH_TOKEN");
 
     await axios.delete(url, {
@@ -106,13 +135,13 @@ export const deleteCity = async (id) => {
     });
     Swal.fire(
       "Delete Success",
-      "City has been successfully deleted",
+      "Hotel has been successfully deleted",
       "success"
     );
   } catch (error) {
     Swal.fire(
       "Delete Failed",
-      "Error when delete city, please try again later",
+      "Error when delete hotel, please try again later",
       "error"
     );
   }

@@ -1,17 +1,36 @@
-import React from 'react'
+import React from "react";
 
-export default function Input({ type = 'text', label = '', isInvalid = false, required = true, errors = [], bgColor = 'text-light' }) {
+export default function Input({
+  type = "text",
+  label = "",
+  isInvalid = false,
+  required = true,
+  errors = [],
+  bgColor = "text-light",
+  onChange = () => {},
+  value = null,
+  multiple = false,
+}) {
   return (
-    <div className='mt-2'>
-      <div className={`form-label ${label !== '' ? 'text-dark' : bgColor}`}>
-        {label !== '' ? label : '-'}
+    <div className="mt-2">
+      <div className={`form-label ${label !== "" ? "text-dark" : bgColor}`}>
+        {label !== "" ? label : "-"}
       </div>
-      <div className='input-group-sm'>
-        <input type={type} className={`form-control ${isInvalid ? 'is-invalid' : ''}`} required={required} />
+      <div className="input-group-sm">
+        <input
+          type={type}
+          className={`form-control ${isInvalid ? "is-invalid" : ""}`}
+          required={required}
+          onChange={onChange}
+          value={value}
+          multiple={multiple}
+        />
       </div>
       {errors.map((v, i) => (
-        <div key={i} className="form-text text-danger">{v}</div>
+        <div key={i} className="form-text text-danger">
+          {v}
+        </div>
       ))}
     </div>
-  )
+  );
 }

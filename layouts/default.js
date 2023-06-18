@@ -11,12 +11,16 @@ import { getAllCountry, getCurrencies } from "../context/country/actions";
 import { getAllCity } from "../context/city/actions";
 import { CityContext } from "../context/city/reducer";
 import Swal from "sweetalert2";
+import { CityLocationContext } from "../context/cityLocation/reducer";
+import { getAllCityLocation } from "../context/cityLocation/actions";
 
 const Layout = ({ children, selectId }) => {
   const { state, dispatch } = useContext(AuthContext);
   const { state: countryState, dispatch: countryDispatch } =
     useContext(CountryContext);
   const { state: cityState, dispatch: cityDispatch } = useContext(CityContext);
+  const { state: cityLocationState, dispatch: cityLocationDispatch } =
+    useContext(CityLocationContext);
   const router = useRouter();
   const { dispatch: authDispatch } = useContext(AuthContext);
 
@@ -43,6 +47,10 @@ const Layout = ({ children, selectId }) => {
     if (countryState.currencyData.length === 0) {
       getMaster("currency");
     }
+
+    // if (cityLocationState.dropdownData.length === 0) {
+    //   getMaster("cityLocation");
+    // }
   };
 
   const getMaster = async (name) => {
@@ -53,6 +61,8 @@ const Layout = ({ children, selectId }) => {
       data = await getAllCity(cityDispatch, true);
     } else if (name === "currency") {
       data = await getCurrencies(countryDispatch);
+    } else if (name === "cityLocation") {
+      data = await getAllCityLocation(cityLocationDispatch, true);
     }
 
     if (data?.status === 401) {

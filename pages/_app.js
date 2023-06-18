@@ -1,8 +1,11 @@
 import { useEffect } from "react";
+import CombinedContextProvider from "../context/";
+
 import "bootstrap/dist/css/bootstrap.css";
 import "../styles/globals.css";
 import "react-calendar/dist/Calendar.css";
-import CombinedContextProvider from "../context/";
+import "leaflet/dist/leaflet.css";
+import "leaflet-geosearch/dist/geosearch.css";
 
 function MyApp({ Component, pageProps }) {
   useEffect(() => {
