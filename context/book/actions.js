@@ -67,3 +67,31 @@ export const recheckBookSearch = async (body) => {
     return { data: [], status: 500 };
   }
 };
+
+export const createBook = async (body) => {
+  try {
+    const url = `${baseUrl}/api/integration/booking`;
+    const token = localStorage.getItem("AUTH_TOKEN");
+
+    const book = await axios.post(url, body, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    Swal.fire(
+      "Book Success",
+      `Successfully booked, your Booking ID is: ${book.data.data.mgBookingID}`,
+      "success"
+    );
+
+    return { data: book?.data, status: book.status };
+  } catch (error) {
+    Swal.fire(
+      "Booking Failed",
+      "Error when booking hotel, please try again later",
+      "error"
+    );
+    return { data: [], status: 500 };
+  }
+};

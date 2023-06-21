@@ -6,6 +6,7 @@ import { NationalityContext } from "../../../context/nationality/reducer";
 import { CityContext } from "../../../context/city/reducer";
 import { CityLocationContext } from "../../../context/cityLocation/reducer";
 import {
+  createBook,
   getAllBookSearch,
   recheckBookSearch,
 } from "../../../context/book/actions";
@@ -17,37 +18,13 @@ import { getAllUserDD } from "../../../context/auth/actions";
 import { BOOK_SEARCH_RESET } from "../../../context/constant";
 import { toIDR } from "../../../utlis/helper";
 
-const dummyData = [
-  {
-    id: 1,
-    location_code: "ALOR",
-    location_name_en: "Alor",
-    location_name_ch: "4",
-    is_used: 1,
-  },
-  {
-    id: 2,
-    location_code: "AMBA",
-    location_name_en: "Ambarawa",
-    location_name_ch: "3",
-    is_used: 1,
-  },
-  {
-    id: 3,
-    location_code: "AMQ",
-    location_name_en: "Ambon",
-    location_name_ch: "5",
-    is_used: 0,
-  },
-];
-
 const initialForm = {
   checkIn: "",
   checkOut: "",
   nationality: "",
   country: "",
   city: "",
-  adults: 2,
+  adults: 0,
   children: 0,
   childAge: 0,
   roomNo: 1,
@@ -65,6 +42,7 @@ const Index = (props) => {
   const [selectedRoom, setSelectedRoom] = useState({});
   const [selectedAgent, setSelectedAgent] = useState({});
   const [recheckData, setRecheckData] = useState(null);
+  const [guestData, setGuestData] = useState([]);
 
   const { state, dispatch } = useContext(BookContext);
   const { state: cityState } = useContext(CityContext);
@@ -77,6 +55,12 @@ const Index = (props) => {
 
   const handleInputChange = (name, value) => {
     setForm({ ...form, [name]: value });
+  };
+
+  const handleGuestChange = (id, name, value) => {
+    let current = [...guestData];
+    current[id][name] = value;
+    setGuestData(current);
   };
 
   const handleGet = async () => {
@@ -112,7 +96,7 @@ const Index = (props) => {
     setSelectedRoom(room);
     Swal.fire({
       icon: "info",
-      title: "Loading Checking Available Room",
+      title: "Checking Available Room",
       showConfirmButton: false,
       timer: 1000 * 60,
       timerProgressBar: true,
@@ -140,6 +124,43 @@ const Index = (props) => {
     }, 1500);
   };
 
+  const handleBook = async () => {
+    Swal.fire({
+      icon: "info",
+      title: "Booking Room",
+      showConfirmButton: false,
+      timer: 1000 * 60,
+      timerProgressBar: true,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    const body = {
+      ...form,
+      hotelCode: selectedHotel.code,
+      sessionId: state?.data?.sessionId,
+      roomCode: selectedRoom?.code,
+      mealPlan: selectedRoom?.mealPlan,
+      rateKey: selectedRoom?.rooms?.room?.[0]?.rateKey,
+      cancelPolicyType: selectedRoom?.cancellationPolicyType,
+      guests: guestData,
+    };
+    delete body.codeHotel;
+
+    await createBook(body);
+
+    setTimeout(() => {
+      Swal.close();
+      setSelectedHotel({});
+      setSelectedRoom({});
+      setRecheckData(null);
+      setSelectedAgent({});
+      setGuestData([]);
+      setForm(initialForm);
+    }, 4500);
+  };
+
   const handleReset = () => {
     dispatch({ type: BOOK_SEARCH_RESET });
     setForm(initialForm);
@@ -147,14 +168,35 @@ const Index = (props) => {
     setSelectedRoom({});
     setRecheckData(null);
     setSelectedAgent({});
+    setGuestData([]);
   };
 
   useEffect(() => {
     getAllUserDD(authDispatch);
   }, []);
 
+  useEffect(() => {
+    let current = [...guestData];
+    if (+form.adults < current.length) {
+      current =
+        current.length === 0 ? [] : current.slice(0, current.length - 1);
+    } else {
+      if (+form.adults !== 0) {
+        current.push({
+          salutation: "",
+          firstName: "",
+          lastName: "",
+          age: "",
+        });
+      }
+    }
+
+    setGuestData(current);
+  }, [form.adults]);
+
   return (
     <div className="mx-3">
+      {console.log({ guestData })}
       <div className="row p-3">
         <div className="col-lg-6">
           <div className="text-dark mb-1">Booking</div>
@@ -226,7 +268,14 @@ const Index = (props) => {
               <Select options={roomData} label="SG" />
             </div>
             <div className="col-2">
-              <Select options={roomData} label="DG" />
+              <Select
+                options={roomData}
+                label="DG"
+                value={form.adults}
+                onChange={(val) => {
+                  handleInputChange("adults", +val.target.value);
+                }}
+              />
             </div>
             <div className="col-2">
               <Select options={roomData} label="TW" />
@@ -247,7 +296,7 @@ const Index = (props) => {
                 }
               />
             </div>
-            <div className="col-4">
+            {/* <div className="col-4">
               <Input
                 label="Adults"
                 type="number"
@@ -276,7 +325,7 @@ const Index = (props) => {
                   handleInputChange("childAge", val.target.value)
                 }
               />
-            </div>
+            </div> */}
             <div className="col-12">
               <Select
                 label="City Location"
@@ -607,16 +656,13 @@ const Index = (props) => {
               <thead>
                 <tr>
                   <th className="bg-blue text-white" width="5%">
-                    Room
-                  </th>
-                  <th className="bg-blue text-white" width="5%">
                     First Name
                   </th>
                   <th className="bg-blue text-white" width="5%">
-                    Family Name
+                    Last Name
                   </th>
                   <th className="bg-blue text-white" width="5%">
-                    Gender
+                    Salutation
                   </th>
                   <th className="bg-blue text-white" width="5%">
                     Age
@@ -624,14 +670,54 @@ const Index = (props) => {
                 </tr>
               </thead>
               <tbody>
-                {dummyData.map((data) => {
+                {guestData.map((data, key) => {
                   return (
                     <tr>
-                      <td>{data.location_code}</td>
-                      <td>{data.location_name_en}</td>
-                      <td>{data.location_name_ch}</td>
-                      <td></td>
-                      <td></td>
+                      <td>
+                        <input
+                          value={data.firstName}
+                          onChange={(val) =>
+                            handleGuestChange(
+                              key,
+                              "firstName",
+                              val.target.value
+                            )
+                          }
+                        />
+                      </td>
+                      <td>
+                        <input
+                          value={data.lastName}
+                          onChange={(val) =>
+                            handleGuestChange(key, "lastName", val.target.value)
+                          }
+                        />
+                      </td>
+                      <td>
+                        <select
+                          value={data.salutation}
+                          style={{ minHeight: 30 }}
+                          onChange={(val) =>
+                            handleGuestChange(
+                              key,
+                              "salutation",
+                              val.target.value
+                            )
+                          }
+                        >
+                          <option>== Select ==</option>
+                          <option value={"Mr"}>Mr</option>
+                          <option value={"Mrs"}>Mrs</option>
+                        </select>
+                      </td>
+                      <td>
+                        <input
+                          value={data.age}
+                          onChange={(val) =>
+                            handleGuestChange(key, "age", val.target.value)
+                          }
+                        />
+                      </td>
                     </tr>
                   );
                 })}
@@ -723,7 +809,10 @@ const Index = (props) => {
               <textarea className="form-control" />
             </div>
             <div className="col-12 d-flex justify-content-end py-2">
-              <button className="btn bg-blue rounded-1 text-white ms-2">
+              <button
+                onClick={() => handleBook()}
+                className="btn bg-blue rounded-1 text-white ms-2"
+              >
                 Book
               </button>
               <button className="btn bg-blue rounded-1 text-white ms-2">
