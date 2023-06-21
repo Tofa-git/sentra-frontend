@@ -6,6 +6,9 @@ import {
   AUTH_SUCCESS,
   AUTH_LOGOUT,
   AUTH_401,
+  GET_USER_FAILED,
+  GET_USER_PROCESS,
+  GET_USER_SUCCESS,
 } from "../constant";
 
 const AuthContext = createContext();
@@ -16,6 +19,7 @@ const initialState = {
   isError: false,
   errorMessage: null,
   status: 200,
+  listUsers: [],
 };
 
 function reducer(state, action) {
@@ -54,6 +58,24 @@ function reducer(state, action) {
       };
     case AUTH_401:
       return { ...state, status: 401 };
+    case GET_USER_PROCESS:
+      return {
+        ...state,
+        isLoading: true,
+      };
+    case GET_USER_SUCCESS:
+      return {
+        ...state,
+        isLoading: false,
+        listUsers: action.payload.data,
+      };
+    case GET_USER_FAILED:
+      return {
+        ...state,
+        isLoading: false,
+        isError: true,
+        errorMessage: action.payload,
+      };
     default:
       return state;
   }

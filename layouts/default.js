@@ -13,6 +13,8 @@ import { CityContext } from "../context/city/reducer";
 import Swal from "sweetalert2";
 import { CityLocationContext } from "../context/cityLocation/reducer";
 import { getAllCityLocation } from "../context/cityLocation/actions";
+import { getAllNationality } from "../context/nationality/actions";
+import { NationalityContext } from "../context/nationality/reducer";
 
 const Layout = ({ children, selectId }) => {
   const { state, dispatch } = useContext(AuthContext);
@@ -23,6 +25,8 @@ const Layout = ({ children, selectId }) => {
     useContext(CityLocationContext);
   const router = useRouter();
   const { dispatch: authDispatch } = useContext(AuthContext);
+  const { state: nationalityState, dispatch: nationalityDispatch } =
+    useContext(NationalityContext);
 
   const recheckToken = () => {
     const token = localStorage.getItem("AUTH_TOKEN");
@@ -36,16 +40,32 @@ const Layout = ({ children, selectId }) => {
   };
 
   const getMasterData = () => {
-    if (countryState.dropdownData.length === 0) {
+    if (
+      !countryState.hasOwnProperty("dropdownData") ||
+      countryState.dropdownData.length === 0
+    ) {
       getMaster("country");
     }
 
-    if (cityState.dropdownData.length === 0) {
+    if (
+      !cityState.hasOwnProperty("dropdownData") ||
+      cityState.dropdownData.length === 0
+    ) {
       getMaster("city");
     }
 
-    if (countryState.currencyData.length === 0) {
+    if (
+      !countryState.hasOwnProperty("currencyData") ||
+      countryState.currencyData.length === 0
+    ) {
       getMaster("currency");
+    }
+
+    if (
+      !nationalityState.hasOwnProperty("dropdownData") ||
+      nationalityState.dropdownData.length === 0
+    ) {
+      getMaster("nationality");
     }
 
     // if (cityLocationState.dropdownData.length === 0) {
@@ -63,6 +83,8 @@ const Layout = ({ children, selectId }) => {
       data = await getCurrencies(countryDispatch);
     } else if (name === "cityLocation") {
       data = await getAllCityLocation(cityLocationDispatch, true);
+    } else if (name === "nationality") {
+      data = await getAllNationality(nationalityDispatch, true);
     }
 
     if (data?.status === 401) {

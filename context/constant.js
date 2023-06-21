@@ -4,6 +4,9 @@ export const AUTH_SUCCESS = "AUTH_SUCCESS";
 export const AUTH_FAILED = "AUTH_FAILED";
 export const AUTH_LOGOUT = "AUTH_LOGOUT";
 export const AUTH_401 = "AUTH_401";
+export const GET_USER_PROCESS = "GET_USER_PROCESS";
+export const GET_USER_SUCCESS = "GET_USER_SUCCESS";
+export const GET_USER_FAILED = "GET_USER_FAILED";
 
 export const COUNTRY_PROCESS = "COUNTRY_PROCESS";
 export const COUNTRY_SUCCESS = "COUNTRY_SUCCESS";
@@ -27,6 +30,11 @@ export const CITY_LOCATION_FAILED = "CITY_LOCATION_FAILED";
 export const HOTEL_PROCESS = "HOTEL_PROCESS";
 export const HOTEL_SUCCESS = "HOTEL_SUCCESS";
 export const HOTEL_FAILED = "HOTEL_FAILED";
+
+export const BOOK_SEARCH_PROCESS = "BOOK_SEARCH_PROCESS";
+export const BOOK_SEARCH_SUCCESS = "BOOK_SEARCH_SUCCESS";
+export const BOOK_SEARCH_FAILED = "BOOK_SEARCH_FAILED";
+export const BOOK_SEARCH_RESET = "BOOK_SEARCH_RESET";
 
 // Another constant
 export const baseUrl = "https://api-azone.link-webid.com";

@@ -1,4 +1,5 @@
 import React from "react";
+import Datetime from "react-datetime";
 
 export default function Input({
   type = "text",
@@ -10,6 +11,7 @@ export default function Input({
   onChange = () => {},
   value = null,
   multiple = false,
+  disabled = false,
 }) {
   return (
     <div className="mt-2">
@@ -17,14 +19,24 @@ export default function Input({
         {label !== "" ? label : "-"}
       </div>
       <div className="input-group-sm">
-        <input
-          type={type}
-          className={`form-control ${isInvalid ? "is-invalid" : ""}`}
-          required={required}
-          onChange={onChange}
-          value={value}
-          multiple={multiple}
-        />
+        {type === "date" ? (
+          <Datetime
+            dateFormat="YYYY-MM-DD"
+            timeFormat={false}
+            onChange={(val) => onChange(val.format("YYYY-MM-DD"))}
+            value={value}
+          />
+        ) : (
+          <input
+            type={type}
+            className={`form-control ${isInvalid ? "is-invalid" : ""}`}
+            required={required}
+            onChange={onChange}
+            value={value}
+            multiple={multiple}
+            disabled={disabled}
+          />
+        )}
       </div>
       {errors.map((v, i) => (
         <div key={i} className="form-text text-danger">

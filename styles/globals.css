@@ -150,6 +150,14 @@ a {
   background: #2c539e !important;
 }
 
+.bg-selected {
+  background: #3b5d9cba !important;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
 .text-blue {
   color: #2c539e !important;
 }

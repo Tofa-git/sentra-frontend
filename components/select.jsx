@@ -10,6 +10,8 @@ export default function Select({
   options = [],
   onChange = () => {},
   value = null,
+  placeholder = "Select Data",
+  target = "general",
 }) {
   return (
     <div className="mt-2">
@@ -24,9 +26,13 @@ export default function Select({
           onChange={onChange}
           value={value}
         >
-          <option value="-">Choose Country</option>
+          <option value="-">{placeholder}</option>
           {options?.map((opt) => {
-            return <option value={opt.id}>{opt.name || opt.shortName}</option>;
+            return (
+              <option value={target === "general" ? opt.id : opt.code}>
+                {opt.name || opt.shortName || opt.email}
+              </option>
+            );
           })}
         </select>
       </div>

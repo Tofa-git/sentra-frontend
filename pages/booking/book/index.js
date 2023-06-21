@@ -1,6 +1,20 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Input from "../../../components/input";
 import Select from "../../../components/select";
+import { CountryContext } from "../../../context/country/reducer";
+import { NationalityContext } from "../../../context/nationality/reducer";
+import { CityContext } from "../../../context/city/reducer";
+import { CityLocationContext } from "../../../context/cityLocation/reducer";
+import {
+  getAllBookSearch,
+  recheckBookSearch,
+} from "../../../context/book/actions";
+import { BookContext } from "../../../context/book/reducer";
+import { AuthContext } from "../../../context/auth/reducer";
+import Swal from "sweetalert2";
+import { useRouter } from "next/router";
+import { getAllUserDD } from "../../../context/auth/actions";
+import { BOOK_SEARCH_RESET } from "../../../context/constant";
 
 const dummyData = [
   {
@@ -26,7 +40,102 @@ const dummyData = [
   },
 ];
 
+const initialForm = {
+  checkIn: "",
+  checkOut: "",
+  nationality: "",
+  country: "",
+  city: "",
+  adults: 2,
+  children: 0,
+  childAge: 0,
+  roomNo: 1,
+  codeHotel: "",
+};
+
+const roomData = new Array(Number(31))
+  .fill()
+  .map((i, key) => ({ id: key + 1, name: key + 1 }));
+
 const Index = (props) => {
+  const router = useRouter();
+
+  const [selectedHotel, setSelectedHotel] = useState({});
+  const [selectedRoom, setSelectedRoom] = useState({});
+  const [selectedAgent, setSelectedAgent] = useState({});
+  const [recheckData, setRecheckData] = useState(null);
+
+  const { state, dispatch } = useContext(BookContext);
+  const { state: cityState } = useContext(CityContext);
+  const { state: countryState } = useContext(CountryContext);
+  const { state: nationalityState } = useContext(NationalityContext);
+  const { state: cityLocationState } = useContext(CityLocationContext);
+  const { state: authState, dispatch: authDispatch } = useContext(AuthContext);
+
+  const [form, setForm] = useState(initialForm);
+
+  const handleInputChange = (name, value) => {
+    setForm({ ...form, [name]: value });
+  };
+
+  const handleGet = async () => {
+    setSelectedHotel({});
+    setSelectedRoom({});
+    setRecheckData(null);
+
+    const book = await getAllBookSearch(dispatch, form);
+    if (book.status === 401) {
+      authDispatch({ type: AUTH_401 });
+      authDispatch({ type: AUTH_LOGOUT });
+      Swal.fire("Token has been Expired", "Please Login Again", "warning");
+      router.push("/authentication/login");
+    }
+  };
+
+  const handleRecheck = async (room) => {
+    setSelectedRoom(room);
+    Swal.fire({
+      icon: "info",
+      title: "Loading Checking Available Room",
+      showConfirmButton: false,
+      timer: 1000 * 60,
+      timerProgressBar: true,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    const body = {
+      ...form,
+      hotelCode: selectedHotel.code,
+      sessionId: state?.data?.sessionId,
+      roomCode: room?.code,
+      mealPlan: room?.mealPlan,
+      rateKey: room?.rooms?.room?.[0]?.rateKey,
+    };
+    delete body.codeHotel;
+
+    const _recheck = await recheckBookSearch(body);
+    setRecheckData(_recheck.data.data);
+
+    setTimeout(() => {
+      Swal.close();
+    }, 1500);
+  };
+
+  const handleReset = () => {
+    dispatch({ type: BOOK_SEARCH_RESET });
+    setForm(initialForm);
+    setSelectedHotel({});
+    setSelectedRoom({});
+    setRecheckData(null);
+    setSelectedAgent({});
+  };
+
+  useEffect(() => {
+    getAllUserDD(authDispatch);
+  }, []);
+
   return (
     <div className="mx-3">
       <div className="row p-3">
@@ -34,22 +143,62 @@ const Index = (props) => {
           <div className="text-dark mb-1">Booking</div>
           <div className="bg-white py-3 row">
             <div className="col-12">
-              <Input label={"Agent"} />
+              <Select
+                label={"Agent"}
+                options={authState?.listUsers}
+                onChange={(val) => {
+                  const user = authState?.listUsers?.find(
+                    (i) => i.id === Number(val.target.value)
+                  );
+                  setSelectedAgent(user);
+                }}
+              />
             </div>
             <div className="col-12">
-              <Select label={"Nationality"} />
+              <Select
+                label={"Nationality"}
+                target="home"
+                // value={form.nationality}
+                options={nationalityState?.dropdownData}
+                onChange={(val) => handleInputChange("nationality", "ID")}
+              />
             </div>
             <div className="col-6">
-              <Select label={"Country"} />
+              <Select
+                label={"Country"}
+                target="home"
+                value={form.country}
+                options={countryState?.dropdownData}
+                onChange={(val) => {
+                  handleInputChange("country", val.target.value);
+                }}
+              />
             </div>
             <div className="col-6">
-              <Select label={"City"} />
+              <Select
+                label={"City"}
+                target="home"
+                value={form.city}
+                options={cityState?.dropdownData}
+                onChange={(val) => handleInputChange("city", val.target.value)}
+              />
+            </div>
+            {console.log(state)}
+            <div className="col-3">
+              <Input
+                type="date"
+                label="Check In"
+                value={form.checkIn}
+                onChange={(val) => handleInputChange("checkIn", val)}
+              />
             </div>
             <div className="col-3">
-              <Input type="date" label="Check In" />
-            </div>
-            <div className="col-3">
-              <Input type="date" label="Check Out" />
+              <Input
+                type="date"
+                label="Check Out"
+                value={form.checkOut}
+                onChange={(val) => handleInputChange("checkOut", val)}
+              />
             </div>
             <div className="col-3">
               <Input type="number" label="Night" />
@@ -58,25 +207,70 @@ const Index = (props) => {
               <Select />
             </div>
             <div className="col-2">
-              <Select label="SG" />
+              <Select options={roomData} label="SG" />
             </div>
             <div className="col-2">
-              <Select label="DG" />
+              <Select options={roomData} label="DG" />
             </div>
             <div className="col-2">
-              <Select label="TW" />
+              <Select options={roomData} label="TW" />
             </div>
             <div className="col-2">
-              <Select label="TP" />
+              <Select options={roomData} label="TP" />
             </div>
             <div className="col-2">
-              <Select label="QD" />
+              <Select options={roomData} label="QD" />
             </div>
             <div className="col-2">
-              <Select label="Rooms" />
+              <Input
+                label="Rooms"
+                type="number"
+                value={form.roomNo}
+                onChange={(val) =>
+                  handleInputChange("roomNo", val.target.value)
+                }
+              />
+            </div>
+            <div className="col-4">
+              <Input
+                label="Adults"
+                type="number"
+                value={form.adults}
+                onChange={(val) =>
+                  handleInputChange("adults", val.target.value)
+                }
+              />
+            </div>
+            <div className="col-4">
+              <Input
+                label="Children"
+                type="number"
+                value={form.children}
+                onChange={(val) =>
+                  handleInputChange("children", val.target.value)
+                }
+              />
+            </div>
+            <div className="col-4">
+              <Input
+                label="Child Age"
+                type="number"
+                value={form.childAge}
+                onChange={(val) =>
+                  handleInputChange("childAge", val.target.value)
+                }
+              />
             </div>
             <div className="col-12">
-              <Select label="City Location" />
+              <Select
+                label="City Location"
+                target="home"
+                value={form.cityLocation}
+                options={cityLocationState?.dropdownData}
+                onChange={(val) =>
+                  handleInputChange("cityLocation", val.target.value)
+                }
+              />
             </div>
             <div className="col-12">
               <Select label="Hotel" />
@@ -85,14 +279,25 @@ const Index = (props) => {
               <Input label="Designate Hotel" />
             </div>
             <div className="col-4 align-items-end d-flex">
-              <button className="bg-blue rounded">Search</button>
-              <button className="bg-blue rounded ms-2">Reset</button>
+              <button
+                disabled={state.isLoading}
+                onClick={() => handleGet(form)}
+                className="btn bg-blue rounded text text-white"
+              >
+                Search
+              </button>
+              <button
+                onClick={() => handleReset()}
+                className="btn bg-blue rounded ms-2 text-white"
+              >
+                Reset
+              </button>
             </div>
             <div className="col-8">
               <Input label="Quick Search" />
             </div>
             <div className="col-4 align-items-end d-flex">
-              <button className="bg-blue rounded">Search</button>
+              <button className="btn bg-blue rounded text-white">Search</button>
             </div>
             <div className="col-6">
               <div className="text-dark mt-2 mb-2">Available Type</div>
@@ -130,7 +335,7 @@ const Index = (props) => {
               <thead>
                 <tr>
                   <th className="bg-blue text-white" width="5%">
-                    RT
+                    Code
                   </th>
                   <th className="bg-blue text-white" width="30%">
                     Hotel
@@ -138,31 +343,23 @@ const Index = (props) => {
                   <th className="bg-blue text-white" width="5%">
                     ★
                   </th>
-                  <th className="bg-blue text-white" width="5%">
-                    Sale
-                  </th>
-                  <th className="bg-blue text-white" width="5%">
-                    Net
-                  </th>
-                  <th className="bg-blue text-white" width="5%">
-                    Breakfast
-                  </th>
-                  <th className="bg-blue text-white" width="5%">
-                    Supplier
-                  </th>
                 </tr>
               </thead>
               <tbody>
-                {dummyData.map((data) => {
+                {state?.data?.hotels.map((data) => {
+                  const isSelected = data.code === selectedHotel?.code;
                   return (
-                    <tr>
-                      <td>{data.location_code}</td>
-                      <td>{data.location_name_en}</td>
-                      <td>{data.location_name_ch}</td>
-                      <td>{data.is_used ? "Yes" : "No"}</td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
+                    <tr
+                      onClick={() => {
+                        setSelectedHotel(data);
+                        setSelectedRoom({});
+                        setRecheckData(null);
+                      }}
+                      className={`${isSelected ? "bg-selected" : ""} pointer`}
+                    >
+                      <td>{data.code}</td>
+                      <td>{data.name}</td>
+                      <td>{data.rating}</td>
                     </tr>
                   );
                 })}
@@ -180,22 +377,19 @@ const Index = (props) => {
               <thead>
                 <tr>
                   <th className="bg-blue text-white" width="5%">
-                    RT
+                    Code
                   </th>
-                  <th className="bg-blue text-white" width="30%">
-                    Hotel
+                  <th className="bg-blue text-white" width="20%">
+                    Name
                   </th>
-                  <th className="bg-blue text-white" width="5%">
-                    ★
+                  <th className="bg-blue text-white" width="10%">
+                    Gross Price
                   </th>
-                  <th className="bg-blue text-white" width="5%">
-                    Sale
-                  </th>
-                  <th className="bg-blue text-white" width="5%">
-                    Net
+                  <th className="bg-blue text-white" width="10%">
+                    Net Price
                   </th>
                   <th className="bg-blue text-white" width="5%">
-                    Breakfast
+                    Plan
                   </th>
                   <th className="bg-blue text-white" width="5%">
                     Supplier
@@ -203,23 +397,34 @@ const Index = (props) => {
                 </tr>
               </thead>
               <tbody>
-                {dummyData.map((data) => {
+                {selectedHotel?.roomDetails?.map((data) => {
+                  const isSelected =
+                    data.code === selectedRoom?.code &&
+                    data.mealPlan === selectedRoom?.mealPlan;
                   return (
-                    <tr>
-                      <td>{data.location_code}</td>
-                      <td>{data.location_name_en}</td>
-                      <td>{data.location_name_ch}</td>
-                      <td>{data.is_used ? "Yes" : "No"}</td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
+                    <tr
+                      onClick={() => handleRecheck(data)}
+                      className={`${isSelected ? "bg-selected" : ""} pointer`}
+                    >
+                      <td>{data.code}</td>
+                      <td>{data.name}</td>
+                      <td>
+                        Rp. {new Intl.NumberFormat().format(data.grossPrice)}
+                      </td>
+                      <td>
+                        Rp. {new Intl.NumberFormat().format(data.netPrice)}
+                      </td>
+                      <td>{data.mealPlanName}</td>
+                      <td>MGJ</td>
                     </tr>
                   );
                 })}
               </tbody>
             </table>
           </div>
-          <div className="text-dark mb-1">Rate</div>
+          <div className="text-dark mb-1">
+            Rate: <span className="text-primary">{selectedRoom?.name}</span>
+          </div>
           <div className="bg-white">
             <table className="table table-bordered table-hover table-striped">
               <thead>
@@ -268,32 +473,50 @@ const Index = (props) => {
                   </th>
                 </tr>
               </thead>
+              {console.log({ recheckData })}
               <tbody>
-                {dummyData.map((data) => {
-                  return (
-                    <tr>
-                      <td>{data.location_code}</td>
-                      <td>{data.location_name_en}</td>
-                      <td>{data.location_name_ch}</td>
-                      <td>{data.is_used ? "Yes" : "No"}</td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                    </tr>
-                  );
-                })}
+                <tr>
+                  <td>{recheckData ? form.checkIn : "-"}</td>
+                  <td>0</td>
+                  <td>{recheckData?.roomDetails?.grossPrice || 0}</td>
+                  <td>0</td>
+                  <td>0</td>
+                  <td>0</td>
+                  <td>0</td>
+                  <td>{recheckData?.roomDetails?.netPrice || 0}</td>
+                  <td>0</td>
+                  <td>0</td>
+                  <td>0</td>
+                </tr>
+                <tr>
+                  <td className="text-primary text-center" colSpan={3}>
+                    CXL DEADLINE
+                  </td>
+                  <td className="text-danger text-center" colSpan={3}>
+                    {recheckData ? "Non Refundable" : "-"}
+                  </td>
+                  <td className="text-primary text-center" colSpan={3}>
+                    SPLY DEADLINE
+                  </td>
+                  <td className="text-danger text-center" colSpan={3}>
+                    {recheckData?.roomDetails?.cancellationPolicies?.policy?.[
+                      recheckData?.roomDetails?.cancellationPolicies?.policy
+                        ?.length - 1
+                    ]?.toDate || "-"}
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
           <div className="text-dark mb-1 d-flex justify-content-between">
             <span>Booking</span>
             <div>
-              <button className="bg-blue rounded-1 ms-2">Wish</button>
-              <button className="bg-blue rounded-1 ms-2">Quotation</button>
+              <button className="btn bg-blue rounded-1 text-white ms-2">
+                Wish
+              </button>
+              <button className="btn bg-blue rounded-1 text-white ms-2">
+                Quotation
+              </button>
             </div>
           </div>
           <div className="bg-white row mx-0 py-2">
@@ -301,37 +524,53 @@ const Index = (props) => {
               <Input label={"Group No"} />
             </div>
             <div className="col-4">
-              <Input label={"Book No"} />
+              <Input label={"Book No"} disabled={true} />
             </div>
             <div className="col-4">
-              <Input label={"Book Type"} />
+              <Input label={"Book Type"} value={"internal"} disabled={true} />
             </div>
             <div className="col-6">
-              <Input label={"Agent"} />
+              <Input
+                label={"Agent"}
+                value={selectedAgent?.firstName}
+                disabled={true}
+              />
             </div>
             <div className="col-6">
-              <Input label={"Manager"} />
+              <Input label={"Manager"} disabled={true} />
             </div>
             <div className="col-6">
-              <Input label={"Markup"} />
+              <Input
+                label={"Markup"}
+                value={"Net + 0  or  Net × 0%"}
+                disabled={true}
+              />
             </div>
             <div className="col-6">
-              <Input label={"Credit"} />
+              <Input
+                label={"Credit"}
+                value={"0.00 / 0.00 (IDR)"}
+                disabled={true}
+              />
             </div>
             <div className="col-6">
               <Input label={"Tel"} />
             </div>
             <div className="col-6">
-              <Input label={"Mobile"} />
+              <Input label={"Mobile"} value={selectedAgent?.mobile} />
             </div>
             <div className="col-6">
-              <Input label={"Email"} />
+              <Input label={"Email"} value={selectedAgent?.email} />
             </div>
             <div className="col-6">
-              <Input label={"Operator"} />
+              <Input label={"Operator"} disabled={true} />
             </div>
             <div className="col-12">
-              <Input label={"If Over (no) Credit"} />
+              <Input
+                label={"If Over (no) Credit"}
+                disabled={true}
+                value={"Book only before CXL dead line"}
+              />
             </div>
           </div>
           <div className="bg-white mt-2">
@@ -398,7 +637,7 @@ const Index = (props) => {
             <div className="col-3">
               <input type="checkbox" />
               <span className="text-dark ms-2">Early checkin-at</span>
-              <select className="form-select rounded-0" value="-">
+              <select className="form-select rounded-0 text-white" value="-">
                 <option value="-" selected disabled>
                   Choose Hours
                 </option>
@@ -413,7 +652,7 @@ const Index = (props) => {
             <div className="col-3">
               <input type="checkbox" />
               <span className="text-dark ms-2">Late checkin-at</span>
-              <select className="form-select rounded-0" value="-">
+              <select className="form-select rounded-0 text-white" value="-">
                 <option value="-" selected disabled>
                   Choose Hours
                 </option>
@@ -455,8 +694,12 @@ const Index = (props) => {
               <textarea className="form-control" />
             </div>
             <div className="col-12 d-flex justify-content-end py-2">
-              <button className="bg-blue rounded-1 ms-2">Book</button>
-              <button className="bg-blue rounded-1 ms-2">Reset</button>
+              <button className="btn bg-blue rounded-1 text-white ms-2">
+                Book
+              </button>
+              <button className="btn bg-blue rounded-1 text-white ms-2">
+                Reset
+              </button>
             </div>
           </div>
         </div>
