@@ -15,6 +15,7 @@ import Swal from "sweetalert2";
 import { useRouter } from "next/router";
 import { getAllUserDD } from "../../../context/auth/actions";
 import { BOOK_SEARCH_RESET } from "../../../context/constant";
+import { toIDR } from "../../../utlis/helper";
 
 const dummyData = [
   {
@@ -83,6 +84,17 @@ const Index = (props) => {
     setSelectedRoom({});
     setRecheckData(null);
 
+    Swal.fire({
+      icon: "info",
+      title: "Search Available Hotel",
+      showConfirmButton: false,
+      timer: 1000 * 60,
+      timerProgressBar: true,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
     const book = await getAllBookSearch(dispatch, form);
     if (book.status === 401) {
       authDispatch({ type: AUTH_401 });
@@ -90,6 +102,10 @@ const Index = (props) => {
       Swal.fire("Token has been Expired", "Please Login Again", "warning");
       router.push("/authentication/login");
     }
+
+    setTimeout(() => {
+      Swal.close();
+    }, 1500);
   };
 
   const handleRecheck = async (room) => {
@@ -112,6 +128,7 @@ const Index = (props) => {
       roomCode: room?.code,
       mealPlan: room?.mealPlan,
       rateKey: room?.rooms?.room?.[0]?.rateKey,
+      cancelPolicyType: room?.cancellationPolicyType,
     };
     delete body.codeHotel;
 
@@ -183,7 +200,6 @@ const Index = (props) => {
                 onChange={(val) => handleInputChange("city", val.target.value)}
               />
             </div>
-            {console.log(state)}
             <div className="col-3">
               <Input
                 type="date"
@@ -343,11 +359,20 @@ const Index = (props) => {
                   <th className="bg-blue text-white" width="5%">
                     ★
                   </th>
+                  <th className="bg-blue text-white" width="5%">
+                    Gross Price
+                  </th>
+                  <th className="bg-blue text-white" width="5%">
+                    Net Price
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {state?.data?.hotels.map((data) => {
                   const isSelected = data.code === selectedHotel?.code;
+                  const sortedData = data?.roomDetails?.sort(
+                    (a, b) => a.grossPrice - b.grossPrice
+                  )[0];
                   return (
                     <tr
                       onClick={() => {
@@ -360,6 +385,8 @@ const Index = (props) => {
                       <td>{data.code}</td>
                       <td>{data.name}</td>
                       <td>{data.rating}</td>
+                      <td>{toIDR(sortedData.grossPrice)}</td>
+                      <td>{toIDR(sortedData.grossPrice)}</td>
                     </tr>
                   );
                 })}
@@ -398,9 +425,7 @@ const Index = (props) => {
               </thead>
               <tbody>
                 {selectedHotel?.roomDetails?.map((data) => {
-                  const isSelected =
-                    data.code === selectedRoom?.code &&
-                    data.mealPlan === selectedRoom?.mealPlan;
+                  const isSelected = data.id === selectedRoom?.id;
                   return (
                     <tr
                       onClick={() => handleRecheck(data)}
@@ -408,12 +433,8 @@ const Index = (props) => {
                     >
                       <td>{data.code}</td>
                       <td>{data.name}</td>
-                      <td>
-                        Rp. {new Intl.NumberFormat().format(data.grossPrice)}
-                      </td>
-                      <td>
-                        Rp. {new Intl.NumberFormat().format(data.netPrice)}
-                      </td>
+                      <td>{toIDR(data.grossPrice)}</td>
+                      <td>{toIDR(data.netPrice)}</td>
                       <td>{data.mealPlanName}</td>
                       <td>MGJ</td>
                     </tr>
@@ -473,17 +494,24 @@ const Index = (props) => {
                   </th>
                 </tr>
               </thead>
-              {console.log({ recheckData })}
               <tbody>
                 <tr>
                   <td>{recheckData ? form.checkIn : "-"}</td>
                   <td>0</td>
-                  <td>{recheckData?.roomDetails?.grossPrice || 0}</td>
+                  <td>
+                    {recheckData?.roomDetails
+                      ? toIDR(recheckData?.roomDetails?.grossPrice)
+                      : 0}
+                  </td>
                   <td>0</td>
                   <td>0</td>
                   <td>0</td>
                   <td>0</td>
-                  <td>{recheckData?.roomDetails?.netPrice || 0}</td>
+                  <td>
+                    {recheckData?.roomDetails
+                      ? toIDR(recheckData?.roomDetails?.netPrice)
+                      : 0}
+                  </td>
                   <td>0</td>
                   <td>0</td>
                   <td>0</td>
@@ -493,7 +521,8 @@ const Index = (props) => {
                     CXL DEADLINE
                   </td>
                   <td className="text-danger text-center" colSpan={3}>
-                    {recheckData ? "Non Refundable" : "-"}
+                    {recheckData?.roomDetails?.cancellationPolicies?.policy?.[0]
+                      ?.fromDate || "Non Refundable"}
                   </td>
                   <td className="text-primary text-center" colSpan={3}>
                     SPLY DEADLINE
