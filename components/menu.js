@@ -104,6 +104,38 @@ const DataMenu = [
     icon: "dashboard",
   },
   {
+    id: "13",
+    refid: "005",
+    headid: "0",
+    type: "2",
+    caption: "Operator",
+    icon: "people",
+  },
+  {
+    id: "14",
+    refid: "005",
+    headid: "0",
+    type: "2",
+    caption: "Agent",
+    icon: "people",
+  },
+  {
+    id: "15",
+    refid: "005",
+    headid: "0",
+    type: "2",
+    caption: "Supplier",
+    icon: "people",
+  },
+  {
+    id: "16",
+    refid: "005",
+    headid: "0",
+    type: "2",
+    caption: "Authority",
+    icon: "people",
+  },
+  {
     id: "31",
     refid: "",
     headid: "3",
@@ -283,6 +315,17 @@ const DataMenu = [
     target: "/currency/exchange-rate",
     icon: "dashboard",
   },
+  //#region Operator
+  {
+    id: "30",
+    refid: "",
+    headid: "13",
+    type: "1",
+    caption: "Operator Management",
+    target: "/currency/exchange-rate",
+    icon: "dashboard",
+  },
+  //#endregion
 ];
 
 export default DataMenu;
