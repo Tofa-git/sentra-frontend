@@ -1,30 +1,17 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Input from "../../../components/input";
 import Select from "../../../components/select";
-
-const dummyData = [
-  {
-    id: 1,
-    location_code: "ALOR",
-    location_name_en: "Alor",
-    location_name_ch: "4",
-    is_used: 1,
-  },
-  {
-    id: 2,
-    location_code: "AMBA",
-    location_name_en: "Ambarawa",
-    location_name_ch: "3",
-    is_used: 1,
-  },
-  {
-    id: 3,
-    location_code: "AMQ",
-    location_name_en: "Ambon",
-    location_name_ch: "5",
-    is_used: 0,
-  },
-];
+import { useRouter } from "next/router";
+import {
+  cancelBooking,
+  getAllBookList,
+  getDetailBook,
+} from "../../../context/book/actions";
+import { AuthContext } from "../../../context/auth/reducer";
+import Swal from "sweetalert2";
+import { BookContext } from "../../../context/book/reducer";
+import Pagination from "../../../components/pagination";
+import BookDetail from "./modalDetail";
 
 const checklist = [
   { id: 0, value: "ALL" },
@@ -46,8 +33,98 @@ const checklist = [
 ];
 
 const Index = (props) => {
+  const router = useRouter();
+  const [keyword, setKeyword] = useState("");
+  const [detailBooking, setDetailBooking] = useState();
+  const { state, dispatch } = useContext(BookContext);
+  const { dispatch: authDispatch } = useContext(AuthContext);
+
+  const handleGet = async (page = 1, limit = 12) => {
+    const country = await getAllBookList(dispatch, page, limit, keyword);
+    if (country.status === 401) {
+      authDispatch({ type: AUTH_401 });
+      authDispatch({ type: AUTH_LOGOUT });
+      Swal.fire("Token has been Expired", "Please Login Again", "warning");
+      router.push("/authentication/login");
+    }
+  };
+
+  const handleDetail = async (bookId) => {
+    setDetailBooking({});
+
+    Swal.fire({
+      icon: "info",
+      title: "Get Detail Book" + `: ${bookId}`,
+      showConfirmButton: false,
+      timer: 1000 * 60,
+      timerProgressBar: true,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    const book = await getDetailBook(bookId);
+    if (book.status === 401) {
+      authDispatch({ type: AUTH_401 });
+      authDispatch({ type: AUTH_LOGOUT });
+      Swal.fire("Token has been Expired", "Please Login Again", "warning");
+      router.push("/authentication/login");
+    }
+    setDetailBooking(book.data.data);
+
+    setTimeout(() => {
+      Swal.close();
+    }, 1500);
+  };
+
+  const handleCancel = async (id) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: `You will cancel ${id}, you won't revert this`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Cancel Booking",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          icon: "info",
+          title: "Canceling Booking" + `: ${id}`,
+          showConfirmButton: false,
+          timer: 1000 * 60,
+          timerProgressBar: true,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+        const res = await cancelBooking(id);
+
+        if (res.status === 500) {
+          Swal.fire("Error Canceling Book", res.message, "error");
+        } else {
+          Swal.fire("Successfully Cancel Book", "", "success");
+        }
+
+        setTimeout(() => {
+          Swal.close();
+        }, 1500);
+      }
+    });
+  };
+
+  useEffect(() => {
+    handleGet();
+  }, []);
+
   return (
     <div className="m-3">
+      <BookDetail
+        id="createHotel"
+        size="modal-xl"
+        handleGet={handleGet}
+        data={detailBooking}
+      />
       <div className="d-flex h-100">
         <div className="w-100">
           <div className="text-dark mb-2">
@@ -139,10 +216,10 @@ const Index = (props) => {
               <div className="col-3">
                 <div className="d-flex flex-row">
                   <Select label={"Client Type"} />
-                  <button className="bg-blue rounded ms-2 h-50 align-self-end">
+                  <button className="bg-blue text-white rounded ms-2 h-50 align-self-end">
                     Search
                   </button>
-                  <button className="bg-blue rounded ms-2 h-50 align-self-end">
+                  <button className="bg-blue text-white rounded ms-2 h-50 align-self-end">
                     Excel
                   </button>
                 </div>
@@ -171,27 +248,30 @@ const Index = (props) => {
               <thead>
                 <tr>
                   <th className="bg-blue text-white" width="5%">
-                    EVT
+                    Booking ID
                   </th>
                   <th className="bg-blue text-white" width="5%">
-                    Book No Group No
+                    Check In
+                  </th>
+                  <th className="bg-blue text-white" width="5%">
+                    Check Out
                   </th>
                   <th className="bg-blue text-white" width="15%">
-                    Book Date
+                    Hotel Name
                   </th>
                   <th className="bg-blue text-white" width="5%">
-                    BK Status
+                    Gross Price
                   </th>
                   <th className="bg-blue text-white" width="5%">
-                    City
+                    Policy Type
                   </th>
                   <th className="bg-blue text-white" width="5%">
-                    Hotel
+                    Room Name
                   </th>
                   <th className="bg-blue text-white" width="5%">
-                    Agent Manager
+                    Action
                   </th>
-                  <th className="bg-blue text-white" width="5%">
+                  {/* <th className="bg-blue text-white" width="5%">
                     C-Day
                   </th>
                   <th className="bg-blue text-white" width="5%">
@@ -229,39 +309,47 @@ const Index = (props) => {
                   </th>
                   <th className="bg-blue text-white" width="5%">
                     Sale Office
-                  </th>
+                  </th> */}
                 </tr>
               </thead>
               <tbody>
-                {dummyData.map((data) => {
+                {state?.dataList?.rows?.map((data) => {
                   return (
                     <tr>
-                      <td>{data.location_code}</td>
-                      <td>{data.location_name_ch}</td>
-                      <td>{data.location_name_en}</td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
+                      <td>{data?.mgBookingID}</td>
+                      <td>{data?.checkIn}</td>
+                      <td>{data?.checkOut}</td>
+                      <td>{data?.hotelName}</td>
+                      <td>{data?.grossPrice}</td>
+                      <td>{data?.cancellationPolicyType}</td>
+                      <td>{data?.roomName}</td>
+                      <td className="d-flex flex-row justify-content-center align-items-center">
+                        <button
+                          type="button"
+                          className="btn btn-primary bg-blue"
+                          data-bs-toggle="modal"
+                          data-bs-target="#createHotel"
+                          onClick={() => handleDetail(data?.mgBookingID)}
+                        >
+                          Detail
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-danger ms-2"
+                          onClick={() => {
+                            handleCancel(data?.mgBookingID);
+                          }}
+                        >
+                          Cancel
+                        </button>
+                      </td>
                     </tr>
                   );
                 })}
               </tbody>
             </table>
           </div>
+          <Pagination state={state?.dataList} handleGet={handleGet} />
         </div>
       </div>
     </div>

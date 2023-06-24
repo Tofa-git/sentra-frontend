@@ -4,6 +4,9 @@ import {
   BOOK_SEARCH_FAILED,
   BOOK_SEARCH_PROCESS,
   BOOK_SEARCH_SUCCESS,
+  BOOK_LIST_FAILED,
+  BOOK_LIST_PROCESS,
+  BOOK_LIST_SUCCESS,
   BOOK_SEARCH_RESET,
 } from "../constant";
 
@@ -14,6 +17,7 @@ const initialState = {
   isError: false,
   errorMessage: null,
   dataSearch: [],
+  dataList: [],
 };
 
 function reducer(state, action) {
@@ -31,6 +35,25 @@ function reducer(state, action) {
       };
 
     case BOOK_SEARCH_FAILED:
+      return {
+        ...state,
+        isLoading: false,
+        isError: true,
+        errorMessage: action.payload,
+      };
+    case BOOK_LIST_PROCESS:
+      return {
+        ...state,
+        isLoading: true,
+      };
+    case BOOK_LIST_SUCCESS:
+      return {
+        ...state,
+        isLoading: false,
+        dataList: action.payload.data,
+      };
+
+    case BOOK_LIST_FAILED:
       return {
         ...state,
         isLoading: false,
