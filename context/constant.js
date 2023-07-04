@@ -38,6 +38,9 @@ export const BOOK_SEARCH_RESET = "BOOK_SEARCH_RESET";
 export const BOOK_LIST_PROCESS = "BOOK_LIST_PROCESS";
 export const BOOK_LIST_SUCCESS = "BOOK_LIST_SUCCESS";
 export const BOOK_LIST_FAILED = "BOOK_LIST_FAILED";
+export const BOOK_DETAIL_PROCESS = "BOOK_DETAIL_PROCESS";
+export const BOOK_DETAIL_SUCCESS = "BOOK_DETAIL_SUCCESS";
+export const BOOK_DETAIL_FAILED = "BOOK_DETAIL_FAILED";
 
 // Another constant
 export const baseUrl = "https://api-azone.link-webid.com";

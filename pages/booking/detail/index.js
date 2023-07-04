@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useContext } from "react";
 import Input from "../../../components/input";
 import Select from "../../../components/select";
+import { BookContext } from "../../../context/book/reducer";
 
 const dummyData = [
   {
@@ -27,20 +28,42 @@ const dummyData = [
 ];
 
 const Index = (props) => {
+  const { state } = useContext(BookContext);
+  const details = state?.details;
+
   return (
     <div className="mx-3">
       <div className="row p-3">
         <div className="col-lg-6">
           <div className="text-dark mb-1">Booking Basic</div>
           <div className="bg-white py-3 row">
-            <div className="col-12">
-              <Input label={"Agent"} />
-            </div>
-            <div className="col-12">
-              <Select label={"Nationality"} />
+            <div className="col-6">
+              <Input
+                label={"Booking ID"}
+                disabled={true}
+                value={details.mgBookingID}
+              />
             </div>
             <div className="col-6">
-              <Select label={"Country"} />
+              <Input
+                label={"Booking Version ID"}
+                disabled={true}
+                value={details.mgBookingVersionID}
+              />
+            </div>
+            <div className="col-6">
+              <Input
+                label={"Check In"}
+                disabled={true}
+                value={details?.checkIn}
+              />
+            </div>
+            <div className="col-6">
+              <Input
+                label={"Check Out"}
+                disabled={true}
+                value={details?.checkOut}
+              />
             </div>
             <div className="col-6">
               <Select label={"City"} />

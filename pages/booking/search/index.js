@@ -33,6 +33,7 @@ const checklist = [
 ];
 
 const Index = (props) => {
+  const { setMode } = props;
   const router = useRouter();
   const [keyword, setKeyword] = useState("");
   const [detailBooking, setDetailBooking] = useState();
@@ -63,13 +64,14 @@ const Index = (props) => {
       },
     });
 
-    const book = await getDetailBook(bookId);
+    const book = await getDetailBook(dispatch, bookId);
     if (book.status === 401) {
       authDispatch({ type: AUTH_401 });
       authDispatch({ type: AUTH_LOGOUT });
       Swal.fire("Token has been Expired", "Please Login Again", "warning");
       router.push("/authentication/login");
     }
+    setMode(2);
     setDetailBooking(book.data.data);
 
     setTimeout(() => {
@@ -315,7 +317,10 @@ const Index = (props) => {
               <tbody>
                 {state?.dataList?.rows?.map((data) => {
                   return (
-                    <tr>
+                    <tr
+                      onClick={() => handleDetail(data?.mgBookingID)}
+                      className="pointer"
+                    >
                       <td>{data?.mgBookingID}</td>
                       <td>{data?.checkIn}</td>
                       <td>{data?.checkOut}</td>
@@ -324,15 +329,13 @@ const Index = (props) => {
                       <td>{data?.cancellationPolicyType}</td>
                       <td>{data?.roomName}</td>
                       <td className="d-flex flex-row justify-content-center align-items-center">
-                        <button
+                        {/* <button
                           type="button"
                           className="btn btn-primary bg-blue"
-                          data-bs-toggle="modal"
-                          data-bs-target="#createHotel"
                           onClick={() => handleDetail(data?.mgBookingID)}
                         >
                           Detail
-                        </button>
+                        </button> */}
                         <button
                           type="button"
                           className="btn btn-danger ms-2"

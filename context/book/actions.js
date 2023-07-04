@@ -6,6 +6,9 @@ import {
   BOOK_LIST_FAILED,
   BOOK_LIST_PROCESS,
   BOOK_LIST_SUCCESS,
+  BOOK_DETAIL_FAILED,
+  BOOK_DETAIL_PROCESS,
+  BOOK_DETAIL_SUCCESS,
   BOOK_SEARCH_RESET,
   baseUrl,
 } from "../constant";
@@ -144,7 +147,8 @@ export const createBook = async (body) => {
   }
 };
 
-export const getDetailBook = async (bookingId) => {
+export const getDetailBook = async (dispatch, bookingId) => {
+  dispatch({ type: BOOK_DETAIL_PROCESS });
   try {
     let url = `${baseUrl}/api/integration/booking-detail/${bookingId}`;
 
@@ -156,9 +160,16 @@ export const getDetailBook = async (bookingId) => {
       },
     });
 
+    dispatch({
+      type: BOOK_DETAIL_SUCCESS,
+      payload: book.data,
+    });
     return { data: book?.data, status: book.status };
   } catch (error) {
-    console.log(error);
+    dispatch({
+      type: BOOK_DETAIL_FAILED,
+      payload: error,
+    });
     return { data: [], status: 500 };
   }
 };
