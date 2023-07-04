@@ -42,5 +42,9 @@ export const BOOK_DETAIL_PROCESS = "BOOK_DETAIL_PROCESS";
 export const BOOK_DETAIL_SUCCESS = "BOOK_DETAIL_SUCCESS";
 export const BOOK_DETAIL_FAILED = "BOOK_DETAIL_FAILED";
 
+export const FACILITY_PROCESS = "FACILITY_PROCESS";
+export const FACILITY_SUCCESS = "FACILITY_SUCCESS";
+export const FACILITY_FAILED = "FACILITY_FAILED";
+
 // Another constant
 export const baseUrl = "https://api-azone.link-webid.com";
