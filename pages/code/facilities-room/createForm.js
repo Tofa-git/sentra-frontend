@@ -46,6 +46,7 @@ const CreateForm = (props) => {
     }
 
     await props.handleGet();
+    setForm(initForm);
     document.getElementById("cancelModal").click();
   };
 
@@ -57,7 +58,6 @@ const CreateForm = (props) => {
       aria-labelledby="exampleModalLabel"
       aria-hidden="true"
     >
-      {console.log({ form })}
       <div className={props.size + " modal-dialog"}>
         <div className="modal-content rounded-2 shadow">
           <div className="modal-header">

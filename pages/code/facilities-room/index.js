@@ -3,8 +3,6 @@ import { useRouter } from "next/router";
 import Layout from "../../../layouts/default";
 import StdForm from "../../../components/forms/stdForm";
 import CreateForm from "./createForm";
-import ImgButton from "../../../components/button/imgButton";
-import "material-icons/iconfont/material-icons.css";
 import { FacilityContext } from "../../../context/facility/reducer";
 import { AuthContext } from "../../../context/auth/reducer";
 import {
@@ -83,7 +81,7 @@ const Index = (props) => {
               role="button"
               title="Go Search"
               style={{ padding: "2px 5px" }}
-              href="#"
+              onClick={() => handleGet(1, 12)}
             >
               <i className="material-icons" style={{ verticalAlign: "middle" }}>
                 search
@@ -132,7 +130,6 @@ const Index = (props) => {
               </th>
             </tr>
           </thead>
-          {console.log(state)}
           <tbody>
             {state?.data?.rows?.map((data) => {
               return (

@@ -46,5 +46,9 @@ export const FACILITY_PROCESS = "FACILITY_PROCESS";
 export const FACILITY_SUCCESS = "FACILITY_SUCCESS";
 export const FACILITY_FAILED = "FACILITY_FAILED";
 
+export const BREAKFAST_PROCESS = "BREAKFAST_PROCESS";
+export const BREAKFAST_SUCCESS = "BREAKFAST_SUCCESS";
+export const BREAKFAST_FAILED = "BREAKFAST_FAILED";
+
 // Another constant
 export const baseUrl = "https://api-azone.link-webid.com";
