@@ -14,30 +14,6 @@ import {
 import Swal from "sweetalert2";
 import Pagination from "../../../components/pagination";
 
-const dummyData = [
-  {
-    id: 1,
-    code: "*BC",
-    facility_name_en: "Business Centre",
-    facility_name_ch: "阿富汗",
-    is_used: 1,
-  },
-  {
-    id: 2,
-    code: "*BQ",
-    facility_name_en: "Business Quantro",
-    facility_name_ch: "阿富汗",
-    is_used: 0,
-  },
-  {
-    id: 3,
-    code: "*BP",
-    facility_name_en: "Boutique",
-    facility_name_ch: "阿尔巴尼亚",
-    is_used: 1,
-  },
-];
-
 const Index = (props) => {
   const router = useRouter();
   const [selectedId, setSelectedId] = useState("002");
@@ -177,6 +153,15 @@ const Index = (props) => {
                       }}
                     >
                       Edit
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-danger ms-2"
+                      onClick={() => {
+                        handleDelete(data.id);
+                      }}
+                    >
+                      Delete
                     </button>
                   </td>
                 </tr>
