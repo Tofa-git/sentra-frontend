@@ -41,14 +41,14 @@ const Index = (props) => {
               <Input
                 label={"Booking ID"}
                 disabled={true}
-                value={details.mgBookingID}
+                value={details?.mgBookingID}
               />
             </div>
             <div className="col-6">
               <Input
                 label={"Booking Version ID"}
                 disabled={true}
-                value={details.mgBookingVersionID}
+                value={details?.mgBookingVersionID}
               />
             </div>
             <div className="col-6">
