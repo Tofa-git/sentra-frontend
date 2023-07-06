@@ -29,7 +29,32 @@ const initialForm = {
   childAge: 0,
   roomNo: 1,
   codeHotel: "",
+  night: 0,
 };
+
+const ratingsData = [
+  {
+    id: 1,
+    name:"★"
+  },
+  {
+    id:2,
+    name:"★★"
+  },
+  {
+    id:3,
+    name:"★★★"
+  },
+  {
+    id:4,
+    name:"★★★★"
+  },
+  {
+    id:5,
+    name:"★★★★★"
+  }
+
+];
 
 const roomData = new Array(Number(31))
   .fill()
@@ -54,7 +79,28 @@ const Index = (props) => {
   const [form, setForm] = useState(initialForm);
 
   const handleInputChange = (name, value) => {
-    setForm({ ...form, [name]: value });
+    if (name === "checkIn" || name === "checkOut") {
+      const checkInDate = name === "checkIn" ? value : form.checkIn;
+      const checkOutDate = name === "checkOut" ? value : form.checkOut;
+  
+      const nightCount = calculateNightCount(checkInDate, checkOutDate);
+      setForm({ ...form, [name]: value, night: nightCount });
+    } else {
+      setForm({ ...form, [name]: value });
+    }
+  };
+
+  const calculateNightCount = (checkInDate, checkOutDate) => {
+    if (checkInDate && checkOutDate) {
+      const oneDay = 24 * 60 * 60 * 1000; // One day in milliseconds
+      const checkIn = new Date(checkInDate);
+      const checkOut = new Date(checkOutDate);
+      const nightCount = Math.round(
+        Math.abs((checkIn - checkOut) / oneDay)
+      );
+      return nightCount;
+    }
+    return 0;
   };
 
   const handleGuestChange = (id, name, value) => {
@@ -207,7 +253,7 @@ const Index = (props) => {
                 options={authState?.listUsers}
                 onChange={(val) => {
                   const user = authState?.listUsers?.find(
-                    (i) => i.id === Number(val.target.value)
+                    (i) => i.id === Number(val.value)
                   );
                   setSelectedAgent(user);
                 }}
@@ -228,8 +274,8 @@ const Index = (props) => {
                 target="home"
                 value={form.country}
                 options={countryState?.dropdownData}
-                onChange={(val) => {
-                  handleInputChange("country", val.target.value);
+                onChange={(val) => {           
+                  handleInputChange("country", val?.target.value);
                 }}
               />
             </div>
@@ -259,10 +305,10 @@ const Index = (props) => {
               />
             </div>
             <div className="col-3">
-              <Input type="number" label="Night" />
+              <Input type="number" label="Night" value={form.night} readOnly />
             </div>
             <div className="col-3">
-              <Select />
+              <Select options={ratingsData}/>
             </div>
             <div className="col-2">
               <Select options={roomData} label="SG" />
