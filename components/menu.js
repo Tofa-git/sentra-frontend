@@ -322,7 +322,19 @@ const DataMenu = [
     headid: "13",
     type: "1",
     caption: "Operator Management",
-    target: "/currency/exchange-rate",
+    target: "/operator",
+    icon: "dashboard",
+  },
+  //#endregion
+
+  //#region Supplier
+  {
+    id: "31",
+    refid: "",
+    headid: "15",
+    type: "1",
+    caption: "Supplier Management",
+    target: "/supplier/supplier-man",
     icon: "dashboard",
   },
   //#endregion
