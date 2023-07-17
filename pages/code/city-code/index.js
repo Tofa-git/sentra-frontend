@@ -218,7 +218,7 @@ const Index = (props) => {
     //     </ul>
     //   </nav>
     // </div>
-    <Pagination state={state} handleGet={handleGet} />
+    <Pagination state={state?.data} handleGet={handleGet} />
   );
 
   return (

@@ -38,9 +38,9 @@ const Index = (props) => {
       case 0:
         return <Book />;
       case 1:
-        return <Search />;
+        return <Search setMode={setMode} />;
       case 2:
-        return <Detail />;
+        return <Detail setMode={setMode} />;
       case 3:
         return <Offline />;
       case 4:

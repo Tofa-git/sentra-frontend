@@ -1,23 +1,62 @@
-import "material-icons/iconfont/material-icons.css";
+import { useEffect, useState } from "react";
+import Swal from "sweetalert2";
+import {
+  createBreakfast,
+  updateBreakfast,
+} from "../../../context/breakfast/actions";
 
-const CreateForm = (options) => {
-  console.log({ options });
-  const { isEdit, selectedData } = options;
+const initForm = {
+  code: "",
+  name: "",
+};
+const CreateForm = (props) => {
+  const { isEdit, selectedData } = props;
+  const [form, setForm] = useState(initForm);
+
+  useEffect(() => {
+    setForm(isEdit ? selectedData : initForm);
+  }, [selectedData, isEdit]);
+
+  const handleInputChange = (name, value) => {
+    setForm({ ...form, [name]: value });
+  };
+
+  const handleSubmit = async () => {
+    const requiredField = ["code", "name"];
+    const hasError = requiredField.filter(
+      (i) => form[i] === 0 || form[i]?.length === 0
+    );
+    if (hasError.length > 0) {
+      return Swal.fire(
+        "Validate",
+        `Field ${hasError.join(", ").toLocaleUpperCase()} can't empty or 0`,
+        "warning"
+      );
+    }
+
+    if (isEdit) {
+      await updateBreakfast(form.id, form);
+    } else {
+      await createBreakfast(form);
+    }
+
+    await props.handleGet();
+    setForm(initForm);
+    document.getElementById("cancelModal").click();
+  };
+
   return (
     <div
       className="modal fade"
-      id={options.id}
+      id={props.id}
       tabIndex="-1"
       aria-labelledby="exampleModalLabel"
       aria-hidden="true"
     >
-      <div className={options.size + " modal-dialog"}>
+      <div className={props.size + " modal-dialog"}>
         <div className="modal-content rounded-2 shadow">
           <div className="modal-header">
-            <h1
-              className="modal-title fs-5 text-black"
-              id={options.id + "Label"}
-            >
+            <h1 className="modal-title fs-5 text-black" id={props.id + "Label"}>
               {isEdit ? "Edit" : "Add"} Breakfast
             </h1>
             <button
@@ -34,7 +73,10 @@ const CreateForm = (options) => {
                 <input
                   className="form-control rounded-0"
                   name="code"
-                  defaultValue={isEdit ? selectedData.code : null}
+                  value={form.code}
+                  onChange={(val) =>
+                    handleInputChange("code", val.target.value)
+                  }
                 />
               </div>
             </div>
@@ -44,8 +86,10 @@ const CreateForm = (options) => {
                 <input
                   type="text"
                   className="form-control rounded-0"
-                  name="breakfast_name"
-                  defaultValue={isEdit ? selectedData.breakfast_name : null}
+                  value={form.name}
+                  onChange={(val) =>
+                    handleInputChange("name", val.target.value)
+                  }
                 />
               </div>
             </div>
@@ -55,10 +99,15 @@ const CreateForm = (options) => {
               type="button"
               className="btn btn-danger rounded-0"
               data-bs-dismiss="modal"
+              id="cancelModal"
             >
               Cancel
             </button>
-            <button type="button" className="btn btn-primary rounded-0">
+            <button
+              onClick={() => handleSubmit()}
+              type="button"
+              className="btn btn-primary rounded-0"
+            >
               {isEdit ? "Edit" : "Add"}
             </button>
           </div>

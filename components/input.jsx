@@ -26,6 +26,15 @@ export default function Input({
             onChange={(val) => onChange(val.format("YYYY-MM-DD"))}
             value={value}
           />
+        ) : type === "checkbox" ? (
+          <input
+            type="checkbox"
+            className={`form-check-input ${isInvalid ? "is-invalid" : ""}`}
+            required={required}
+            onChange={onChange}
+            checked={value}
+            disabled={disabled}
+          />
         ) : (
           <input
             type={type}
