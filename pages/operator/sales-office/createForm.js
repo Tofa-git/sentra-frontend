@@ -15,7 +15,7 @@ import Swal from "sweetalert2";
 const initForm = {
   salesOffice: "",
   name: "",
-  code: "",
+  username: "",
   manager: "",
   fileIds: [],
 };
@@ -44,7 +44,7 @@ const CreateForm = (props) => {
   const handleSubmit = async () => {
     const requiredField = [
         "FileIds",
-        "code",
+        "username",
         "name",
         "manager",
       ];
@@ -59,7 +59,7 @@ const CreateForm = (props) => {
         );
       }
   
-    // const requiredField = ["name", "code", "latitude", "longitude"];
+    // const requiredField = ["name", "username", "latitude", "longitude"];
     // const hasError = requiredField.filter(
     //   (i) => form[i] === 0 || form[i]?.length === 0
     // );
@@ -115,7 +115,7 @@ const CreateForm = (props) => {
              <div className="col-6">
                 <Input
                   label={"Sales Office ID"}
-                  value={form.code}
+                  value={form.username}
                   onChange={(val) =>
                     handleInputChange("code", val.target.value)
                   }

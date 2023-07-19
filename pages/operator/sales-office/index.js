@@ -6,35 +6,8 @@ import CreateForm from "./createForm";
 import { AuthContext } from "../../../context/auth/reducer";
 import { CountryContext } from "../../../context/country/reducer";
 import { CityContext } from "../../../context/city/reducer";
-import { getAllHotel } from "../../../context/hotel/actions";
-import { HotelContext } from "../../../context/hotel/reducer";
-
-const dummyData = [
-    {
-        id: 1,
-        code: "ALOR",
-        hotel_name: "Alor",
-        rank: "阿富汗",
-        p_field: "Alor",
-        i_field: 1,
-    },
-    {
-        id: 2,
-        code: "AMBA",
-        hotel_name: "Ambarawa",
-        rank: "阿富汗",
-        p_field: "Ambarawa",
-        i_field: 0,
-    },
-    {
-        id: 3,
-        code: "AMQ",
-        hotel_name: "Ambon",
-        rank: "阿尔巴尼亚",
-        p_field: "Ambon",
-        i_field: 1,
-    },
-];
+import { getAllSales } from "../../../context/salesOffice/actions";
+import { SalesOfficeContext } from "../../../context/salesOffice/reducer";
 
 const Index = (props) => {
     const router = useRouter();
@@ -43,7 +16,7 @@ const Index = (props) => {
     const [isEdit, setIsEdit] = useState(false);
 
     const [keyword, setKeyword] = useState("");
-    const { state, dispatch } = useContext(HotelContext);
+    const { state, dispatch } = useContext(SalesOfficeContext);
     const { dispatch: authDispatch } = useContext(AuthContext);
     const { state: countryState } = useContext(CountryContext);
     const { state: cityState } = useContext(CityContext);
@@ -53,8 +26,8 @@ const Index = (props) => {
     }, []);
 
     const handleGet = async (page = 1, limit = 12) => {
-        const country = await getAllHotel(dispatch, false, page, limit, keyword);
-        if (country.status === 401) {
+        const sales = await getAllSales(dispatch, false, page, limit, keyword);
+        if (sales.status === 401) {
             authDispatch({ type: AUTH_401 });
             authDispatch({ type: AUTH_LOGOUT });
             Swal.fire("Token has been Expired", "Please Login Again", "warning");
@@ -143,9 +116,9 @@ const Index = (props) => {
                         {state?.data?.rows?.map((data) => {
                             return (
                                 <tr>
-                                    <td>{data.code}</td>
+                                    <td>{data.username}</td>
                                     <td>{data.name}</td>
-                                    <td>{data.phone}</td>
+                                    <td>{data.manager}</td>
                                     <td>
                                         <button
                                             type="button"

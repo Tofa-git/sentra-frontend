@@ -50,5 +50,22 @@ export const BREAKFAST_PROCESS = "BREAKFAST_PROCESS";
 export const BREAKFAST_SUCCESS = "BREAKFAST_SUCCESS";
 export const BREAKFAST_FAILED = "BREAKFAST_FAILED";
 
+export const SUPPLIER_PROCESS = "SUPPLIER_PROCESS";
+export const SUPPLIER_SUCCESS = "SUPPLIER_SUCCESS";
+export const SUPPLIER_FAILED = "SUPPLIER_FAILED";
+
+export const AGENT_PROCESS = "AGENT_PROCESS";
+export const AGENT_SUCCESS = "AGENT_SUCCESS";
+export const AGENT_FAILED = "AGENT_FAILED";
+
+export const OPERATOR_MANAGEMENT_PROCESS = "OPERATOR_MANAGEMENT_PROCESS";
+export const OPERATOR_MANAGEMENT_SUCCESS = "OPERATOR_MANAGEMENT_SUCCESS";
+export const OPERATOR_MANAGEMENT_FAILED = "OPERATOR_MANAGEMENT_FAILED";
+
+export const SALES_OFFICE_PROCESS = "SALES_OFFICE_PROCESS";
+export const SALES_OFFICE_SUCCESS = "SALES_OFFICE_SUCCESS";
+export const SALES_OFFICE_FAILED = "SALES_OFFICE_FAILED";
+
 // Another constant
-export const baseUrl = "https://api-azone.link-webid.com";
+// export const baseUrl = "https://api-azone.link-webid.com";
+export const baseUrl = "http://localhost:4000";

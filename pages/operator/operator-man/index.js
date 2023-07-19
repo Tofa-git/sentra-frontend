@@ -4,37 +4,10 @@ import Layout from "../../../layouts/default";
 import StdForm from "../../../components/forms/stdForm";
 import CreateForm from "./createForm";
 import { AuthContext } from "../../../context/auth/reducer";
-import { CountryContext } from "../../../context/country/reducer";
 import { CityContext } from "../../../context/city/reducer";
-import { getAllHotel } from "../../../context/hotel/actions";
-import { HotelContext } from "../../../context/hotel/reducer";
+import { getAllOperator } from "../../../context/operatorMan/actions";
+import { OperatorManContext } from "../../../context/operatorMan/reducer";
 
-const dummyData = [
-    {
-        id: 1,
-        code: "ALOR",
-        hotel_name: "Alor",
-        rank: "阿富汗",
-        p_field: "Alor",
-        i_field: 1,
-    },
-    {
-        id: 2,
-        code: "AMBA",
-        hotel_name: "Ambarawa",
-        rank: "阿富汗",
-        p_field: "Ambarawa",
-        i_field: 0,
-    },
-    {
-        id: 3,
-        code: "AMQ",
-        hotel_name: "Ambon",
-        rank: "阿尔巴尼亚",
-        p_field: "Ambon",
-        i_field: 1,
-    },
-];
 
 const Index = (props) => {
     const router = useRouter();
@@ -43,18 +16,16 @@ const Index = (props) => {
     const [isEdit, setIsEdit] = useState(false);
 
     const [keyword, setKeyword] = useState("");
-    const { state, dispatch } = useContext(HotelContext);
+    const { state, dispatch } = useContext(OperatorManContext);
     const { dispatch: authDispatch } = useContext(AuthContext);
-    const { state: countryState } = useContext(CountryContext);
     const { state: cityState } = useContext(CityContext);
 
-    useEffect(() => {
-        handleGet();
-    }, []);
+    const totalPage = state?.data?.totalPage || 0;
 
     const handleGet = async (page = 1, limit = 12) => {
-        const country = await getAllHotel(dispatch, false, page, limit, keyword);
-        if (country.status === 401) {
+        const operator = await getAllOperator(dispatch, false, page, limit, keyword);
+
+        if (operator.status === 401) {
             authDispatch({ type: AUTH_401 });
             authDispatch({ type: AUTH_LOGOUT });
             Swal.fire("Token has been Expired", "Please Login Again", "warning");
@@ -62,6 +33,11 @@ const Index = (props) => {
         }
     };
 
+    useEffect(() => {
+        handleGet();
+        console.log(state)
+    }, []);
+    
     const toolbarForm = (
         <>
             <div
@@ -180,11 +156,12 @@ const Index = (props) => {
                     </thead>
                     <tbody>
                         {state?.data?.rows?.map((data) => {
+                            console.log(data)
                             return (
                                 <tr>
-                                    <td>{data.code}</td>
-                                    <td>{data.name}</td>
-                                    <td>{data.phone}</td>
+                                    <td>{data.firstName}</td>
+                                    <td>{data.lastName}</td>
+                                    <td>{data.mobile}</td>
                                     <td>{data.email}</td>
                                     <td>{data.salesOffice}</td>
                                     <td>{data.i_field ? "Yes" : "No"}</td>
@@ -223,19 +200,23 @@ const Index = (props) => {
                             Previous
                         </a>
                     </li>
-                    {
-                    new Array(Number(state?.data?.totalPage)).fill().map((i, key) => {
-                        const current = key + 1;
-                        return (
-                            <li
-                                class={`page-item ${current === state?.data?.page && "active"}`}
-                            >
-                                <a class="page-link" onClick={() => handleGet(current)}>
-                                    {current}
-                                </a>
-                            </li>
-                        );
-                    })}
+                    {totalPage > 0 &&
+                        new Array(totalPage).fill().map((i, key) => {
+                            const current = key + 1;
+                            return (
+                                <li
+                                    class={`page-item ${current === state?.data?.page && "active"
+                                        }`}
+                                >
+                                    <a
+                                        class="page-link"
+                                        onClick={() => handleGet(current)}
+                                    >
+                                        {current}
+                                    </a>
+                                </li>
+                            );
+                        })}
                     <li class={`page-item ${!state?.data?.hasNext && "disabled"}`}>
                         <a
                             class="page-link"

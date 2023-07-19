@@ -4,6 +4,8 @@ import { CityContextProvider } from "./city/reducer";
 import { NationalityContextProvider } from "./nationality/reducer";
 import { CityLocationContextProvider } from "./cityLocation/reducer";
 import { HotelContextProvider } from "./hotel/reducer";
+import { OperatorManContextProvider } from "./operatorMan/reducer";
+import { SalesOfficeContextProvider } from "./salesOffice/reducer";
 import { BookContextProvider } from "./book/reducer";
 import { FacilityContextProvider } from "./facility/reducer";
 import { BreakfastContextProvider } from "./breakfast/reducer";
@@ -19,7 +21,11 @@ export default function CombinedContextProvider({ children }) {
                 <HotelContextProvider>
                   <FacilityContextProvider>
                     <BreakfastContextProvider>
-                      {children}
+                      <OperatorManContextProvider>
+                        <SalesOfficeContextProvider>
+                          {children}
+                        </SalesOfficeContextProvider>
+                      </OperatorManContextProvider>
                     </BreakfastContextProvider>
                   </FacilityContextProvider>
                 </HotelContextProvider>

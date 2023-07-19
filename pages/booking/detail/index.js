@@ -2,6 +2,8 @@ import React, { useContext } from "react";
 import Input from "../../../components/input";
 import Select from "../../../components/select";
 import { BookContext } from "../../../context/book/reducer";
+import { memo, useEffect, useState, useCallback } from 'react'
+import { AuthContext } from "../../../context/auth/reducer";
 
 const dummyData = [
   {
@@ -21,6 +23,7 @@ const dummyData = [
     twnNet: 0,
   }
 ];
+
 const dropdownMrMrs = [
   {
     id: 1,
@@ -36,9 +39,98 @@ const dropdownMrMrs = [
   }
 ];
 
+const dropdownResStatus = [
+  {
+    id: 1,
+    name: "Not Yet"
+  },
+  {
+    id: 2,
+    name: "Acknowledge"
+  },
+  {
+    id: 3,
+    name: "Done"
+  }
+];
+
+const dropdownBookType = [
+  {
+    id: 1,
+    name: "Web"
+  },
+  {
+    id: 2,
+    name: "Internal"
+  },
+  {
+    id: 3,
+    name: "XML"
+  },
+  {
+    id: 4,
+    name: "Offline"
+  },
+  {
+    id: 5,
+    name: "WEB"
+  }
+];
+
+const roomData = new Array(Number(31))
+  .fill()
+  .map((i, key) => ({ id: key + 1, name: key + 1 }));
+
 const Index = (props) => {
   const { state } = useContext(BookContext);
+  const { state: authState, dispatch: authDispatch } = useContext(AuthContext);
   const details = state?.details;
+
+  const [roomGrossPrice, setRoomGrossPrice] = useState(details?.hotels.hotel.roomDetails.grossPrice ?? 0);
+  const [roomNetPrice, setRoomNetPrice] = useState(details?.hotels.hotel.roomDetails.netPrice ?? 0);
+  const [addGrossCharge, setAddGrossCharge] = useState(0);
+  const [addGrossChargeIDR, setAddGrossChargeIDR] = useState(0);
+  const [addNetCharge, setAddNetCharge] = useState(0);
+  const [addNetChargeIDR, setAddNetChargeIDR] = useState(0);
+  const [roomNight, setRoomNight] = useState(0);
+  const [selectedFirstOps, setSelectedFirstOps] = useState({});
+
+  const bookingCreatedAt = details?.local[0].bookingCreatedAt ?? "-";
+  const formattedDateTime = formatDateTime(bookingCreatedAt);
+
+  const totalGross = Number(roomGrossPrice) + Number(addGrossCharge);
+  const totalNet = roomNetPrice + addNetCharge;
+  const totalProfit = totalGross - totalNet;
+
+  function formatDateTime(dateTime) {
+    const date = new Date(dateTime);
+    const options = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      second: 'numeric',
+      hour12: false,
+    };
+    return date.toLocaleString(undefined, options);
+  }
+
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(value);
+  };
+
+  useEffect(() => {
+    calculateRoomNight();
+  }, [details]);
+
+  const calculateRoomNight = () => {
+    const checkInDate = new Date(details?.checkIn);
+    const checkOutDate = new Date(details?.checkOut);
+    const timeDifference = checkOutDate.getTime() - checkInDate.getTime();
+    const roomNightValue = Math.ceil(timeDifference / (1000 * 3600 * 24));
+    setRoomNight(roomNightValue);
+  };
 
   return (
     <div className="mx-3">
@@ -61,27 +153,20 @@ const Index = (props) => {
               />
             </div>
             <div className="col-2">
-              <Select label="Type" />
-            </div>
-            <div className="col-4">
-              <Input
-                label={"Nationality"}
-                disabled={true}
-                value={details?.nationality}
-              />
+              <Select value="1" label="Type" options={dropdownBookType} />
             </div>
             <div className="col-4">
               <Input
                 label={"Country"}
                 disabled={true}
-                value={details?.nationality}
+                value={details?.local[0].hotelCountryCode}
               />
             </div>
             <div className="col-4">
               <Input
                 label={"City"}
                 disabled={true}
-                value={details?.nationality}
+                value={details?.local[0].hotelCityCode}
               />
             </div>
             <div className="col-6">
@@ -101,34 +186,34 @@ const Index = (props) => {
               <Input
                 label={"Tel"}
                 disabled={true}
-                value={details?.nationality}
+                value={details?.local[0].hotelPhone ?? "-"}
               />
             </div>
             <div className="col-6">
               <Input
                 label={"Supplier Hotel"}
                 disabled={true}
-                value={details?.nationality}
+                value={details?.local[0].bookingHotelName}
               />
             </div>
             <div className="col-2">
               <Input
                 disabled={true}
-                value={details?.nationality}
+                value={details?.hotels.hotel.rating}
               />
             </div>
             <div className="col-10">
               <Input
                 label={"Master Address"}
                 disabled={true}
-                value={details?.address}
+                value={details?.local[0].hotelAddress}
               />
             </div>
             <div className="col-10">
               <Input
                 label={"Supplier Address"}
                 disabled={true}
-                value={details?.address}
+                value={details?.local[0].hotelAddress}
               />
             </div>
             <div className="col-5">
@@ -146,87 +231,126 @@ const Index = (props) => {
               />
             </div>
             <div className="col-2">
-              <Input type="number" label="Room Night" />
+              <Input type="number" label="Room Night" value={roomNight} />
             </div>
 
             <div className="col-2">
-              <Select label="SG" />
+              <Select options={roomData} label="SG" />
             </div>
             <div className="col-2">
-              <Select label="DG" />
+              <Select options={roomData} label="DG" />
             </div>
             <div className="col-2">
-              <Select label="TW" />
+              <Select options={roomData} label="TW" />
             </div>
             <div className="col-2">
-              <Select label="TP" />
+              <Select options={roomData} label="TP" />
             </div>
             <div className="col-2">
-              <Select label="QD" />
+              <Select options={roomData} label="QD" />
             </div>
             <div className="col-2">
-              <Select label="TW (C)" />
+              <Select options={roomData} label="TW (C)" />
             </div>
 
             <div className="col-6">
-              <Input type="text" label="XML Ref #" />
+              <Input
+                type="text"
+                label="XML Ref #"
+                value={details?.local[0].xmlRef ?? "-"} />
             </div>
             <div className="col-6">
-              <Input type="text" label="Agent (XO) Ref No" />
+              <Input
+                type="text"
+                label="Agent (XO) Ref No"
+                value={details?.local[0].agentRef ?? "-"} />
             </div>
 
             <div className="col-6">
-              <Input type="text" label="Agent" />
+              <Input type="text" label="Agent"
+                value={details?.local[0].userFirstName ?? "-"} />
             </div>
             <div className="col-6">
-              <Input type="text" label="ID" />
+              <Input type="text" label="ID"
+                value={details?.local[0].userUsername ?? "-"} />
             </div>
 
             <div className="col-6">
-              <Input type="text" label="Phone" />
+              <Input type="text" label="Phone"
+                value={details?.local[0].userMobile ?? "-"} />
             </div>
             <div className="col-6">
-              <Input type="text" label="Mail" />
+              <Input type="text" label="Mail"
+                value={details?.local[0].userEmail ?? "-"} />
             </div>
 
             <div className="col-7">
-              <Input label="Sales Office" />
+              <Input label="Sales Office"
+                value={details?.local[0].userSalesOffice ?? "-"} />
             </div>
 
             <div className="col-6">
-              <Input label="Manager" />
+              <Input label="Manager"
+                value={details?.local[0].userManager ?? "-"} />
             </div>
             <div className="col-6">
-              <Input label="ID" />
-            </div>
-
-            <div className="col-6">
-              <Input type="text" label="Phone" />
-            </div>
-            <div className="col-6">
-              <Input type="text" label="Mail" />
-            </div>
-
-
-            <div className="col-6">
-              <Input type="text" label="Sub Name" />
-            </div>
-            <div className="col-6">
-              <Input type="text" label="Email" />
+              <Input label="ID"
+                value={details?.local[0].userManagerId ?? "-"} />
             </div>
 
             <div className="col-6">
-              <Input type="text" label="Mobile" />
+              <Input
+                type="text"
+                label="Phone"
+                disabled={true}
+                value={details?.local[0].userManagerMobile ?? "-"} />
             </div>
             <div className="col-6">
-              <Input type="text" label="Phone" />
+              <Input
+                type="text"
+                label="Mail"
+                disabled={true}
+                value={details?.local[0].userManagerEmail ?? "-"} />
+            </div>
+
+
+            <div className="col-6">
+              <Input
+                type="text"
+                label="Sub Name"
+                value={details?.local[0].userSubName ?? "-"} />
+            </div>
+            <div className="col-6">
+              <Input type="text" label="Email"
+                value={details?.local[0].userManagerEmail ?? "-"} />
             </div>
 
             <div className="col-6">
-              <Select label="First Operator" />
+              <Input type="text" label="Mobile"
+                value={details?.local[0].userManagerMobile ?? "-"} />
             </div>
             <div className="col-6">
-              <Select label="Last Operator" />
+              <Input type="text" label="Phone"
+                value={details?.local[0].userManagerPhone ?? "-"} />
+            </div>
+
+            <div className="col-6">
+              <Select
+                label="First Operator"
+                options={authState?.listUsers}
+                onChange={(val) => {
+                  const user = authState?.listUsers?.find(
+                    (i) => i.id === Number(val.value)
+                  );
+                  setSelectedFirstOps(user);
+                }}
+                value={details?.local[0].userCreatedBy ?? "-"} />
+            </div>
+            <div className="col-6">
+              <Input
+                label="Last Operator"
+                disabled={true}
+                value={details?.local[0].userFirstName ?? "-"} />
             </div>
 
             <div className="col-12 d-flex justify-content-end py-2">
@@ -254,46 +378,46 @@ const Index = (props) => {
                     <tr>
                       <td>Room</td>
                       <td>
-                        <Input />
+                        <Input value={formatCurrency(roomGrossPrice) ?? "-"} onChange={(e) => setRoomGrossPrice(e.target.value)} />
                       </td>
                       <td>
-                        <Input />
+                        <Input value={formatCurrency(roomGrossPrice) ?? "-"} disabled />
                       </td>
                       <td>
-                        <Input />
+                        <Input value={formatCurrency(roomNetPrice) ?? "-"} onChange={(e) => setRoomNetPrice(e.target.value)} />
                       </td>
                       <td>
-                        <Input />
+                        <Input value={formatCurrency(roomNetPrice) ?? "-"} disabled />
                       </td>
                     </tr>
                     <tr>
                       <td>Add Charge</td>
                       <td>
-                        <Input />
+                        <Input type="number" value={addGrossCharge} onChange={(e) => setAddGrossCharge(e.target.value)} />
                       </td>
                       <td>
-                        <Input />
+                        <Input type="number" value={addNetChargeIDR} onChange={(e) => setAddGrossChargeIDR(e.target.value)} disabled />
                       </td>
                       <td>
-                        <Input />
+                        <Input type="number" value={addNetCharge} onChange={(e) => setAddNetCharge(e.target.value)} />
                       </td>
                       <td>
-                        <Input />
+                        <Input type="number" value={addNetChargeIDR} disabled onChange={(e) => setAddNetChargeIDR(e.target.value)} />
                       </td>
                     </tr>
                     <tr>
                       <td>Total</td>
                       <td>
-                        <Input />
+                        <Input value={formatCurrency(totalGross)} disabled />
                       </td>
                       <td>
-                        <Input />
+                        <Input value={formatCurrency(totalGross)} disabled />
                       </td>
                       <td>
-                        <Input />
+                        <Input value={formatCurrency(totalNet)} disabled />
                       </td>
                       <td>
-                        <Input />
+                        <Input value={formatCurrency(totalNet)} disabled />
                       </td>
                     </tr>
                     <tr>
@@ -307,7 +431,7 @@ const Index = (props) => {
                         <input type="text" name="taxAmt" style={{ width: "100px", textAlign: "right" }} />
 
                         <label>Profit</label>
-                        <input type="text" name="profit" style={{ width: "100px", textAlign: "right" }} />
+                        <input type="text" name="profit" value={formatCurrency(totalProfit)} style={{ width: "100px", textAlign: "right" }} />
                       </td>
                     </tr>
                   </tbody>
@@ -324,7 +448,7 @@ const Index = (props) => {
                   <Input label="IDR" />
                 </div>
                 <div className="col-4 align-items-end d-flex">
-                  <button className="bg-blue rounded">Search</button>
+                  <button className="bg-blue rounded">Save</button>
                 </div>
               </div>
             </div>
@@ -353,13 +477,15 @@ const Index = (props) => {
           </div>
           <div className="bg-white row mx-0 py-2">
             <div className="col-4">
-              <Input label={"Restotal Status"} />
+              <Input label={"Restotal Status"}
+                value={details?.status ?? "-"} />
             </div>
             <div className="col-4">
-              <Input label={""} />
+              <Select value="-" label="" options={dropdownResStatus} />
             </div>
             <div className="col-4">
-              <Input label={"Book Date/Time"} />
+              <Input label={"Book Date/Time"}
+                value={formattedDateTime} disabled />
             </div>
             <div className="col-6">
               <Input label={"Agent"} />
@@ -414,7 +540,7 @@ const Index = (props) => {
                 </tr>
               </thead>
               <tbody>
-                {details?.hotels?.hotel?.roomDetails?.rooms?.room?.paxDetails?.pax?.map((data) => {
+                {details?.hotels?.hotel?.roomDetails?.rooms?.room[0].paxDetails?.pax?.map((data) => {
                   return (
                     <tr key={data.salutation + data.firstName + data.lastName}>
                       <td>{data.salutation}</td>
@@ -436,9 +562,7 @@ const Index = (props) => {
               </div>
               <div className="col-4">
 
-                <Select value="-" label="Mr/Mrs" options={dropdownMrMrs}>
-
-                </Select>
+                <Select value="-" label="Mr/Mrs" options={dropdownMrMrs} />
               </div>
               <div className="col-6">
                 <Select label="First Name" />
@@ -570,8 +694,8 @@ const Index = (props) => {
               <div className="col-3">
                 <Input label="Net" />
               </div>
-              <div className="col-3">                             
-                <Input type="checkbox" label="To Hotel"/>
+              <div className="col-3">
+                <Input type="checkbox" label="To Hotel" />
               </div>
 
               <div className="col-12 d-flex justify-content-end py-2">
