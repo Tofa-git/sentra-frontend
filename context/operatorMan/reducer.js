@@ -42,10 +42,7 @@ function reducer(state, action) {
                     ...changedState,
                     dropdownData: action.payload.data,
                 };
-            } else {      
-                console.log(action.payload.data)          
-                console.log(changedState)
-                console.log(state)
+            } else {                      
                 return {
                     ...state,
                     ...changedState,

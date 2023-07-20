@@ -1,25 +1,20 @@
 import React, { Component, useState } from "react";
 import Layout from "../../layouts/default";
 import "material-icons/iconfont/material-icons.css";
-import OperatorMan from "./operator-man";
-import SalesOffice from "./sales-office";
-import LoginList from "./login-list";
+import Supplier from "./supplier-man";
+import Markup from "./supplier-markup";
 
 
-const operatorButton = [
+
+const supplierButton = [
   {
     id: 0,
-    name: "Operator Management",
+    name: "Supplier",
   },
   {
     id: 1,
-    name: "Sales Office",
+    name: "Supplier Markup",
   },
-  {
-    id: 2,
-    name: "Login List",
-  },
-  
 ];
 
 const Index = (props) => {
@@ -28,11 +23,9 @@ const Index = (props) => {
   const renderContent = () => {
     switch (mode) {
       case 0:
-        return <OperatorMan />;
+        return <Supplier />;
       case 1:
-        return <SalesOffice />;
-      case 2:
-        return <LoginList />;
+        return <Markup />;     
       default:
         break;
     }
@@ -41,7 +34,7 @@ const Index = (props) => {
   return (
     <Layout selectId={"001"}>
       <div className="d-flex flex-row pt-2 mx-3">
-        {operatorButton.map((i) => {
+        {supplierButton.map((i) => {
           return (
             <button
               class={`btn ${

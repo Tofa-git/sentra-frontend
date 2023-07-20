@@ -34,8 +34,7 @@ const Index = (props) => {
     };
 
     useEffect(() => {
-        handleGet();
-        console.log(state)
+        handleGet();        
     }, []);
     
     const toolbarForm = (
@@ -155,8 +154,7 @@ const Index = (props) => {
                         </tr>
                     </thead>
                     <tbody>
-                        {state?.data?.rows?.map((data) => {
-                            console.log(data)
+                        {state?.data?.rows?.map((data) => {                            
                             return (
                                 <tr>
                                     <td>{data.firstName}</td>
@@ -164,7 +162,7 @@ const Index = (props) => {
                                     <td>{data.mobile}</td>
                                     <td>{data.email}</td>
                                     <td>{data.salesOffice}</td>
-                                    <td>{data.i_field ? "Yes" : "No"}</td>
+                                    <td>{data.status == 1 ? "Yes" : "No"}</td>
                                     <td>
                                         <button
                                             type="button"

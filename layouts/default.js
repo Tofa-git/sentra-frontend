@@ -8,6 +8,8 @@ import { AUTH_401, AUTH_LOGOUT, AUTH_SUCCESS } from "../context/constant";
 import "material-icons/iconfont/material-icons.css";
 import { CountryContext } from "../context/country/reducer";
 import { getAllCountry, getCurrencies } from "../context/country/actions";
+import { getAllCurrency } from "../context/currency/action";
+import { CurrencyContext } from "../context/currency/reducer"
 import { getAllCity } from "../context/city/actions";
 import { CityContext } from "../context/city/reducer";
 import Swal from "sweetalert2";
@@ -20,6 +22,8 @@ const Layout = ({ children, selectId }) => {
   const { state, dispatch } = useContext(AuthContext);
   const { state: countryState, dispatch: countryDispatch } =
     useContext(CountryContext);
+    const { state: currencyState, dispatch: currencyDispatch } =
+    useContext(CurrencyContext);
   const { state: cityState, dispatch: cityDispatch } = useContext(CityContext);
   const { state: cityLocationState, dispatch: cityLocationDispatch } =
     useContext(CityLocationContext);
@@ -62,6 +66,12 @@ const Layout = ({ children, selectId }) => {
     }
 
     if (
+      !currencyState.hasOwnProperty("dropdownData") ||
+      currencyState.dropdownData.length === 0
+    ) {
+      getMaster("curr");
+    }
+    if (
       !nationalityState.hasOwnProperty("dropdownData") ||
       nationalityState.dropdownData.length === 0
     ) {
@@ -81,7 +91,9 @@ const Layout = ({ children, selectId }) => {
       data = await getAllCity(cityDispatch, true);
     } else if (name === "currency") {
       data = await getCurrencies(countryDispatch);
-    } else if (name === "cityLocation") {
+    } else if (name === "curr") {
+      data = await getAllCurrency(currencyDispatch,true);
+    }else if (name === "cityLocation") {
       data = await getAllCityLocation(cityLocationDispatch, true);
     } else if (name === "nationality") {
       data = await getAllNationality(nationalityDispatch, true);

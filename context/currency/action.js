@@ -1,29 +1,29 @@
 import Swal from "sweetalert2";
 import {
-  SUPPLIER_FAILED,
-  SUPPLIER_PROCESS,
-  SUPPLIER_SUCCESS,
+  CURRENCY_FAILED,
+  CURRENCY_PROCESS,
+  CURRENCY_SUCCESS,
   baseUrl,
 } from "../constant";
 import axios from "axios";
 
-export const getAllSupplier = async (
+export const getAllCurrency = async (
   dispatch,
   isDropDown = false,
   page = 1,
   limit = 12,
   name = ""
 ) => {
-  dispatch({ type: SUPPLIER_PROCESS });
+  dispatch({ type: CURRENCY_PROCESS });
   try {
-    let url = `${baseUrl}/api/suppliers?page=${page}&limit=${limit}`;
+    let url = `${baseUrl}/api/master/currency?page=${page}&limit=${limit}`;
 
     if (name.length > 0) {
       url += `&name=${name}`;
     }
 
     if (isDropDown) {
-      url = `${baseUrl}/api/supplier-dd`;
+      url = `${baseUrl}/api/master/currency-dd`;
     }
 
     const token = localStorage.getItem("AUTH_TOKEN");
@@ -38,21 +38,21 @@ export const getAllSupplier = async (
     const data = await res.json();
 
     dispatch({
-      type: SUPPLIER_SUCCESS,
+      type: CURRENCY_SUCCESS,
       payload: { data: data?.data, isDropDown },
     });
     return { data: data?.data, status: res.status };
   } catch (error) {
     dispatch({
-      type: SUPPLIER_FAILED,
+      type: CURRENCY_FAILED,
       payload: error?.response?.data?.message || "Error",
     });
   }
 };
 
-export const createSupplier = async (body) => {
+export const createCurrency = async (body) => {
   try {
-    const url = `${baseUrl}/api/supplier`;
+    const url = `${baseUrl}/api/master/currency/`;
     const token = localStorage.getItem("AUTH_TOKEN");
 
     await axios.post(url, body, {
@@ -62,21 +62,21 @@ export const createSupplier = async (body) => {
     });
     Swal.fire(
       "Create Success",
-      "Supplier has been successfully created",
+      "Currency has been successfully created",
       "success"
     );
   } catch (error) {
     Swal.fire(
       "Create Failed",
-      "Error when create Supplier, please try again later",
+      "Error when create Currency, please try again later",
       "error"
     );
   }
 };
 
-export const updateSupplier = async (id, body) => {
+export const updateCurrency = async (id, body) => {
   try {
-    const url = `${baseUrl}/api/supplier/${id}`;
+    const url = `${baseUrl}/api/master/currency/${id}`;
     const token = localStorage.getItem("AUTH_TOKEN");
 
     await axios.put(url, body, {
@@ -86,21 +86,21 @@ export const updateSupplier = async (id, body) => {
     });
     Swal.fire(
       "Update Success",
-      "Supplier has been successfully updated",
+      "Currency has been successfully updated",
       "success"
     );
   } catch (error) {
     Swal.fire(
       "Update Failed",
-      "Error when update Supplier, please try again later",
+      "Error when update Currency, please try again later",
       "error"
     );
   }
 };
 
-export const deleteSupplier = async (id) => {
+export const deleteCurrency = async (id) => {
   try {
-    const url = `${baseUrl}/api/supplier/${id}`;
+    const url = `${baseUrl}/api/master/currency/${id}`;
     const token = localStorage.getItem("AUTH_TOKEN");
 
     await axios.delete(url, {
@@ -110,13 +110,13 @@ export const deleteSupplier = async (id) => {
     });
     Swal.fire(
       "Delete Success",
-      "Supplier has been successfully deleted",
+      "Currency has been successfully deleted",
       "success"
     );
   } catch (error) {
     Swal.fire(
       "Delete Failed",
-      "Error when delete Supplier, please try again later",
+      "Error when delete Currency, please try again later",
       "error"
     );
   }

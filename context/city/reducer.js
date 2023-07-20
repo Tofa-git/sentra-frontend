@@ -32,7 +32,7 @@ function reducer(state, action) {
         isError: false,
         errorMessage: null,
       };
-      if (action.payload.isDropDown) {
+      if (action.payload.isDropDown) {                
         return {
           ...state,
           ...changedState,

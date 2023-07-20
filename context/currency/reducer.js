@@ -1,12 +1,12 @@
 import { createContext, useReducer } from "react";
 
 import {
-    SUPPLIER_FAILED,
-    SUPPLIER_PROCESS,
-    SUPPLIER_SUCCESS,
+    CURRENCY_FAILED,
+    CURRENCY_PROCESS,
+    CURRENCY_SUCCESS,
 } from "../constant";
 
-const SupplierContext = createContext();
+const CurrencyContext = createContext();
 
 const initialState = {
     isLoading: false,
@@ -24,13 +24,13 @@ const initialState = {
 };
 
 function reducer(state, action) {        
-    switch (action.type) {    
-        case SUPPLIER_PROCESS:
+    switch (action.type) {            
+        case CURRENCY_PROCESS:
             return {
                 ...state,
                 isLoading: true,
             };
-        case SUPPLIER_SUCCESS:
+        case CURRENCY_SUCCESS:
             const changedState = {
                 isLoading: false,
                 isError: false,
@@ -49,7 +49,7 @@ function reducer(state, action) {
                     data: action.payload.data,
                 };
             }
-        case SUPPLIER_FAILED:
+        case CURRENCY_FAILED:
             return {
                 ...state,
                 isLoading: false,
@@ -61,14 +61,14 @@ function reducer(state, action) {
     }
 }
 
-function SupplierContextProvider({ children }) {
+function CurrencyContextProvider({ children }) {
     const [state, dispatch] = useReducer(reducer, initialState);
 
     return (
-        <SupplierContext.Provider value={{ state, dispatch }}>
+        <CurrencyContext.Provider value={{ state, dispatch }}>
             {children}
-        </SupplierContext.Provider>
+        </CurrencyContext.Provider>
     );
 }
 
-export { SupplierContext, SupplierContextProvider };
+export { CurrencyContext, CurrencyContextProvider };

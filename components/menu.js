@@ -327,14 +327,26 @@ const DataMenu = [
   },
   //#endregion
 
+    //#region Agent
+    {
+      id: "31",
+      refid: "",
+      headid: "14",
+      type: "1",
+      caption: "Agent Management",
+      target: "/operator",
+      icon: "dashboard",
+    },
+    //#endregion
+
   //#region Supplier
   {
-    id: "31",
+    id: "32",
     refid: "",
     headid: "15",
     type: "1",
     caption: "Supplier Management",
-    target: "/supplier/supplier-man",
+    target: "/supplier",
     icon: "dashboard",
   },
   //#endregion

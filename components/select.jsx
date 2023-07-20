@@ -30,7 +30,7 @@ export default function Select({
           {options?.map((opt) => {
             return (
               <option value={target === "general" ? opt.id : opt.code}>
-                {opt.name || opt.shortName || opt.email}
+                {opt.name || opt.shortName || opt.email || opt.code}
               </option>
             );
           })}

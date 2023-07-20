@@ -46,6 +46,40 @@ export const getAllCity = async (
   }
 };
 
+export const getDDLCity = async (
+  dispatch,
+  countryId,
+  isDropDown = true,
+) => {
+  dispatch({ type: CITY_PROCESS });
+  try {    
+    let url = `${baseUrl}/api/master/city-code-dd?countryId=${countryId}`;
+
+    const token = localStorage.getItem("AUTH_TOKEN");
+    const config = {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    const res = await fetch(url, config);    
+    const data = await res.json();
+    dispatch({
+      type: CITY_SUCCESS,
+      payload: { data: data?.data, isDropDown },
+    });
+
+    return { data: data?.data, status: res.status };
+  } catch (error) {
+    console.log(error)
+    dispatch({
+      type: CITY_FAILED,
+      payload: error?.response?.data?.message || "Error",
+    });
+  }
+};
+
 export const createCity = async (body) => {
   try {
     const url = `${baseUrl}/api/master/city-code`;

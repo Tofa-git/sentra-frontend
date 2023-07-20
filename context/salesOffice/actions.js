@@ -23,7 +23,7 @@ export const getAllSales = async (
     }
 
     if (isDropDown) {
-      url = `${baseUrl}/api/users-dd`;
+      url = `${baseUrl}/api/userSale-dd`;
     }
 
     const token = localStorage.getItem("AUTH_TOKEN");
