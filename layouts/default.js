@@ -46,14 +46,14 @@ const Layout = ({ children, selectId }) => {
   const getMasterData = () => {
     if (
       !countryState.hasOwnProperty("dropdownData") ||
-      countryState.dropdownData.length === 0
+      countryState?.dropdownData.length === 0
     ) {
       getMaster("country");
     }
 
     if (
       !cityState.hasOwnProperty("dropdownData") ||
-      cityState.dropdownData.length === 0
+      cityState?.dropdownData.length === 0
     ) {
       getMaster("city");
     }

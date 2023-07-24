@@ -1,7 +1,12 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Layout from "../../../layouts/default";
 import StdForm from "../../../components/forms/stdForm";
+import { AuthContext } from "../../../context/auth/reducer";
+import { CountryContext } from "../../../context/country/reducer";
+import { CityContext } from "../../../context/city/reducer";
+import { getAllHotel } from "../../../context/hotel/actions";
+import { HotelContext } from "../../../context/hotel/reducer";
 import "material-icons/iconfont/material-icons.css";
 
 const dummyData = [
@@ -24,9 +29,29 @@ const dummyData = [
 
 const Index = (props) => {
   const router = useRouter();
-  const [selectedId, setSelectedId] = useState("002");
+  const selectedId = "006";
   const [selectedData, setSelectedData] = useState();
   const [isEdit, setIsEdit] = useState(false);
+
+  const [keyword, setKeyword] = useState("");
+  const { state, dispatch } = useContext(HotelContext);
+  const { dispatch: authDispatch } = useContext(AuthContext);
+  const { state: countryState } = useContext(CountryContext);
+  const { state: cityState } = useContext(CityContext);
+
+  useEffect(() => {
+    handleGet();
+  }, []);
+
+  const handleGet = async (page = 1, limit = 12) => {
+    const country = await getAllHotel(dispatch, false, page, limit, keyword);
+    if (country.status === 401) {
+      authDispatch({ type: AUTH_401 });
+      authDispatch({ type: AUTH_LOGOUT });
+      Swal.fire("Token has been Expired", "Please Login Again", "warning");
+      router.push("/authentication/login");
+    }
+  };
 
   const toolbarForm = <></>;
 
@@ -37,6 +62,7 @@ const Index = (props) => {
     >
       <div className="w-100 row">
         <div className="col-sm-6 mt-2">
+          {/* "Local Code" section */}
           <span>
             <i
               className="material-icons fs-6 text-black"
@@ -131,12 +157,12 @@ const Index = (props) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {dummyData.map((data) => {
+                  {state?.data?.rows?.map((data) => {
                     return (
                       <tr>
                         <td>{data.code}</td>
-                        <td>{data.city_name_en}</td>
-                        <td>{data.star || 5}</td>
+                        <td>{data.name}</td>
+                        <td>{data.star.replace('Star', '')}</td>
                       </tr>
                     );
                   })}
@@ -144,6 +170,101 @@ const Index = (props) => {
               </table>
             </div>
           </span>
+          {/* "Local Code Total" section */}
+          <div className="col-3 d-flex align-items-center">
+            <span className="p-1 px-2 small text-primary">
+              Total Data: {state?.data?.count}
+            </span>
+          </div>
+          {/* "Local Code Pagination" section */}
+          <div className="row w-100 mt-2">
+            <div className="col-md-6">
+              <div className="d-flex">
+                <nav aria-label="Page navigation example">
+                  <ul className="pagination">
+                    {state?.data?.totalPage > 5 ? (
+                      <>
+                        <li className={`page-item ${1 === state?.data?.page && "disabled"}`}>
+                          <a className="page-link" onClick={() => handleGet(state?.data?.page - 1)}>
+                            Previous
+                          </a>
+                        </li>
+                        {state?.data?.page > 3 && (
+                          <>
+                            <li className="page-item">
+                              <a className="page-link" onClick={() => handleGet(1)}>
+                                1
+                              </a>
+                            </li>
+                            <li className="page-item">
+                              <a className="page-link">...</a>
+                            </li>
+                          </>
+                        )}
+                        {new Array(Number(state?.data?.totalPage)).fill().map((i, key) => {
+                          const current = key + 1;
+                          if (
+                            current === state?.data?.page ||
+                            (current >= state?.data?.page - 2 && current <= state?.data?.page + 2)
+                          ) {
+                            return (
+                              <li className={`page-item ${current === state?.data?.page && "active"}`}>
+                                <a className="page-link" onClick={() => handleGet(current)}>
+                                  {current}
+                                </a>
+                              </li>
+                            );
+                          }
+                          return null;
+                        })}
+                        {state?.data?.page < state?.data?.totalPage - 2 && (
+                          <>
+                            <li className="page-item">
+                              <a className="page-link">...</a>
+                            </li>
+                            <li className="page-item">
+                              <a className="page-link" onClick={() => handleGet(state?.data?.totalPage)}>
+                                {state?.data?.totalPage}
+                              </a>
+                            </li>
+                          </>
+                        )}
+                        <li className={`page-item ${!state?.data?.hasNext && "disabled"}`}>
+                          <a className="page-link" onClick={() => handleGet(state?.data?.page + 1)}>
+                            Next
+                          </a>
+                        </li>
+                      </>
+                    ) : (
+                      <>
+                        <li className={`page-item ${1 === state?.data?.page && "disabled"}`}>
+                          <a className="page-link" onClick={() => handleGet(state?.data?.page - 1)}>
+                            Previous
+                          </a>
+                        </li>
+                        {new Array(Number(state?.data?.totalPage)).fill().map((i, key) => {
+                          const current = key + 1;
+                          return (
+                            <li className={`page-item ${current === state?.data?.page && "active"}`}>
+                              <a className="page-link" onClick={() => handleGet(current)}>
+                                {current}
+                              </a>
+                            </li>
+                          );
+                        })}
+                        <li className={`page-item ${!state?.data?.hasNext && "disabled"}`}>
+                          <a className="page-link" onClick={() => handleGet(state?.data?.page + 1)}>
+                            Next
+                          </a>
+                        </li>
+                      </>
+                    )}
+                  </ul>
+                </nav>
+              </div>
+            </div>
+          </div>
+          {/* End Section */}
         </div>
         <div className="col-sm-6 mt-2">
           <div>
