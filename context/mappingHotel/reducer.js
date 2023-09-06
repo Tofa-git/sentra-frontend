@@ -1,8 +1,8 @@
 import { createContext, useReducer } from "react";
 
-import { MAPPING_COUNTRY_FAILED, MAPPING_COUNTRY_PROCESS, MAPPING_COUNTRY_SUCCESS } from "../constant";
+import { MAPPING_HOTEL_FAILED, MAPPING_HOTEL_PROCESS, MAPPING_HOTEL_SUCCESS } from "../constant";
 
-const MappingCountryContext = createContext();
+const MappingHotelContext = createContext();
 
 const initialState = {
   isLoading: false,
@@ -22,38 +22,38 @@ const initialState = {
 
 function reducer(state, action) {
   switch (action.type) {
-    case MAPPING_COUNTRY_PROCESS:
+    case MAPPING_HOTEL_PROCESS:
       return {
         ...state,
         isLoading: true,
       };
-    case MAPPING_COUNTRY_SUCCESS:
+    case MAPPING_HOTEL_SUCCESS:
       const changedState = {
         isLoading: false,
         isError: false,
         errorMessage: null,
       };
-      if (action.payload.isSync) {                
+      console.log(action.payload)
+      if (action.payload.isSync) {
         return {
           ...state,
           ...changedState,
           syncData: action.payload.data,
         };
-      } else if (action.payload.isDropDown) {        
-        console.log(action.payload)
+      } else if (action.payload.isDropDown) {
         return {
           ...state,
           ...changedState,
           dropdownData: action.payload.data,
         };
-      }else {
+      } else {
         return {
           ...state,
           ...changedState,
           data: action.payload.data,
         };
       }
-    case MAPPING_COUNTRY_FAILED:
+    case MAPPING_HOTEL_FAILED:
       return {
         ...state,
         isLoading: false,
@@ -65,14 +65,14 @@ function reducer(state, action) {
   }
 }
 
-function MappingCountryContextProvider({ children }) {
+function MappingHotelContextProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   return (
-    <MappingCountryContext.Provider value={{ state, dispatch }}>
+    <MappingHotelContext.Provider value={{ state, dispatch }}>
       {children}
-    </MappingCountryContext.Provider>
+    </MappingHotelContext.Provider>
   );
 }
 
-export { MappingCountryContext, MappingCountryContextProvider };
+export { MappingHotelContext, MappingHotelContextProvider };

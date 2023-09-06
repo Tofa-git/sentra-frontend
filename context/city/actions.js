@@ -151,3 +151,42 @@ export const deleteCity = async (id) => {
     );
   }
 };
+
+export const getMasterCity = async (
+  dispatch,
+  isDropDown = false,
+  page = 1,
+  limit = 12,
+  name = "",  
+) => {
+  dispatch({ type: CITY_PROCESS });
+  try {
+    let url = `${baseUrl}/api/master/city-code?page=${page}&limit=${limit}`;
+
+    if (name.length > 0) {
+      url += `&longName=${name}`;
+    }
+    
+    const token = localStorage.getItem("AUTH_TOKEN");
+    const config = {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    const res = await fetch(url, config);
+    const data = await res.json();
+
+    dispatch({
+      type: CITY_SUCCESS,
+      payload: { data: data?.data, isDropDown },
+    });
+    return { data: data?.data, status: res.status };
+  } catch (error) {
+    dispatch({
+      type: CITY_FAILED,
+      payload: error?.response?.data?.message || "Error",
+    });
+  }
+};

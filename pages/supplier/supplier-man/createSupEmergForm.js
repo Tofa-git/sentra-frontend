@@ -39,9 +39,7 @@ const CreateForm = (props) => {
   const { state: currencyState } = useContext(CurrencyContext);
 
   const handleDropDown = async () => {    
-    
-    const ddl = await getDDLCity(cityDDLDispatch, countryId);         
-    console.log(cityDDLState) 
+    const ddl = await getDDLCity(cityDDLDispatch, countryId);             
   };
 
   const handleCountryChange = (event) => {

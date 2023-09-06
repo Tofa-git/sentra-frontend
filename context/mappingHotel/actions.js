@@ -1,8 +1,8 @@
 import Swal from "sweetalert2";
 import {
-  MAPPING_COUNTRY_FAILED,
-  MAPPING_COUNTRY_PROCESS,
-  MAPPING_COUNTRY_SUCCESS,
+  MAPPING_HOTEL_FAILED,
+  MAPPING_HOTEL_PROCESS,
+  MAPPING_HOTEL_SUCCESS,
   baseUrl,
 } from "../constant";
 import axios from "axios";
@@ -15,9 +15,9 @@ export const getData = async (
   supplierId,
   name = ""
 ) => {
-  dispatch({ type: MAPPING_COUNTRY_PROCESS });
+  dispatch({ type: MAPPING_HOTEL_PROCESS });
   try {
-    let url = `${baseUrl}/api/integration/show-mapcountry?page=${page}&limit=${limit}`;
+    let url = `${baseUrl}/api/integration/show-maphotel?page=${page}&limit=${limit}`;
     let method = "GET";
     let body = null;
 
@@ -26,7 +26,7 @@ export const getData = async (
     }
 
     if (isSync) {
-      url = `${baseUrl}/api/integration/show-mapcountry?page=${page}&limit=${limit}`;
+      url = `${baseUrl}/api/integration/show-maphotel?page=${page}&limit=${limit}`;
     } else {
       // Set the method to POST for synchronization
       method = "POST";
@@ -47,13 +47,13 @@ export const getData = async (
     const data = await res.json();
 
     dispatch({
-      type: MAPPING_COUNTRY_SUCCESS,
+      type: MAPPING_HOTEL_SUCCESS,
       payload: { data: data?.data, isSync },
     });
     return { data: data?.data, status: res.status };
   } catch (error) {
     dispatch({
-      type: MAPPING_COUNTRY_FAILED,
+      type: MAPPING_HOTEL_FAILED,
       payload: error?.response?.data?.message || "Error",
     });
   }
@@ -62,31 +62,41 @@ export const getData = async (
 export const syncData = async (
   dispatch,
   isSync = true,
-  supplierId=0
+  supplierId=0,
+  country,
+  city,
 ) => {
-  dispatch({ type: MAPPING_COUNTRY_PROCESS });
+  dispatch({ type: MAPPING_HOTEL_PROCESS });
   try {
-    let url = `${baseUrl}/api/integration/sync-mapcountry/${supplierId}`;
-
+    let url = `${baseUrl}/api/integration/sync-maphotel/${supplierId}`;
+    let body = null;
+    
     const token = localStorage.getItem("AUTH_TOKEN");
+
+    body = JSON.stringify({ 
+      Country: country,
+      City: city
+    });
+
     const config = {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
       },
+      body: body, 
     };
 
     const res = await fetch(url, config);
     const data = await res.json();
     dispatch({
-      type: MAPPING_COUNTRY_SUCCESS,
+      type: MAPPING_HOTEL_SUCCESS,
       payload: { data: data?.data, isSync },
     });
 
     return { data: data?.data, status: res.status };
   } catch (error) {
     dispatch({
-      type: MAPPING_COUNTRY_FAILED,
+      type: MAPPING_HOTEL_FAILED,
       payload: error?.response?.data?.message || "Error",
     });
   }
@@ -94,7 +104,7 @@ export const syncData = async (
 
 export const createData = async (body) => {
   try {
-    const url = `${baseUrl}/api/integration/create-mapcountry`;
+    const url = `${baseUrl}/api/integration/create-maphotel`;
     const token = localStorage.getItem("AUTH_TOKEN");
 
     await axios.post(url, body, {
@@ -118,7 +128,7 @@ export const createData = async (body) => {
 
 export const updateData = async (id, body) => {
   try {
-    const url = `${baseUrl}/api/integration/update-mapcountry/${id}`;
+    const url = `${baseUrl}/api/integration/update-maphotel/${id}`;
     const token = localStorage.getItem("AUTH_TOKEN");
 
     await axios.put(url, body, {
@@ -140,14 +150,16 @@ export const updateData = async (id, body) => {
   }
 };
 
-export const getDDLCountry = async (
-  dispatch,  
+export const getDDLHotel = async (
+  dispatch,
+  countryId,
+  cityId,
   supplierid,
   isDropDown = true,
 ) => {
-  dispatch({ type: MAPPING_COUNTRY_PROCESS });
+  dispatch({ type: MAPPING_HOTEL_PROCESS });
   try {    
-    let url = `${baseUrl}/api/integration/mapcountry-dd?supplierId=${supplierid}`;
+    let url = `${baseUrl}/api/integration/maphotel-dd?supplierId=${supplierid}&countryId=${countryId}&cityId=${cityId}`;
 
     const token = localStorage.getItem("AUTH_TOKEN");
     const config = {
@@ -159,9 +171,8 @@ export const getDDLCountry = async (
 
     const res = await fetch(url, config);    
     const data = await res.json();
-    console.log(data)
     dispatch({
-      type: MAPPING_COUNTRY_SUCCESS,
+      type: MAPPING_HOTEL_SUCCESS,
       payload: { data: data?.data, isDropDown },
     });
 
@@ -169,7 +180,41 @@ export const getDDLCountry = async (
   } catch (error) {
     console.log(error)
     dispatch({
-      type: MAPPING_COUNTRY_FAILED,
+      type: MAPPING_HOTEL_FAILED,
+      payload: error?.response?.data?.message || "Error",
+    });
+  }
+};
+
+export const getDDLIDHotel = async (
+  dispatch,
+  id,  
+  isDropDown = true,
+) => {
+  dispatch({ type: MAPPING_HOTEL_PROCESS });
+  try {    
+    let url = `${baseUrl}/api/integration/maphotelid-dd`;
+
+    const token = localStorage.getItem("AUTH_TOKEN");
+    const config = {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    const res = await fetch(url, config);    
+    const data = await res.json();
+    dispatch({
+      type: MAPPING_HOTEL_SUCCESS,
+      payload: { data: data?.data, isDropDown },
+    });
+
+    return { data: data?.data, status: res.status };
+  } catch (error) {
+    console.log(error)
+    dispatch({
+      type: MAPPING_HOTEL_FAILED,
       payload: error?.response?.data?.message || "Error",
     });
   }

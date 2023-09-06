@@ -14,13 +14,24 @@ import Swal from "sweetalert2";
 // const Map = dynamic(() => import("../../components/map/index"), { ssr: false });
 
 const initForm = {
-  salesOffice: "",
-  name: "",
   code: "",
+  category: "",
+  name: "",  
   email: "",
   phone: "",
+  fax: "",
+  rqEmail: "",
+  ccEmail: "",
   address: "",
-  password: "",
+  url: "",
+  urlApi: "",  
+  address: "",
+  remark: "",
+  creditDay: "",
+  currency: "",
+  exchangeRate: "",
+  agentMarkup: "false",
+  xmlMapping: "false",  
   status: "1",
   fileIds: [],
 };
@@ -43,8 +54,8 @@ const CreateForm = (props) => {
   const { state: cityLocationState } = useContext(CityLocationContext);
   const { state: currencyState } = useContext(CurrencyContext);
 
-
   useEffect(() => {    
+    console.log(selectedData)
     setForm(isEdit ? selectedData : initForm);
   }, [selectedData, isEdit]);
 
@@ -53,11 +64,9 @@ const CreateForm = (props) => {
   };
 
   const handleSubmit = async () => {
-    const requiredField = [
-      "salesOffice",
+    const requiredField = [      
       "code",
-      "name",
-      "password",
+      "name",      
       "address",
       "phone",
       "email",
@@ -125,90 +134,99 @@ const CreateForm = (props) => {
                 <Select
                   label={"Category"}
                   options={categoryData}
-                  value={form.status}
+                  value={form.category}
                   onChange={(val) =>
-                    handleInputChange("status", val.target.value)
+                    handleInputChange("category", val.target.value)
                   }
                 />
               </div>
               <div className="col-6">
                 <Input
                   label={"Name"}
-                  value={form.password}
+                  value={form.name}
                   onChange={(val) =>
-                    handleInputChange("password", val.target.value)
+                    handleInputChange("name", val.target.value)
                   }
                 />
               </div>
               <div className="col-6">
                 <Input
                   label={"Email"}
-                  value={form.name}
+                  value={form.email}
                   onChange={(val) =>
-                    handleInputChange("name", val.target.value)
+                    handleInputChange("email", val.target.value)
                   }
                 />
               </div>
               <div className="col-6">
                 <Input
                   label={"Phone"}
-                  value={form.password}
+                  value={form.phone}
                   onChange={(val) =>
-                    handleInputChange("password", val.target.value)
+                    handleInputChange("phone", val.target.value)
                   }
                 />
               </div>
               <div className="col-6">
                 <Input
                   label={"Fax"}
-                  value={form.name}
+                  value={form.fax}
                   onChange={(val) =>
-                    handleInputChange("name", val.target.value)
+                    handleInputChange("fax", val.target.value)
                   }
                 />
               </div>
               <div className="col-6">
                 <Input
                   label={"RQ Email"}
-                  value={form.password}
+                  value={form.rqEmail}
                   onChange={(val) =>
-                    handleInputChange("password", val.target.value)
+                    handleInputChange("rqEmail", val.target.value)
                   }
                 />
               </div>
               <div className="col-6">
                 <Input
                   label={"CC Email"}
-                  value={form.name}
+                  value={form.ccEmail}
                   onChange={(val) =>
-                    handleInputChange("name", val.target.value)
+                    handleInputChange("ccEmail", val.target.value)
                   }
                 />
               </div>
               <div className="col-12">
                 <Input
                   label={"Address"}
-                  value={form.password}
+                  value={form.address}
                   onChange={(val) =>
-                    handleInputChange("password", val.target.value)
+                    handleInputChange("address", val.target.value)
                   }
                 />
               </div>
               <div className="col-12">
                 <Input
                   label={"Url"}
-                  value={form.name}
+                  value={form.url}
                   onChange={(val) =>
-                    handleInputChange("name", val.target.value)
+                    handleInputChange("url", val.target.value)
+                  }
+                />
+              </div>
+              <div className="col-12">
+                <Input
+                  label={"Url Api"}
+                  value={form.urlApi}
+                  onChange={(val) =>
+                    handleInputChange("urlApi", val.target.value)
                   }
                 />
               </div>
               <div className="col-12">
                 <Input
                   label={"Remark"}
-                  value={form.phone}
+                  value={form.remark}
                   onChange={(val) =>
-                    handleInputChange("phone", val.target.value)
+                    handleInputChange("remark", val.target.value)
                   }
                 />
               </div>
@@ -216,9 +234,9 @@ const CreateForm = (props) => {
               <div className="col-4">
                 <Input
                   label={"Credit Day"}
-                  value={form.email}
+                  value={form.creditDay}
                   onChange={(val) =>
-                    handleInputChange("email", val.target.value)
+                    handleInputChange("creditDay", val.target.value)
                   }
                 />
               </div>
@@ -229,16 +247,16 @@ const CreateForm = (props) => {
                   value={form.currency}
                   options={currencyState?.dropdownData}
                   onChange={(val) =>
-                    handleInputChange("salesOffice", val.target.value)
+                    handleInputChange("currency", val.target.value)
                   }
                 />
               </div>
               <div className="col-4">
                 <Input
                   label={"Exchange Rate"}
-                  value={form.address}
+                  value={form.exchangeRate}
                   onChange={(val) =>
-                    handleInputChange("address", val.target.value)
+                    handleInputChange("exchangeRate", val.target.value)
                   }
                 />
               </div>

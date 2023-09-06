@@ -1,5 +1,7 @@
 import { AuthContextProvider } from "./auth/reducer";
 import { CountryContextProvider } from "./country/reducer";
+import { MappingCountryContextProvider } from "./mappingCountry/reducer";
+import { MappingCityContextProvider } from "./mappingCity/reducer";
 import { CityContextProvider } from "./city/reducer";
 import { NationalityContextProvider } from "./nationality/reducer";
 import { CityLocationContextProvider } from "./cityLocation/reducer";
@@ -11,6 +13,7 @@ import { BookContextProvider } from "./book/reducer";
 import { FacilityContextProvider } from "./facility/reducer";
 import { BreakfastContextProvider } from "./breakfast/reducer";
 import { CurrencyContextProvider } from "./currency/reducer";
+import { MappingHotelContextProvider } from "./mappingHotel/reducer";
 
 export default function CombinedContextProvider({ children }) {
   return (
@@ -27,7 +30,13 @@ export default function CombinedContextProvider({ children }) {
                         <SalesOfficeContextProvider>
                           <CurrencyContextProvider>
                             <SupplierContextProvider>
-                              {children}
+                              <MappingCountryContextProvider>
+                                <MappingCityContextProvider>
+                                  <MappingHotelContextProvider>
+                                    {children}
+                                  </MappingHotelContextProvider>
+                                </MappingCityContextProvider>
+                              </MappingCountryContextProvider>
                             </SupplierContextProvider>
                           </CurrencyContextProvider>
                         </SalesOfficeContextProvider>

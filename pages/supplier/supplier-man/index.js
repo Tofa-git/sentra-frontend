@@ -5,6 +5,7 @@ import Select from "../../../components/select";
 import CreateSupListForm from "./createSupListForm";
 import CreateSupManForm from "./createSupManForm";
 import CreateSupEmergForm from "./createSupEmergForm";
+import CreateSupEndpointForm from "./createSupEndpointForm";
 import { AuthContext } from "../../../context/auth/reducer";
 import { SupplierContext } from "../../../context/supplier/reducer";
 import { getAllSupplier, deleteSupplier } from "../../../context/supplier/actions";
@@ -47,6 +48,21 @@ const Index = (props) => {
   const { state, dispatch } = useContext(SupplierContext);
   const { dispatch: authDispatch } = useContext(AuthContext);
 
+  const [numDivs, setNumDivs] = useState(1);
+  const [markupEndValues, setMarkupEndValues] = useState(['0']);
+
+  const handleMarkupEnd1Change = (e) => {
+    const newValue = e.target.value;
+    setMarkupEndValues([newValue]); // Update the state with a new array containing only the entered value
+    setNumDivs(2); // Reset numDivs to 1 when a new value is entered in markup_end1
+  };
+
+  const handleMarkupEndInputChange = (index, value) => {
+    const updatedValues = [...markupEndValues];
+    updatedValues[index] = value;
+    setMarkupEndValues(updatedValues);
+    setNumDivs(index + 3);
+  };
 
   // State to store the index of the selected row
   const [selectedRowIndex, setSelectedRowIndex] = useState(null);
@@ -154,6 +170,69 @@ const Index = (props) => {
           className="btn btn-sm btn-primary bg-blue ms-2 rounded-0 d-flex flex-row align-items-center shadow-sm"
           data-bs-toggle="modal"
           data-bs-target="#createHotel"
+          onClick={() => setIsEdit(false)}
+        >
+          <i
+            className="material-icons fs-6"
+            style={{ verticalAlign: "middle" }}
+          >
+            add
+          </i>
+          <span className="ms-2">Tambah</span>
+        </button>
+      </div>
+    </>
+  );
+
+  const toolbarSupEndpoint = (
+    <>
+      <div
+        className="d-flex flex-row align-items-center bg-light p-2"
+        style={{ borderBottom: "1px solid #dddddd" }}
+      >
+        <span className="flex-shrink-1 pe-1 ms-2 small text-nowrap text-dark">
+          Used
+        </span>
+        <div className="flex-fill input-group">
+          <select className="form-select rounded-0" name="i_field">
+            <option value="-">Yes</option>
+            <option value="-">No</option>
+          </select>
+        </div>
+        <span className="flex-shrink-1 pe-1 ms-2 small text-nowrap text-dark">
+          Supplier Name
+        </span>
+        <div className="flex-fill input-group">
+          <input
+            name="q"
+            type="text"
+            className="form-control bg-white rounded-0 p-0 px-1"
+            placeholder="Supplier Name"
+          />
+          <div className="d-flex input-group-append">
+            <div className="d-flex btn-group">
+              <a
+                className="btn btn-outline-secondary rounded-0"
+                id="search_button"
+                role="button"
+                title="Go Search"
+                style={{ padding: "2px 5px" }}
+                href="#"
+              >
+                <i
+                  className="material-icons"
+                  style={{ verticalAlign: "middle" }}
+                >
+                  search
+                </i>
+              </a>
+            </div>
+          </div>
+        </div>
+        <button
+          className="btn btn-sm btn-primary bg-blue ms-2 rounded-0 d-flex flex-row align-items-center shadow-sm"
+          data-bs-toggle="modal"
+          data-bs-target="#createSupEndpoint"
           onClick={() => setIsEdit(false)}
         >
           <i
@@ -351,7 +430,7 @@ const Index = (props) => {
                                   type="button"
                                   class="btn btn-primary bg-blue"
                                   data-bs-toggle="modal"
-                                  data-bs-target="#updateSupplier"
+                                  data-bs-target="#createHotel"
                                   onClick={() => {
                                     setIsEdit(true);
                                     setSelectedData(entry);
@@ -376,7 +455,172 @@ const Index = (props) => {
                     </tbody>
                   </table>
                 </div>
+
+                <div className="text-dark mb-1 mt-4">Supplier API</div>
+                <div className="stdFormHeader flex-shrink-1">
+                  {toolbarSupEndpoint}
+                </div>
+                <div className="bg-white">
+                  {isOpenManager && (
+                    <table className="table table-bordered table-hover table-striped">
+                      <thead>
+                        <tr>
+                          <th className="bg-blue text-white" width="15%">
+                            Name
+                          </th>
+                          <th className="bg-blue text-white" width="15%">
+                            Method
+                          </th>
+                          <th className="bg-blue text-white" width="10%">
+                            Action
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {
+                          state.data.rows.map((entry, index) => {
+                            if (selectedRowIndex === index && entry.suppApi && entry.suppApi.length > 0) {
+                              return entry.suppApi.map((data) => (
+                                <tr>
+                                  <td>{data.name}</td>
+                                  <td>{data.method}</td>
+                                  <td>
+                                    <button
+                                      type="button"
+                                      class="btn btn-primary bg-blue"
+                                      data-bs-toggle="modal"
+                                      data-bs-target="#createSupEndpoint"
+                                      onClick={() => {
+                                        setIsEdit(true);
+                                        setSelectedData(data);
+                                      }}
+                                    >
+                                      Edit
+                                    </button>
+                                    <button
+                                      type="button"
+                                      className="btn btn-warning ms-2"                                     
+                                    >
+                                      Detail
+                                    </button>
+                                  </td>
+                                </tr>
+                              ));
+                            }
+                          })
+                        }
+                      </tbody>
+                    </table>
+                  )}
+
+                </div>
+
+                <div className="text-dark mb-1 mt-4">Markup By Section</div>
+                <div
+                  className="d-flex flex-row align-items-center bg-light p-2"
+                  style={{ borderBottom: "1px solid #dddddd" }}
+                >
+
+                  <div className="flex-fill input-group">
+                    <input
+                      name="markup_start1"
+                      type="text"
+                      className="form-control bg-gray rounded-0 p-0 px-1"
+                      value="0"
+                      disabled="true"
+                    />
+                  </div>
+
+                  <span className="flex-shrink-1 pe-1 ms-2 small text-nowrap text-dark">
+                    ~
+                  </span>
+                  <div className="flex-fill input-group">
+                    <input
+                      name="markup_end1"
+                      type="number"
+                      className="form-control bg-white rounded-0 p-0 px-1"
+                      value={markupEndValues[0]} // Use the state value here
+                      onChange={handleMarkupEnd1Change}
+                    />
+                  </div>
+                  <span className="flex-shrink-1 pe-1 ms-2 small text-nowrap text-dark">
+                    Net
+                  </span>
+                  <div className="flex-fill input-group">
+                    <input
+                      name="markup_net1"
+                      type="text"
+                      className="form-control bg-white rounded-0 p-0 px-1"
+                      value="0"
+                    />
+                  </div>
+                  <span className="flex-shrink-1 pe-1 ms-2 small text-nowrap text-dark">
+
+                  </span>
+                  <div className="flex-fill input-group">
+                    <select className="form-control bg-white rounded-0 p-0 px-1" name="markup_type1">
+                      <option value="1">Percentage(%)</option>
+                      <option value="2">Fix Amount</option>
+                    </select>
+                  </div>
+
+
+                </div>
+                {/* Render additional divs based on numDivs */}
+                {[...Array(numDivs - 1)].map((_, index) => (
+                  <div
+                    className="d-flex flex-row align-items-center bg-light p-2"
+                    style={{ borderBottom: "1px solid #dddddd" }}
+                  >
+                    <div key={index} className="d-flex flex-row align-items-center bg-light p-2" style={{ borderBottom: "1px solid #dddddd" }}>
+                      {/* Replace the input names with appropriate values */}
+                      <div className="flex-fill input-group">
+                        <input
+                          name={`markup_start${index + 2}`}
+                          type="text"
+                          className="form-control bg-gray rounded-0 p-0 px-1"
+                          value="0"
+                          disabled
+                        />
+                      </div>
+
+                      <span className="flex-shrink-1 pe-1 ms-2 small text-nowrap text-dark">
+                        ~
+                      </span>
+                      <div className="flex-fill input-group">
+                        <input
+                          name={`markup_end${index + 2}`}
+                          type="text"
+                          className="form-control bg-white rounded-0 p-0 px-1"
+                          value={markupEndValues[index]} // Use the state value here for markup_end inputs
+                          onChange={(e) => handleMarkupEndInputChange(index, e.target.value)}
+                        />
+                      </div>
+                      <span className="flex-shrink-1 pe-1 ms-2 small text-nowrap text-dark">
+                        Net
+                      </span>
+                      <div className="flex-fill input-group">
+                        <input
+                          name={`markup_net${index + 2}`}
+                          type="text"
+                          className="form-control bg-white rounded-0 p-0 px-1"
+                          value="0"
+                        />
+                      </div>
+                      <span className="flex-shrink-1 pe-1 ms-2 small text-nowrap text-dark">
+
+                      </span>
+                      <div className="flex-fill input-group">
+                        <select className="form-control bg-white rounded-0 p-0 px-1" name={`markup_type${index + 2}`}>
+                          <option value="1">Percentage(%)</option>
+                          <option value="2">Fix Amount</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
+
 
               <div className="col-lg-6">
                 <div className="text-dark mb-1">Supplier Manager Information</div>
@@ -443,8 +687,7 @@ const Index = (props) => {
                         </tr>
                       </thead>
                       <tbody>
-                        {state.data.rows[selectedRowManIndex]?.suppMan.map((manager) => {
-                          console.log(state.data.rows[selectedRowIndex?.suppMan])
+                        {state.data.rows[selectedRowManIndex]?.suppMan.map((manager) => {                          
                           // Check if the manager has suppEmerg data
                           if (state.data.rows[selectedRowIndex].suppMan.length > 0 && manager.suppEmerg && manager.suppEmerg.length > 0) {
                             return manager.suppEmerg.map((data) => (
@@ -454,8 +697,8 @@ const Index = (props) => {
                                 <td>{data.phoneSecond}</td>
                               </tr>
                             ));
-                          } 
-                          
+                          }
+
                         })}
                       </tbody>
                     </table>
@@ -472,6 +715,14 @@ const Index = (props) => {
 
       <CreateSupListForm
         id="createHotel"
+        size="modal-xl"
+        isEdit={isEdit}
+        selectedData={selectedData}
+        handleGet={handleGet}
+      />
+
+      <CreateSupEndpointForm
+        id="createSupEndpoint"
         size="modal-xl"
         isEdit={isEdit}
         selectedData={selectedData}

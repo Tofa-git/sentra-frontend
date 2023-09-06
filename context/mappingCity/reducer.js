@@ -1,8 +1,8 @@
 import { createContext, useReducer } from "react";
 
-import { MAPPING_COUNTRY_FAILED, MAPPING_COUNTRY_PROCESS, MAPPING_COUNTRY_SUCCESS } from "../constant";
+import { MAPPING_CITY_FAILED, MAPPING_CITY_PROCESS, MAPPING_CITY_SUCCESS } from "../constant";
 
-const MappingCountryContext = createContext();
+const MappingCityContext = createContext();
 
 const initialState = {
   isLoading: false,
@@ -22,25 +22,24 @@ const initialState = {
 
 function reducer(state, action) {
   switch (action.type) {
-    case MAPPING_COUNTRY_PROCESS:
+    case MAPPING_CITY_PROCESS:
       return {
         ...state,
         isLoading: true,
       };
-    case MAPPING_COUNTRY_SUCCESS:
+    case MAPPING_CITY_SUCCESS:
       const changedState = {
         isLoading: false,
         isError: false,
         errorMessage: null,
-      };
+      };      
       if (action.payload.isSync) {                
         return {
           ...state,
           ...changedState,
           syncData: action.payload.data,
         };
-      } else if (action.payload.isDropDown) {        
-        console.log(action.payload)
+      }  else if (action.payload.isDropDown) {        
         return {
           ...state,
           ...changedState,
@@ -53,7 +52,7 @@ function reducer(state, action) {
           data: action.payload.data,
         };
       }
-    case MAPPING_COUNTRY_FAILED:
+    case MAPPING_CITY_FAILED:
       return {
         ...state,
         isLoading: false,
@@ -65,14 +64,14 @@ function reducer(state, action) {
   }
 }
 
-function MappingCountryContextProvider({ children }) {
+function MappingCityContextProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   return (
-    <MappingCountryContext.Provider value={{ state, dispatch }}>
+    <MappingCityContext.Provider value={{ state, dispatch }}>
       {children}
-    </MappingCountryContext.Provider>
+    </MappingCityContext.Provider>
   );
 }
 
-export { MappingCountryContext, MappingCountryContextProvider };
+export { MappingCityContext, MappingCityContextProvider };

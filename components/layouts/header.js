@@ -6,7 +6,7 @@ const Headers = () => {
             		<i className="material-icons">apps</i>
             	</a>
                 <label className='p-0 d-flex align-items-center px-2 cursor-default'>
-                    <span className='small m-0 p-0 text-light fs-6'>Sentra Hotel</span>
+                    <span className='small m-0 p-0 text-light fs-6'>Extra-Net Solution Network (ESN)</span>
                 </label>
             </div>
             <div className="offcanvas offcanvas-start" tabIndex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
