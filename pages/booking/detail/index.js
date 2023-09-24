@@ -95,7 +95,7 @@ const Index = (props) => {
   const [roomNight, setRoomNight] = useState(0);
   const [selectedFirstOps, setSelectedFirstOps] = useState({});
 
-  const bookingCreatedAt = details?.local[0].bookingCreatedAt ?? "-";
+  const bookingCreatedAt = details?.local.bookingCreatedAt ?? "-";
   const formattedDateTime = formatDateTime(bookingCreatedAt);
 
   const totalGross = Number(roomGrossPrice) + Number(addGrossCharge);
@@ -159,14 +159,14 @@ const Index = (props) => {
               <Input
                 label={"Country"}
                 disabled={true}
-                value={details?.local[0].hotelCountryCode}
+                value={details?.local.hotelCountryCode}
               />
             </div>
             <div className="col-4">
               <Input
                 label={"City"}
                 disabled={true}
-                value={details?.local[0].hotelCityCode}
+                value={details?.local.hotelCityCode}
               />
             </div>
             <div className="col-6">
@@ -186,14 +186,14 @@ const Index = (props) => {
               <Input
                 label={"Tel"}
                 disabled={true}
-                value={details?.local[0].hotelPhone ?? "-"}
+                value={details?.local.hotelPhone ?? "-"}
               />
             </div>
             <div className="col-6">
               <Input
                 label={"Supplier Hotel"}
                 disabled={true}
-                value={details?.local[0].bookingHotelName}
+                value={details?.local.bookingHotelName}
               />
             </div>
             <div className="col-2">
@@ -206,14 +206,14 @@ const Index = (props) => {
               <Input
                 label={"Master Address"}
                 disabled={true}
-                value={details?.local[0].hotelAddress}
+                value={details?.local.hotelAddress}
               />
             </div>
             <div className="col-10">
               <Input
                 label={"Supplier Address"}
                 disabled={true}
-                value={details?.local[0].hotelAddress}
+                value={details?.local.hotelAddress}
               />
             </div>
             <div className="col-5">
@@ -257,45 +257,45 @@ const Index = (props) => {
               <Input
                 type="text"
                 label="XML Ref #"
-                value={details?.local[0].xmlRef ?? "-"} />
+                value={details?.local.xmlRef ?? "-"} />
             </div>
             <div className="col-6">
               <Input
                 type="text"
                 label="Agent (XO) Ref No"
-                value={details?.local[0].agentRef ?? "-"} />
+                value={details?.local.agentRef ?? "-"} />
             </div>
 
             <div className="col-6">
               <Input type="text" label="Agent"
-                value={details?.local[0].userFirstName ?? "-"} />
+                value={details?.local.userFirstName ?? "-"} />
             </div>
             <div className="col-6">
               <Input type="text" label="ID"
-                value={details?.local[0].userUsername ?? "-"} />
+                value={details?.local.userUsername ?? "-"} />
             </div>
 
             <div className="col-6">
               <Input type="text" label="Phone"
-                value={details?.local[0].userMobile ?? "-"} />
+                value={details?.local.userMobile ?? "-"} />
             </div>
             <div className="col-6">
               <Input type="text" label="Mail"
-                value={details?.local[0].userEmail ?? "-"} />
+                value={details?.local.userEmail ?? "-"} />
             </div>
 
             <div className="col-7">
               <Input label="Sales Office"
-                value={details?.local[0].userSalesOffice ?? "-"} />
+                value={details?.local.userSalesOffice ?? "-"} />
             </div>
 
             <div className="col-6">
               <Input label="Manager"
-                value={details?.local[0].userManager ?? "-"} />
+                value={details?.local.userManager ?? "-"} />
             </div>
             <div className="col-6">
               <Input label="ID"
-                value={details?.local[0].userManagerId ?? "-"} />
+                value={details?.local.userManagerId ?? "-"} />
             </div>
 
             <div className="col-6">
@@ -303,14 +303,14 @@ const Index = (props) => {
                 type="text"
                 label="Phone"
                 disabled={true}
-                value={details?.local[0].userManagerMobile ?? "-"} />
+                value={details?.local.userManagerMobile ?? "-"} />
             </div>
             <div className="col-6">
               <Input
                 type="text"
                 label="Mail"
                 disabled={true}
-                value={details?.local[0].userManagerEmail ?? "-"} />
+                value={details?.local.userManagerEmail ?? "-"} />
             </div>
 
 
@@ -318,20 +318,20 @@ const Index = (props) => {
               <Input
                 type="text"
                 label="Sub Name"
-                value={details?.local[0].userSubName ?? "-"} />
+                value={details?.local.userSubName ?? "-"} />
             </div>
             <div className="col-6">
               <Input type="text" label="Email"
-                value={details?.local[0].userManagerEmail ?? "-"} />
+                value={details?.local.userManagerEmail ?? "-"} />
             </div>
 
             <div className="col-6">
               <Input type="text" label="Mobile"
-                value={details?.local[0].userManagerMobile ?? "-"} />
+                value={details?.local.userManagerMobile ?? "-"} />
             </div>
             <div className="col-6">
               <Input type="text" label="Phone"
-                value={details?.local[0].userManagerPhone ?? "-"} />
+                value={details?.local.userManagerPhone ?? "-"} />
             </div>
 
             <div className="col-6">
@@ -344,13 +344,13 @@ const Index = (props) => {
                   );
                   setSelectedFirstOps(user);
                 }}
-                value={details?.local[0].userCreatedBy ?? "-"} />
+                value={details?.local.userCreatedBy ?? "-"} />
             </div>
             <div className="col-6">
               <Input
                 label="Last Operator"
                 disabled={true}
-                value={details?.local[0].userFirstName ?? "-"} />
+                value={details?.local.userFirstName ?? "-"} />
             </div>
 
             <div className="col-12 d-flex justify-content-end py-2">

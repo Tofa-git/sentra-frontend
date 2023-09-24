@@ -3,6 +3,9 @@ import {
   BOOK_SEARCH_FAILED,
   BOOK_SEARCH_PROCESS,
   BOOK_SEARCH_SUCCESS,
+  BOOK_SEARCH_ROOM_FAILED,
+  BOOK_SEARCH_ROOM_PROCESS,
+  BOOK_SEARCH_ROOM_SUCCESS,
   BOOK_LIST_FAILED,
   BOOK_LIST_PROCESS,
   BOOK_LIST_SUCCESS,
@@ -46,6 +49,28 @@ export const getAllBookSearch = async (dispatch, body) => {
     Swal.fire(
       "Search Failed",
       "Error when search hotel, please try again later",
+      "error"
+    );
+    return { data: [], status: 500 };
+  }
+};
+
+export const getAllBookSearchRoom = async (body,supplierId) => {  
+  try {
+    const url = `${baseUrl}/api/integration/search-hotel-room/${supplierId}`;
+    const token = localStorage.getItem("AUTH_TOKEN");
+
+    const book = await axios.post(url, body, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+   
+    return { data: book?.data, status: book.status };
+  } catch (error) {
+    Swal.fire(
+      "Searching Room Failed",
+      "Error when searching room hotel, please try again later",
       "error"
     );
     return { data: [], status: 500 };

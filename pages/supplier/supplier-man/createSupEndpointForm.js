@@ -44,11 +44,7 @@ const namesData = [
     {
         id: "Meal",
         name: "Meal Type"
-    },
-    {
-        id: "Breakfast",
-        name: "Breakfast"
-    },
+    },    
     {
         id: "Search",
         name: "Search"
@@ -60,6 +56,10 @@ const namesData = [
     {
         id: "Book",
         name: "Book"
+    },
+    {
+        id: "Search Room",
+        name: "Search Room"
     }
 ];
 

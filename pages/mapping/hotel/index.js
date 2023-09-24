@@ -60,6 +60,7 @@ const Index = (props) => {
   const [zipMst, setZipMst] = useState("");
 
   /*Supplier Section */
+  const [idMappingSup, setIdMappingSup] = useState("");
   const [codeSup, setCodeSup] = useState("");
   const [nameSup, setNameSup] = useState("");
   const [chainCodeSup, setChainCodeSup] = useState("");
@@ -83,6 +84,7 @@ const Index = (props) => {
   const [supplierId, setSupplierId] = useState("");
   const [masterId, setMasterId] = useState("");
   const [citySync, setCitySync] = useState("");
+  const [isShowMapped, setIsShowMapped] = useState(false);
   const [countrySync, setCountrySync] = useState("");
 
   const { state, dispatch } = useContext(HotelContext);
@@ -117,7 +119,7 @@ const Index = (props) => {
 
   useEffect(() => {
     handleGetMapping();
-  }, [keywordSupplier, supplierId]);
+  }, [keywordSupplier, citySync, countrySync, isShowMapped,supplierId]);
 
   const handleDropDown = async () => {
     const ddl = await getDDLSupp(supplierDDLDispatch, true);
@@ -153,7 +155,7 @@ const Index = (props) => {
       setChainNameMst(selectedHotel.chainName);
       setBrandCodeMst(selectedHotel.brandCode);
       setBrandNameMst(selectedHotel.brandName);
-    }    
+    }
   };
 
   const handleGet = async (page = 1, limit = 12) => {
@@ -167,7 +169,7 @@ const Index = (props) => {
   };
 
   const handleGetMapping = async (page = 1, limit = 12) => {
-    const mapping = await getData(mappingHotelDispatch, false, page, limit, supplierId, keywordSupplier);
+    const mapping = await getData(mappingHotelDispatch, false, page, limit, supplierId, countrySync, citySync, isShowMapped,keywordSupplier);
     if (mapping.status === 401) {
       authDispatch({ type: AUTH_401 });
       authDispatch({ type: AUTH_LOGOUT });
@@ -195,7 +197,12 @@ const Index = (props) => {
 
   const handleHotelChange = (event) => {
     const selectedHotelCode = event.target.value;
-    setMasterId(selectedHotelCode)    
+    setMasterId(selectedHotelCode)
+  };
+
+  const handleShowMapping = (event) => {
+    const isShowMapping = event.target.checked;
+    setIsShowMapped(isShowMapping);
   };
 
   const [selectedRowIndex, setSelectedRowIndex] = useState(null);
@@ -219,7 +226,7 @@ const Index = (props) => {
   const handleRowSupClick = (index, id, data) => {
     // Function to handle row click
     setSelectedData(index)
-
+    setIdMappingSup(data.id)
     setCodeSup(data.code)
     setNameSup(data.name)
     setPhoneSup(data.phone)
@@ -294,6 +301,29 @@ const Index = (props) => {
     if (supplierId === "") {
       Swal.fire("Information", "Please select a supplier to be sync", "warning");
     }
+
+    if (mapping?.status === 200) {
+      Swal.fire("Information", "Sync Success", "success");
+      handleGet();
+    }
+  };
+
+  const handleMerge = async (page = 1, limit = 12) => {
+    const initForm = {
+      masterId: masterId,
+      code: codeSup,
+      name: nameSup,
+      phone: phoneSup,
+      address: addressSup,
+      zipCode: zipSup,
+      star: starSup,
+      chainCode: chainCodeSup,
+      chainName: chainNameSup,
+      brandCode: brandCodeSup,
+      brandName: brandNameSup,
+      status: 1,
+    };
+    const mapping = await updateData(idMappingSup, initForm);
 
     if (mapping?.status === 200) {
       Swal.fire("Information", "Sync Success", "success");
@@ -540,7 +570,7 @@ const Index = (props) => {
                     {mappingCountryState?.dropdownData?.map((country) => {
                       return (
                         <option key={country.id} value={country.id}>
-                          {country.code + " - " + country.name}
+                          {country.name}
                         </option>
                       );
                     })}
@@ -560,15 +590,30 @@ const Index = (props) => {
                     {mappingCityState?.dropdownData?.map((city) => {
                       return (
                         <option key={city.id} value={city.id}>
-                          {city.code + " - " + city.name}
+                          {city.name}
                         </option>
                       );
                     })}
                   </select>
                 </div>
               </div>
+              <div className="d-flex flex-row align-items-center mt-2">
+                <span className="flex-shrink-1 pe-2 small text-nowrap text-dark pe-2">
+                  Show Only Mapped Hotel
+                </span>
+                <div className="flex-fill input-group ms-2">
+                  <input
+                    type="checkbox"
+                    className={`form-check-input`}                    
+                    onChange={handleShowMapping}
+                    checked={isShowMapped}
+                    disabled={false}
+                  />
+                </div>
+              </div>
 
               <div className="col-12 d-flex justify-content-end py-2">
+
                 <button
                   onClick={() => handleSync()}
                   className="btn bg-warning rounded-1 text-black ms-2"
@@ -812,9 +857,9 @@ const Index = (props) => {
 
                 <div className="col-12 d-flex justify-content-end py-2">
                   <button
-                    onClick={() => handleSync()}
+                    onClick={() => handleMerge()}
                     className="btn bg-warning rounded-1 text-black ms-2"
-                    disabled={supplierId && citySync && countrySync ? false : true}
+                    disabled={codeSup ? false : true}
                   >
                     Merge
                   </button>

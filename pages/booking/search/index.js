@@ -273,53 +273,15 @@ const Index = (props) => {
                   <th className="bg-blue text-white" width="5%">
                     Action
                   </th>
-                  {/* <th className="bg-blue text-white" width="5%">
-                    C-Day
-                  </th>
-                  <th className="bg-blue text-white" width="5%">
-                    CXLDL
-                  </th>
-                  <th className="bg-blue text-white" width="5%">
-                    Check IN/OUT
-                  </th>
-                  <th className="bg-blue text-white" width="5%">
-                    Bed Type
-                  </th>
-                  <th className="bg-blue text-white" width="5%">
-                    Guest Name
-                  </th>
-                  <th className="bg-blue text-white" width="5%">
-                    Profit %
-                  </th>
-                  <th className="bg-blue text-white" width="5%">
-                    Sale
-                  </th>
-                  <th className="bg-blue text-white" width="5%">
-                    Net
-                  </th>
-                  <th className="bg-blue text-white" width="5%">
-                    Type
-                  </th>
-                  <th className="bg-blue text-white" width="5%">
-                    Big Income
-                  </th>
-                  <th className="bg-blue text-white" width="5%">
-                    XML
-                  </th>
-                  <th className="bg-blue text-white" width="5%">
-                    First Last Ops
-                  </th>
-                  <th className="bg-blue text-white" width="5%">
-                    Sale Office
-                  </th> */}
+                  
                 </tr>
               </thead>
               <tbody>
                 {state?.dataList?.rows?.map((data) => {
                   return (
                     <tr
-                      onClick={() => handleDetail(data?.mgBookingID)}
-                      className="pointer"
+                      // onClick={() => handleDetail(data?.mgBookingID)}
+                      // className="pointer"
                     >
                       <td>{data?.mgBookingID}</td>
                       <td>{data?.checkIn}</td>
@@ -329,13 +291,13 @@ const Index = (props) => {
                       <td>{data?.cancellationPolicyType}</td>
                       <td>{data?.roomName}</td>
                       <td className="d-flex flex-row justify-content-center align-items-center">
-                        {/* <button
+                        <button
                           type="button"
                           className="btn btn-primary bg-blue"
                           onClick={() => handleDetail(data?.mgBookingID)}
                         >
                           Detail
-                        </button> */}
+                        </button>
                         <button
                           type="button"
                           className="btn btn-danger ms-2"

@@ -8,6 +8,7 @@ import { CityLocationContext } from "../../../context/cityLocation/reducer";
 import {
   createBook,
   getAllBookSearch,
+  getAllBookSearchRoom,
   recheckBookSearch,
 } from "../../../context/book/actions";
 import { BookContext } from "../../../context/book/reducer";
@@ -21,9 +22,17 @@ import { toIDR } from "../../../utlis/helper";
 const initialForm = {
   checkIn: "",
   checkOut: "",
-  nationality: "",
+  lowestPriceOnly: true,
+  nationality: "ID",
+  currency: "IDR",
   country: "",
   city: "",
+  cityCode: "1704",
+  adultSG: 0,
+  adultDB: 0,
+  adultTW: 0,
+  adultTP: 0,
+  adultQD: 0,
   adults: 0,
   children: 0,
   childAge: 0,
@@ -35,23 +44,23 @@ const initialForm = {
 const ratingsData = [
   {
     id: 1,
-    name:"★"
+    name: "★"
   },
   {
-    id:2,
-    name:"★★"
+    id: 2,
+    name: "★★"
   },
   {
-    id:3,
-    name:"★★★"
+    id: 3,
+    name: "★★★"
   },
   {
-    id:4,
-    name:"★★★★"
+    id: 4,
+    name: "★★★★"
   },
   {
-    id:5,
-    name:"★★★★★"
+    id: 5,
+    name: "★★★★★"
   }
 
 ];
@@ -66,8 +75,12 @@ const Index = (props) => {
   const [selectedHotel, setSelectedHotel] = useState({});
   const [selectedRoom, setSelectedRoom] = useState({});
   const [selectedAgent, setSelectedAgent] = useState({});
+  const [roomHotelData, setRoomHotelData] = useState([]);
   const [recheckData, setRecheckData] = useState(null);
   const [guestData, setGuestData] = useState([]);
+  const [request, setRequest] = useState("");
+  const [bookRequest, setBookRequest] = useState('');
+  const [supplierCode, setSupplierCode] = useState('');
 
   const { state, dispatch } = useContext(BookContext);
   const { state: cityState } = useContext(CityContext);
@@ -79,16 +92,56 @@ const Index = (props) => {
   const [form, setForm] = useState(initialForm);
 
   const handleInputChange = (name, value) => {
-    if (name === "checkIn" || name === "checkOut") {
-      const checkInDate = name === "checkIn" ? value : form.checkIn;
-      const checkOutDate = name === "checkOut" ? value : form.checkOut;
-  
-      const nightCount = calculateNightCount(checkInDate, checkOutDate);
-      setForm({ ...form, [name]: value, night: nightCount });
-    } else {
-      setForm({ ...form, [name]: value });
-    }
-  };
+    let current = [...guestData];
+
+    switch (name) {
+      case "adultSG":
+        const sg = name === "adultSG" ? value : form.adultSG;
+
+        setForm({ ...form, [name]: value, adults: form.adults += sg });
+
+        current.push({
+          room: `SG ${value}`,
+          salutation: "",
+          firstName: "",
+          lastName: "",
+          age: "",
+        });
+
+        break;
+      case "adultDB":
+        const db = name === "adultDB" ? value : form.adultDB;
+
+        setForm({ ...form, [name]: value, adults: form.adults += db + 1 });
+        break;
+      case "adultTW":
+        const tw = name === "adultTW" ? value : form.adultTW;
+
+        setForm({ ...form, [name]: value, adults: form.adults += tw + 1 });
+        break;
+      case "adultTP":
+        const tp = name === "adultTP" ? value : form.adultTP;
+
+        setForm({ ...form, [name]: value, adults: form.adults += tp + 2 });
+        break;
+      case "adultQD":
+        const qd = name === "adultQD" ? value : form.adultQD;
+
+        setForm({ ...form, [name]: value, adults: form.adults += qd + 3 });
+        break;
+      case "checkOut":
+        const checkInDate = name === "checkIn" ? value : form.checkIn;
+        const checkOutDate = name === "checkOut" ? value : form.checkOut;
+
+        const nightCount = calculateNightCount(checkInDate, checkOutDate);
+        setForm({ ...form, [name]: value, night: nightCount });
+        break;
+      default:
+        // Code to execute when name doesn't match any of the cases
+        setForm({ ...form, [name]: value });
+    };
+    console.log(form)
+  }
 
   const calculateNightCount = (checkInDate, checkOutDate) => {
     if (checkInDate && checkOutDate) {
@@ -138,6 +191,38 @@ const Index = (props) => {
     }, 1500);
   };
 
+  const handleRoomGet = async (data, supplierId) => {
+
+    Swal.fire({
+      icon: "info",
+      title: "Search Available Room",
+      showConfirmButton: false,
+      timer: 1000 * 60,
+      timerProgressBar: true,
+      didOpen: () => {
+        Swal.showLoading();
+      },
+    });
+
+    const body = {
+      ...data,
+      checkIn: form.checkIn,
+      checkOut: form?.checkOut,
+      nationality: form?.nationality,
+      currency: form?.currency,
+      realTimeRoom: 1,
+      realTimeValue: 0,
+      realTimeAdult: 1,
+    };
+
+    const _recheck = await getAllBookSearchRoom(body, supplierId);
+    setRoomHotelData(_recheck.data.data.rooms);
+
+    setTimeout(() => {
+      Swal.close();
+    }, 1500);
+  };
+
   const handleRecheck = async (room) => {
     setSelectedRoom(room);
     Swal.fire({
@@ -150,11 +235,12 @@ const Index = (props) => {
         Swal.showLoading();
       },
     });
-
     const body = {
       ...form,
+      supplierId: selectedHotel.supplierId,
       hotelCode: selectedHotel.code,
-      sessionId: state?.data?.sessionId,
+      hotelName: selectedHotel.name,
+      sessionId: selectedHotel.sessionId,
       roomCode: room?.code,
       mealPlan: room?.mealPlan,
       rateKey: room?.rooms?.room?.[0]?.rateKey,
@@ -185,12 +271,15 @@ const Index = (props) => {
     const body = {
       ...form,
       hotelCode: selectedHotel.code,
-      sessionId: state?.data?.sessionId,
+      supplierId: selectedHotel.supplierId,
+      sessionId: selectedHotel.sessionId,
       roomCode: selectedRoom?.code,
       mealPlan: selectedRoom?.mealPlan,
+      request: bookRequest != "" ? bookRequest + ';' + request : request,
       rateKey: selectedRoom?.rooms?.room?.[0]?.rateKey,
       cancelPolicyType: selectedRoom?.cancellationPolicyType,
       guests: guestData,
+      agent: selectedAgent
     };
     delete body.codeHotel;
 
@@ -217,6 +306,39 @@ const Index = (props) => {
     setGuestData([]);
   };
 
+
+  // Function to handle checkbox changes
+  const handleCheckboxChange = (e) => {
+    // Get the text from the adjacent span element
+    const text = e.target.nextElementSibling.textContent.trim();
+
+    // Update the selectedOptions state with the new value
+    setRequest((prevSelectedOptions) => {
+      // Check if the checkbox is checked
+      if (e.target.checked) {
+        // Append the text to the existing selectedOptions with a semicolon separator
+        if (prevSelectedOptions.length === 0) {
+          return text;
+        } else {
+          return prevSelectedOptions + ';' + text;
+        }
+      } else {
+        // Remove the text from the selectedOptions if the checkbox is unchecked
+        return prevSelectedOptions.replace(new RegExp(text + ';?', 'g'), '');
+      }
+    });
+
+  };
+
+  // Function to handle textarea changes
+  const handleTextareaChange = (e) => {
+    // Get the value from the textarea
+    const text = e.target.value;
+
+    // Update the bookRequest state with the new value
+    setBookRequest(text);
+  };
+
   useEffect(() => {
     getAllUserDD(authDispatch);
   }, []);
@@ -224,16 +346,21 @@ const Index = (props) => {
   useEffect(() => {
     let current = [...guestData];
     if (+form.adults < current.length) {
+
       current =
         current.length === 0 ? [] : current.slice(0, current.length - 1);
     } else {
+
       if (+form.adults !== 0) {
-        current.push({
-          salutation: "",
-          firstName: "",
-          lastName: "",
-          age: "",
-        });
+        for (let i = current.length; i < +form.adults; i++) {
+          current.push({
+            room: "",
+            salutation: "",
+            firstName: "",
+            lastName: "",
+            age: "",
+          });
+        }
       }
     }
 
@@ -262,7 +389,7 @@ const Index = (props) => {
             <div className="col-12">
               <Select
                 label={"Nationality"}
-                target="home"
+                target="general"
                 // value={form.nationality}
                 options={nationalityState?.dropdownData}
                 onChange={(val) => handleInputChange("nationality", "ID")}
@@ -271,10 +398,10 @@ const Index = (props) => {
             <div className="col-6">
               <Select
                 label={"Country"}
-                target="home"
+                target="general"
                 value={form.country}
                 options={countryState?.dropdownData}
-                onChange={(val) => {           
+                onChange={(val) => {
                   handleInputChange("country", val?.target.value);
                 }}
               />
@@ -282,7 +409,7 @@ const Index = (props) => {
             <div className="col-6">
               <Select
                 label={"City"}
-                target="home"
+                target="general"
                 value={form.city}
                 options={cityState?.dropdownData}
                 onChange={(val) => handleInputChange("city", val.target.value)}
@@ -300,6 +427,7 @@ const Index = (props) => {
               <Input
                 type="date"
                 label="Check Out"
+                disabled={form.checkIn ? true : false}
                 value={form.checkOut}
                 onChange={(val) => handleInputChange("checkOut", val)}
               />
@@ -308,29 +436,49 @@ const Index = (props) => {
               <Input type="number" label="Night" value={form.night} readOnly />
             </div>
             <div className="col-3">
-              <Select options={ratingsData}/>
+              <Select options={ratingsData} />
             </div>
             <div className="col-2">
-              <Select options={roomData} label="SG" />
+              <Select options={roomData}
+                label="SG"
+                value={form.adultSG}
+                onChange={(val) => {
+                  handleInputChange("adultSG", +val.target.value);
+                }} />
             </div>
             <div className="col-2">
               <Select
                 options={roomData}
-                label="DG"
-                value={form.adults}
+                label="DB"
+                value={form.adultDB}
                 onChange={(val) => {
-                  handleInputChange("adults", +val.target.value);
+                  handleInputChange("adultDB", +val.target.value);
                 }}
               />
             </div>
             <div className="col-2">
-              <Select options={roomData} label="TW" />
+              <Select options={roomData}
+                label="TW"
+                value={form.adultTW}
+                onChange={(val) => {
+                  handleInputChange("adultTW", +val.target.value);
+                }} />
             </div>
             <div className="col-2">
-              <Select options={roomData} label="TP" />
+              <Select options={roomData}
+                label="TP"
+                value={form.adultTP}
+                onChange={(val) => {
+                  handleInputChange("adultTP", +val.target.value);
+                }} />
             </div>
             <div className="col-2">
-              <Select options={roomData} label="QD" />
+              <Select options={roomData}
+                label="QD"
+                value={form.adultQD}
+                onChange={(val) => {
+                  handleInputChange("adultQD", +val.target.value);
+                }} />
             </div>
             <div className="col-2">
               <Input
@@ -455,10 +603,10 @@ const Index = (props) => {
                     ★
                   </th>
                   <th className="bg-blue text-white" width="5%">
-                    Gross Price
+                    Net Price
                   </th>
                   <th className="bg-blue text-white" width="5%">
-                    Net Price
+                    Supplier
                   </th>
                 </tr>
               </thead>
@@ -474,14 +622,21 @@ const Index = (props) => {
                         setSelectedHotel(data);
                         setSelectedRoom({});
                         setRecheckData(null);
+
+                        if (data.roomDetails.length == 0) {
+                          handleRoomGet(data, data.supplierId)
+                        } else {
+                          setRoomHotelData(data.roomDetails)
+                          setSupplierCode(data.supplierCode);
+                        }
                       }}
                       className={`${isSelected ? "bg-selected" : ""} pointer`}
                     >
                       <td>{data.code}</td>
                       <td>{data.name}</td>
                       <td>{data.rating}</td>
-                      <td>{toIDR(sortedData.grossPrice)}</td>
-                      <td>{toIDR(sortedData.grossPrice)}</td>
+                      <td>{toIDR(data.netPrice)}</td>
+                      <td>{data.supplierCode}</td>
                     </tr>
                   );
                 })}
@@ -519,8 +674,10 @@ const Index = (props) => {
                 </tr>
               </thead>
               <tbody>
-                {selectedHotel?.roomDetails?.map((data) => {
+                {roomHotelData?.map((data) => {
                   const isSelected = data.id === selectedRoom?.id;
+                  console.log("data room : ")
+                  console.log(data)
                   return (
                     <tr
                       onClick={() => handleRecheck(data)}
@@ -531,7 +688,7 @@ const Index = (props) => {
                       <td>{toIDR(data.grossPrice)}</td>
                       <td>{toIDR(data.netPrice)}</td>
                       <td>{data.mealPlanName}</td>
-                      <td>MGJ</td>
+                      <td>{supplierCode}</td>
                     </tr>
                   );
                 })}
@@ -702,6 +859,9 @@ const Index = (props) => {
               <thead>
                 <tr>
                   <th className="bg-blue text-white" width="5%">
+                    Room
+                  </th>
+                  <th className="bg-blue text-white" width="5%">
                     First Name
                   </th>
                   <th className="bg-blue text-white" width="5%">
@@ -719,6 +879,18 @@ const Index = (props) => {
                 {guestData.map((data, key) => {
                   return (
                     <tr>
+                      <td>
+                        <input
+                          value={data.room}
+                          onChange={(val) =>
+                            handleGuestChange(
+                              key,
+                              "room",
+                              val.target.value
+                            )
+                          }
+                        />
+                      </td>
                       <td>
                         <input
                           value={data.firstName}
@@ -776,23 +948,23 @@ const Index = (props) => {
           <div className="bg-white row mx-0 py-2">
             <div className="col-12 text-dark fw-bold mb-2">Add Request</div>
             <div className="col-3">
-              <input type="checkbox" />
+              <input type="checkbox" onChange={handleCheckboxChange} />
               <span className="text-dark ms-2">Honeymoon</span>
             </div>
             <div className="col-3">
-              <input type="checkbox" />
+              <input type="checkbox" onChange={handleCheckboxChange} />
               <span className="text-dark ms-2">Non-Smoking Room</span>
             </div>
             <div className="col-3">
-              <input type="checkbox" />
+              <input type="checkbox" onChange={handleCheckboxChange} />
               <span className="text-dark ms-2">Smoking Room Request</span>
             </div>
             <div className="col-3">
-              <input type="checkbox" />
+              <input type="checkbox" onChange={handleCheckboxChange} />
               <span className="text-dark ms-2">Interconnecting rooms</span>
             </div>
             <div className="col-3">
-              <input type="checkbox" />
+              <input type="checkbox" onChange={handleCheckboxChange} />
               <span className="text-dark ms-2">Adjoinning rooms</span>
             </div>
             <div className="col-3">
@@ -826,11 +998,11 @@ const Index = (props) => {
               </select>
             </div>
             <div className="col-3">
-              <input type="checkbox" />
+              <input type="checkbox" onChange={handleCheckboxChange} />
               <span className="text-dark ms-2">King size bed request</span>
             </div>
             <div className="col-3">
-              <input type="checkbox" />
+              <input type="checkbox" onChange={handleCheckboxChange} />
               <span className="text-dark ms-2">Share bed child request</span>
             </div>
             <div className="col-3">
@@ -839,16 +1011,16 @@ const Index = (props) => {
               <input type="number" className="form-control" />
             </div>
             <div className="col-3">
-              <input type="checkbox" />
+              <input type="checkbox" onChange={handleCheckboxChange} />
               <span className="text-dark ms-2">Bath tube request</span>
             </div>
             <div className="col-3">
-              <input type="checkbox" />
+              <input type="checkbox" onChange={handleCheckboxChange} />
               <span className="text-dark ms-2">Hight Speed Internet</span>
             </div>
             <div className="col-12 text-dark fw-bold mt-2">Book Request</div>
             <div className="col-12">
-              <textarea className="form-control" />
+              <textarea className="form-control" value={bookRequest} onChange={handleTextareaChange} />
             </div>
             <div className="col-12 text-dark fw-bold mt-2">Internal Remark</div>
             <div className="col-12">

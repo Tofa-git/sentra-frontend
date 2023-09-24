@@ -12,6 +12,8 @@ import { SupplierContextProvider } from "./supplier/reducer";
 import { BookContextProvider } from "./book/reducer";
 import { FacilityContextProvider } from "./facility/reducer";
 import { BreakfastContextProvider } from "./breakfast/reducer";
+import { MealContextProvider } from "./meal/reducer";
+import { BedTypeContextProvider } from "./bedType/reducer";
 import { CurrencyContextProvider } from "./currency/reducer";
 import { MappingHotelContextProvider } from "./mappingHotel/reducer";
 
@@ -26,21 +28,25 @@ export default function CombinedContextProvider({ children }) {
                 <HotelContextProvider>
                   <FacilityContextProvider>
                     <BreakfastContextProvider>
-                      <OperatorManContextProvider>
-                        <SalesOfficeContextProvider>
-                          <CurrencyContextProvider>
-                            <SupplierContextProvider>
-                              <MappingCountryContextProvider>
-                                <MappingCityContextProvider>
-                                  <MappingHotelContextProvider>
-                                    {children}
-                                  </MappingHotelContextProvider>
-                                </MappingCityContextProvider>
-                              </MappingCountryContextProvider>
-                            </SupplierContextProvider>
-                          </CurrencyContextProvider>
-                        </SalesOfficeContextProvider>
-                      </OperatorManContextProvider>
+                      <MealContextProvider>
+                        <OperatorManContextProvider>
+                          <SalesOfficeContextProvider>
+                            <CurrencyContextProvider>
+                              <SupplierContextProvider>
+                                <MappingCountryContextProvider>
+                                  <MappingCityContextProvider>
+                                    <MappingHotelContextProvider>
+                                      <BedTypeContextProvider>
+                                        {children}
+                                      </BedTypeContextProvider>
+                                    </MappingHotelContextProvider>
+                                  </MappingCityContextProvider>
+                                </MappingCountryContextProvider>
+                              </SupplierContextProvider>
+                            </CurrencyContextProvider>
+                          </SalesOfficeContextProvider>
+                        </OperatorManContextProvider>
+                      </MealContextProvider>
                     </BreakfastContextProvider>
                   </FacilityContextProvider>
                 </HotelContextProvider>

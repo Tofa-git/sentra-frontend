@@ -25,6 +25,7 @@ export default function Input({
             timeFormat={false}
             onChange={(val) => onChange(val.format("YYYY-MM-DD"))}
             value={value}
+            disabled={disabled}
           />
         ) : type === "checkbox" ? (
           <input

@@ -13,6 +13,9 @@ export const getData = async (
   page = 1,
   limit = 12,
   supplierId,
+  countryId,
+  cityId,
+  isShow,
   name = ""
 ) => {
   dispatch({ type: MAPPING_HOTEL_PROCESS });
@@ -30,7 +33,14 @@ export const getData = async (
     } else {
       // Set the method to POST for synchronization
       method = "POST";
-      body = JSON.stringify({ supplierId: supplierId ?? 0 });
+      body = JSON.stringify(
+        {
+          supplierId: supplierId ?? 0,
+          countryId: countryId ?? null,
+          cityId: cityId ?? null,
+          isShow:isShow
+        }
+      );
     }
 
     const token = localStorage.getItem("AUTH_TOKEN");
@@ -38,9 +48,9 @@ export const getData = async (
       method: method,
       headers: {
         Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json", 
+        "Content-Type": "application/json",
       },
-      body: body, 
+      body: body,
     };
 
     const res = await fetch(url, config);
@@ -62,7 +72,7 @@ export const getData = async (
 export const syncData = async (
   dispatch,
   isSync = true,
-  supplierId=0,
+  supplierId = 0,
   country,
   city,
 ) => {
@@ -70,10 +80,10 @@ export const syncData = async (
   try {
     let url = `${baseUrl}/api/integration/sync-maphotel/${supplierId}`;
     let body = null;
-    
+
     const token = localStorage.getItem("AUTH_TOKEN");
 
-    body = JSON.stringify({ 
+    body = JSON.stringify({
       Country: country,
       City: city
     });
@@ -83,7 +93,7 @@ export const syncData = async (
       headers: {
         Authorization: `Bearer ${token}`,
       },
-      body: body, 
+      body: body,
     };
 
     const res = await fetch(url, config);
@@ -158,7 +168,7 @@ export const getDDLHotel = async (
   isDropDown = true,
 ) => {
   dispatch({ type: MAPPING_HOTEL_PROCESS });
-  try {    
+  try {
     let url = `${baseUrl}/api/integration/maphotel-dd?supplierId=${supplierid}&countryId=${countryId}&cityId=${cityId}`;
 
     const token = localStorage.getItem("AUTH_TOKEN");
@@ -169,7 +179,7 @@ export const getDDLHotel = async (
       },
     };
 
-    const res = await fetch(url, config);    
+    const res = await fetch(url, config);
     const data = await res.json();
     dispatch({
       type: MAPPING_HOTEL_SUCCESS,
@@ -188,11 +198,11 @@ export const getDDLHotel = async (
 
 export const getDDLIDHotel = async (
   dispatch,
-  id,  
+  id,
   isDropDown = true,
 ) => {
   dispatch({ type: MAPPING_HOTEL_PROCESS });
-  try {    
+  try {
     let url = `${baseUrl}/api/integration/maphotelid-dd`;
 
     const token = localStorage.getItem("AUTH_TOKEN");
@@ -203,7 +213,7 @@ export const getDDLIDHotel = async (
       },
     };
 
-    const res = await fetch(url, config);    
+    const res = await fetch(url, config);
     const data = await res.json();
     dispatch({
       type: MAPPING_HOTEL_SUCCESS,

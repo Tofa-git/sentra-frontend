@@ -3,12 +3,12 @@ import { useRouter } from "next/router";
 import Layout from "../../../layouts/default";
 import StdForm from "../../../components/forms/stdForm";
 import CreateForm from "./createForm";
-import { BreakfastContext } from "../../../context/breakfast/reducer";
+import { BedTypeContext } from "../../../context/bedType/reducer";
 import { AuthContext } from "../../../context/auth/reducer";
 import {
-  deleteBreakfast,
-  getAllBreakfast,
-} from "../../../context/breakfast/actions";
+  deleteBedType,
+  getAllBedType,
+} from "../../../context/bedType/actions";
 import Swal from "sweetalert2";
 import Pagination from "../../../components/pagination";
 
@@ -18,7 +18,7 @@ const Index = (props) => {
   const [selectedData, setSelectedData] = useState();
   const [isEdit, setIsEdit] = useState(false);
   const [keyword, setKeyword] = useState("");
-  const { state, dispatch } = useContext(BreakfastContext);
+  const { state, dispatch } = useContext(BedTypeContext);
   const { dispatch: authDispatch } = useContext(AuthContext);
 
   useEffect(() => {
@@ -26,7 +26,7 @@ const Index = (props) => {
   }, [keyword]);
 
   const handleGet = async (page = 1, limit = 12) => {
-    const country = await getAllBreakfast(
+    const country = await getAllBedType(
       dispatch,
       false,
       page,
@@ -52,7 +52,7 @@ const Index = (props) => {
       confirmButtonText: "Yes, delete it!",
     }).then(async (result) => {
       if (result.isConfirmed) {
-        await deleteBreakfast(id);
+        await deleteBedType(id);
         handleGet();
       }
     });
@@ -72,7 +72,7 @@ const Index = (props) => {
           name="q"
           type="text"
           className="form-control bg-white rounded-0 p-0 px-1"
-          placeholder="Breakfast Name"
+          placeholder="BedType Name"
           onChange={(val) => setKeyword(val.target.value)}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
@@ -126,7 +126,7 @@ const Index = (props) => {
             >
               arrow_right
             </i>
-            <span className="ms-2 text-black">Breakfast List</span>
+            <span className="ms-2 text-black">BedType List</span>
 
 
             <div className="mt-2">
@@ -230,7 +230,7 @@ const Index = (props) => {
       <StdForm
         id={1}
         icon="grid_on"
-        caption="Breakfast Hotel"
+        caption="BedType Hotel"
         toolbar={toolbarForm}
         body={bodyForm}
         footer={footers}

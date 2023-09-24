@@ -11,6 +11,7 @@ import {
   updateHotel,
 } from "../../../context/hotel/actions";
 import Swal from "sweetalert2";
+import { useRouter } from "next/router";
 
 // const Map = dynamic(() => import("../../components/map/index"), { ssr: false });
 
