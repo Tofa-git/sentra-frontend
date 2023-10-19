@@ -12,7 +12,9 @@ export const getAllHotel = async (
   isDropDown = false,
   page = 1,
   limit = 12,
-  name = ""
+  name = "",
+  countryId,
+  cityId,
 ) => {
   dispatch({ type: HOTEL_PROCESS });
   try {
@@ -20,6 +22,14 @@ export const getAllHotel = async (
 
     if (name.length > 0) {
       url += `&name=${name}`;
+    }
+
+    if (countryId.length > 0) {
+      url += `&countryId=${countryId}`;
+    }
+
+    if (cityId.length > 0) {
+      url += `&cityId=${cityId}`;
     }
 
     if (isDropDown) {

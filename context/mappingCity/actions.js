@@ -174,3 +174,40 @@ export const getDDLCity = async (
     });
   }
 };
+
+export const getDDLFilterCity = async (
+  dispatch,
+  countryId,
+  supplierid,
+  isDropDown = false,
+  isFilter = true,
+) => {
+  dispatch({ type: MAPPING_CITY_PROCESS });
+  try {    
+    let url = `${baseUrl}/api/integration/mapcity-dd?supplierId=${supplierid}&countryId=${countryId}`;
+
+    const token = localStorage.getItem("AUTH_TOKEN");
+    const config = {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    const res = await fetch(url, config);    
+    const data = await res.json();
+    dispatch({
+      type: MAPPING_CITY_SUCCESS,
+      payload: { data: data?.data, isDropDown,isFilter },
+    });
+
+    return { data: data?.data, status: res.status };
+  } catch (error) {
+    console.log(error)
+    dispatch({
+      type: MAPPING_CITY_FAILED,
+      payload: error?.response?.data?.message || "Error",
+    });
+  }
+};
+

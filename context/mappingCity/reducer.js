@@ -45,7 +45,13 @@ function reducer(state, action) {
           ...changedState,
           dropdownData: action.payload.data,
         };
-      }else {
+      }  else if (action.payload.isFilter) {                
+        return {
+          ...state,
+          ...changedState,
+          dropdownFilterData: action.payload.data,
+        };
+      } else {
         return {
           ...state,
           ...changedState,

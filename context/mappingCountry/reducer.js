@@ -18,6 +18,7 @@ const initialState = {
   },
   syncData: [],
   dropdownData: [],
+  dropdownFilterData: [],
 };
 
 function reducer(state, action) {
@@ -39,12 +40,17 @@ function reducer(state, action) {
           ...changedState,
           syncData: action.payload.data,
         };
-      } else if (action.payload.isDropDown) {        
-        console.log(action.payload)
+      } else if (action.payload.isDropDown) {                
         return {
           ...state,
           ...changedState,
           dropdownData: action.payload.data,
+        };
+      } else if (action.payload.isFilter) {                
+        return {
+          ...state,
+          ...changedState,
+          dropdownFilterData: action.payload.data,
         };
       }else {
         return {

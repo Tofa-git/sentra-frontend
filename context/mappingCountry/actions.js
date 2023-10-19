@@ -174,3 +174,38 @@ export const getDDLCountry = async (
     });
   }
 };
+
+export const getDDLFilterCountry = async (
+  dispatch,  
+  supplierid,
+  isDropDown = false,
+  isFilter = true,
+) => {
+  dispatch({ type: MAPPING_COUNTRY_PROCESS });
+  try {    
+    let url = `${baseUrl}/api/integration/mapcountry-dd?supplierId=${2}`;
+
+    const token = localStorage.getItem("AUTH_TOKEN");
+    const config = {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    const res = await fetch(url, config);    
+    const data = await res.json();    
+    dispatch({
+      type: MAPPING_COUNTRY_SUCCESS,
+      payload: { data: data?.data, isDropDown,isFilter },
+    });
+
+    return { data: data?.data, status: res.status };
+  } catch (error) {
+    console.log(error)
+    dispatch({
+      type: MAPPING_COUNTRY_FAILED,
+      payload: error?.response?.data?.message || "Error",
+    });
+  }
+};

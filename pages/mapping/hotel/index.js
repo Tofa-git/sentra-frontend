@@ -9,8 +9,8 @@ import { getAllHotel } from "../../../context/hotel/actions";
 import { HotelContext } from "../../../context/hotel/reducer";
 import { SupplierContext } from "../../../context/supplier/reducer";
 import { getDDLSupp } from "../../../context/supplier/actions";
-import { getDDLCountry } from "../../../context/mappingCountry/actions";
-import { getDDLCity } from "../../../context/mappingCity/actions";
+import { getDDLCountry,getDDLFilterCountry } from "../../../context/mappingCountry/actions";
+import { getDDLCity,getDDLFilterCity } from "../../../context/mappingCity/actions";
 import { getDDLIDHotel } from "../../../context/mappingHotel/actions";
 import { syncData, getData, createData, updateData } from "../../../context/mappingHotel/actions";
 import { MappingCityContext } from "../../../context/mappingCity/reducer";
@@ -83,9 +83,11 @@ const Index = (props) => {
   /* Sync */
   const [supplierId, setSupplierId] = useState("");
   const [masterId, setMasterId] = useState("");
-  const [citySync, setCitySync] = useState("");
   const [isShowMapped, setIsShowMapped] = useState(false);
+  const [citySync, setCitySync] = useState("");
   const [countrySync, setCountrySync] = useState("");
+  const [cityFilter, setCityFilter] = useState("");
+  const [countryFilter, setCountryFilter] = useState("");
 
   const { state, dispatch } = useContext(HotelContext);
   const { dispatch: authDispatch } = useContext(AuthContext);
@@ -110,8 +112,12 @@ const Index = (props) => {
   }, [countrySync]);
 
   useEffect(() => {
+    handleDropDownCityFilter();
+  }, [countryFilter]);
+
+  useEffect(() => {
     handleGet();
-  }, [keywordLocal]);
+  }, [keywordLocal, cityFilter]);
 
   useEffect(() => {
     handleDropDownHotel();
@@ -119,10 +125,12 @@ const Index = (props) => {
 
   useEffect(() => {
     handleGetMapping();
-  }, [keywordSupplier, citySync, countrySync, isShowMapped,supplierId]);
+  }, [keywordSupplier, citySync, countrySync, isShowMapped, supplierId]);
 
   const handleDropDown = async () => {
     const ddl = await getDDLSupp(supplierDDLDispatch, true);
+    await getDDLFilterCountry(mappingCountryDispatch, 2, false,true);
+
     if (ddl.status === 401) {
       authDispatch({ type: AUTH_401 });
       authDispatch({ type: AUTH_LOGOUT });
@@ -133,6 +141,10 @@ const Index = (props) => {
 
   const handleDropDownCity = async () => {
     await getDDLCity(mappingCityDispatch, countrySync, supplierId, true);
+  };
+
+  const handleDropDownCityFilter = async () => {
+    await getDDLFilterCity(mappingCityDispatch, countryFilter, 2, false,true);
   };
 
   const handleDropDownCountry = async () => {
@@ -159,7 +171,7 @@ const Index = (props) => {
   };
 
   const handleGet = async (page = 1, limit = 12) => {
-    const country = await getAllHotel(dispatch, false, page, limit, keywordLocal);
+    const country = await getAllHotel(dispatch, false, page, limit, keywordLocal, countryFilter, cityFilter);
     if (country.status === 401) {
       authDispatch({ type: AUTH_401 });
       authDispatch({ type: AUTH_LOGOUT });
@@ -169,7 +181,7 @@ const Index = (props) => {
   };
 
   const handleGetMapping = async (page = 1, limit = 12) => {
-    const mapping = await getData(mappingHotelDispatch, false, page, limit, supplierId, countrySync, citySync, isShowMapped,keywordSupplier);
+    const mapping = await getData(mappingHotelDispatch, false, page, limit, supplierId, countrySync, citySync, isShowMapped, keywordSupplier);
     if (mapping.status === 401) {
       authDispatch({ type: AUTH_401 });
       authDispatch({ type: AUTH_LOGOUT });
@@ -193,6 +205,17 @@ const Index = (props) => {
   const handleCityChange = (event) => {
     const selectedCityCode = event.target.value;
     setCitySync(selectedCityCode);
+  };
+
+  const handleCountryFilterChange = (event) => {
+    const selectedCountryCode = event.target.value;
+    setCountryFilter(selectedCountryCode);
+    handleDropDownCityFilter();
+  };
+
+  const handleCityFilterChange = (event) => {
+    const selectedCityCode = event.target.value;
+    setCityFilter(selectedCityCode);
   };
 
   const handleHotelChange = (event) => {
@@ -326,8 +349,8 @@ const Index = (props) => {
     const mapping = await updateData(idMappingSup, initForm);
 
     if (mapping?.status === 200) {
-      Swal.fire("Information", "Sync Success", "success");
-      handleGet();
+      Swal.fire("Information", "Merge Success", "success");
+      handleGetMapping();
     }
   };
 
@@ -340,86 +363,156 @@ const Index = (props) => {
     >
       <div className="w-100 row">
         <div className="col-sm-6 mt-2">
+
           {/* "Local Code" section */}
-          <span>
-            <i
-              className="material-icons fs-6 text-black"
-              style={{ verticalAlign: "middle" }}
-            >
-              arrow_right
-            </i>
-            <span className="ms-2 text-black">Local Code</span>
+
+          <div>
+            {/* "Local Filter" section */}
+            <span>
+              <i
+                className="material-icons fs-6 text-black"
+                style={{ verticalAlign: "middle" }}
+              >
+                arrow_right
+              </i>
+              <span className="ms-2 text-black">Sync Data</span>
+            </span>
+
             <div className="d-flex flex-column bg-light p-2 border">
 
               <div className="d-flex flex-row align-items-center mt-2">
-                <div className="flex-fill input-group w-75">
-                  <input
-                    name="q"
-                    type="text"
-                    className="form-control bg-white rounded-0 p-0 px-1"
-                    placeholder="Name"
-                    onChange={(val) => setKeywordLocal(val.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        handleGet(1, 12);
-                      }
-                    }}
-                  />
+                <span className="flex-shrink-1 pe-2 small text-nowrap text-dark pe-2">
+                  Country
+                </span>
+                <div className="flex-fill input-group">
+                  <select
+                    className="form-select rounded-0"
+                    name="is_used"
+                    value={countryFilter}
+                    onChange={handleCountryFilterChange}
+                  >
+                    <option value="0">==SELECT==</option>
+                    {mappingCountryState?.dropdownFilterData?.map((country) => {
+                      return (
+                        <option key={country.id} value={country.id}>
+                          {country.name}
+                        </option>
+                      );
+                    })}
+                  </select>
                 </div>
-
-                <button
-                  className="btn btn-sm btn-primary bg-blue rounded-0 align-items-center shadow-sm d-flex flex-row ms-2"
-                  onClick={() => handleGet(1, 12)}
-                >
-                  <i
-                    className="material-icons fs-6"
-                    style={{ verticalAlign: "middle" }}
+                <span className="flex-shrink-1 pe-2 small text-nowrap text-dark pe-2">
+                  City
+                </span>
+                <div className="flex-fill input-group ms-2">
+                  <select
+                    className="form-select rounded-0"
+                    name="is_used"
+                    value={cityFilter}
+                    onChange={handleCityFilterChange}
                   >
-                    search
-                  </i>
-                  <span className="ms-2">Search</span>
-                </button>
-
-                <div className="d-flex flex-row ms-2">
-                  <input type="checkbox" />
-                  <span
-                    className="text-black ms-2"
-                    style={{ fontSize: "10px" }}
-                  >
-                    Sply Hide
-                  </span>
+                    <option value="0">==SELECT==</option>
+                    {mappingCityState?.dropdownFilterData?.map((city) => {
+                      return (
+                        <option key={city.id} value={city.id}>
+                          {city.name}
+                        </option>
+                      );
+                    })}
+                  </select>
                 </div>
               </div>
+              <div className="d-flex flex-row align-items-center mt-2">
+                <span className="flex-shrink-1 pe-2 small text-nowrap text-dark pe-2">
+                  Supplier Hide
+                </span>
+                <div className="flex-fill input-group ms-2">
+                  <input
+                    type="checkbox"
+                    className={`form-check-input`}
+                    onChange={handleShowMapping}
+                    checked={isShowMapped}
+                    disabled={false}
+                  />
+                </div>
+              </div>
+
             </div>
-            <div className="mt-2">
-              <table className="table table-bordered table-hover table-striped">
-                <thead>
-                  <tr>
-                    <th className="bg-blue text-white" width="30%">
-                      Code
-                    </th>
-                    <th className="bg-blue text-white" width="60%">
-                      Hotel Name
-                    </th>
-                    <th className="bg-blue text-white" width="10%">
-                      Star
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {state?.data?.rows?.map((data, index) => {
-                    return (
-                      <tr onClick={() => handleRowClick(index, data.id, data)} className="pointer">
-                        <td>{data.code}</td>
-                        <td>{data.name}</td>
-                        <td>{data.star.replace('Star', '')}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </span>
+          </div>
+
+          <div className="mt-2">
+            <span>
+              <i
+                className="material-icons fs-6 text-black"
+                style={{ verticalAlign: "middle" }}
+              >
+                arrow_right
+              </i>
+              <span className="ms-2 text-black">Local Code</span>
+
+              <div className="d-flex flex-column bg-light p-2 border">
+
+                <div className="d-flex flex-row align-items-center mt-2">
+                  <div className="flex-fill input-group w-75">
+                    <input
+                      name="q"
+                      type="text"
+                      className="form-control bg-white rounded-0 p-0 px-1"
+                      placeholder="Name"
+                      onChange={(val) => setKeywordLocal(val.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          handleGet(1, 12);
+                        }
+                      }}
+                    />
+                  </div>
+
+                  <button
+                    className="btn btn-sm btn-primary bg-blue rounded-0 align-items-center shadow-sm d-flex flex-row ms-2"
+                    onClick={() => handleGet(1, 12)}
+                  >
+                    <i
+                      className="material-icons fs-6"
+                      style={{ verticalAlign: "middle" }}
+                    >
+                      search
+                    </i>
+                    <span className="ms-2">Search</span>
+                  </button>
+                </div>
+              </div>
+              <div className="mt-2">
+                <table className="table table-bordered table-hover table-striped">
+                  <thead>
+                    <tr>
+                      <th className="bg-blue text-white" width="30%">
+                        Code
+                      </th>
+                      <th className="bg-blue text-white" width="60%">
+                        Hotel Name
+                      </th>
+                      <th className="bg-blue text-white" width="10%">
+                        Star
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {state?.data?.rows?.map((data, index) => {
+                      return (
+                        <tr onClick={() => handleRowClick(index, data.id, data)} className="pointer">
+                          <td>{data.code}</td>
+                          <td>{data.name}</td>
+                          <td>{data.star.replace('Star', '')}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </span>
+          </div>
+
           {/* "Local Code Total" section */}
           <div className="col-3 d-flex align-items-center">
             <span className="p-1 px-2 small text-primary">
@@ -604,7 +697,7 @@ const Index = (props) => {
                 <div className="flex-fill input-group ms-2">
                   <input
                     type="checkbox"
-                    className={`form-check-input`}                    
+                    className={`form-check-input`}
                     onChange={handleShowMapping}
                     checked={isShowMapped}
                     disabled={false}
@@ -1031,6 +1124,13 @@ const Index = (props) => {
 
                 <div className="col-12 d-flex justify-content-end py-2">
                   <button
+                    disabled={true}
+                    onClick={() => handleGet(form)}
+                    className="btn bg-blue rounded text text-white"
+                  >
+                    Save to Local
+                  </button>
+                  <button
                     className="btn bg-blue rounded-1 text-white ms-2"
                     onClick={() => handleSubmit()}
                     disabled={codeSup ? false : true}
@@ -1038,7 +1138,6 @@ const Index = (props) => {
                     Save
                   </button>
                 </div>
-
               </div>
               : <div></div>}
           </div>

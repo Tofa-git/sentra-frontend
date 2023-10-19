@@ -55,7 +55,7 @@ export const getAllBookSearch = async (dispatch, body) => {
   }
 };
 
-export const getAllBookSearchRoom = async (body,supplierId) => {  
+export const getAllBookSearchRoom = async (body, supplierId) => {
   try {
     const url = `${baseUrl}/api/integration/search-hotel-room/${supplierId}`;
     const token = localStorage.getItem("AUTH_TOKEN");
@@ -65,7 +65,7 @@ export const getAllBookSearchRoom = async (body,supplierId) => {
         Authorization: `Bearer ${token}`,
       },
     });
-   
+
     return { data: book?.data, status: book.status };
   } catch (error) {
     Swal.fire(
@@ -172,18 +172,22 @@ export const createBook = async (body) => {
   }
 };
 
-export const getDetailBook = async (dispatch, bookingId) => {
+export const getDetailBook = async (dispatch, bookingId,supplierId) => {
   dispatch({ type: BOOK_DETAIL_PROCESS });
   try {
     let url = `${baseUrl}/api/integration/booking-detail/${bookingId}`;
 
     const token = localStorage.getItem("AUTH_TOKEN");
-
-    const book = await axios.get(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
+    console.log(token)
+    const book = await axios.post(url,
+      {
+        "supplierId": supplierId
       },
-    });
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
     dispatch({
       type: BOOK_DETAIL_SUCCESS,
@@ -199,7 +203,7 @@ export const getDetailBook = async (dispatch, bookingId) => {
   }
 };
 
-export const cancelBooking = async (bookingId) => {
+export const cancelBooking = async (bookingId, supplierId) => {
   try {
     let url = `${baseUrl}/api/integration/booking-cancel/${bookingId}`;
 
@@ -207,7 +211,9 @@ export const cancelBooking = async (bookingId) => {
 
     const book = await axios.put(
       url,
-      {},
+      {
+        "supplierId": supplierId
+      },
       {
         headers: {
           Authorization: `Bearer ${token}`,

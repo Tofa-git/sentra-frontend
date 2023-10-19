@@ -34,6 +34,7 @@ const initialForm = {
   adultTP: 0,
   adultQD: 0,
   adults: 0,
+  adult: 0,
   children: 0,
   childAge: 0,
   roomNo: 1,
@@ -78,6 +79,7 @@ const Index = (props) => {
   const [roomHotelData, setRoomHotelData] = useState([]);
   const [recheckData, setRecheckData] = useState(null);
   const [guestData, setGuestData] = useState([]);
+  const [sessionId, setSessionId] = useState("");
   const [request, setRequest] = useState("");
   const [bookRequest, setBookRequest] = useState('');
   const [supplierCode, setSupplierCode] = useState('');
@@ -99,7 +101,7 @@ const Index = (props) => {
         const sg = name === "adultSG" ? value : form.adultSG;
 
         setForm({ ...form, [name]: value, adults: form.adults += sg });
-
+        setForm({ ...form, [name]: value, adult: form.adults += sg });
         current.push({
           room: `SG ${value}`,
           salutation: "",
@@ -113,21 +115,33 @@ const Index = (props) => {
         const db = name === "adultDB" ? value : form.adultDB;
 
         setForm({ ...form, [name]: value, adults: form.adults += db + 1 });
+        setForm({ ...form, [name]: value, adult: form.adult += db  });
+
+        current.push({
+          room: `DB ${value}`,
+          salutation: "",
+          firstName: "",
+          lastName: "",
+          age: "",
+        });
         break;
       case "adultTW":
         const tw = name === "adultTW" ? value : form.adultTW;
 
         setForm({ ...form, [name]: value, adults: form.adults += tw + 1 });
+        setForm({ ...form, [name]: value, adult: form.adult += tw});
         break;
       case "adultTP":
         const tp = name === "adultTP" ? value : form.adultTP;
 
         setForm({ ...form, [name]: value, adults: form.adults += tp + 2 });
+        setForm({ ...form, [name]: value, adult: form.adult += tp });
         break;
       case "adultQD":
         const qd = name === "adultQD" ? value : form.adultQD;
 
         setForm({ ...form, [name]: value, adults: form.adults += qd + 3 });
+        setForm({ ...form, [name]: value, adult: form.adult += qd });
         break;
       case "checkOut":
         const checkInDate = name === "checkIn" ? value : form.checkIn;
@@ -140,7 +154,9 @@ const Index = (props) => {
         // Code to execute when name doesn't match any of the cases
         setForm({ ...form, [name]: value });
     };
-    console.log(form)
+
+    setGuestData(current);
+  
   }
 
   const calculateNightCount = (checkInDate, checkOutDate) => {
@@ -217,7 +233,7 @@ const Index = (props) => {
 
     const _recheck = await getAllBookSearchRoom(body, supplierId);
     setRoomHotelData(_recheck.data.data.rooms);
-
+      
     setTimeout(() => {
       Swal.close();
     }, 1500);
@@ -240,7 +256,7 @@ const Index = (props) => {
       supplierId: selectedHotel.supplierId,
       hotelCode: selectedHotel.code,
       hotelName: selectedHotel.name,
-      sessionId: selectedHotel.sessionId,
+      sessionId: sessionId,
       roomCode: room?.code,
       mealPlan: room?.mealPlan,
       rateKey: room?.rooms?.room?.[0]?.rateKey,
@@ -250,6 +266,10 @@ const Index = (props) => {
 
     const _recheck = await recheckBookSearch(body);
     setRecheckData(_recheck.data.data);
+
+    if(_recheck.data.data.sessionId){
+      setSessionId(_recheck.data.data.sessionId)
+    }
 
     setTimeout(() => {
       Swal.close();
@@ -272,28 +292,36 @@ const Index = (props) => {
       ...form,
       hotelCode: selectedHotel.code,
       supplierId: selectedHotel.supplierId,
-      sessionId: selectedHotel.sessionId,
+      sessionId: sessionId,
       roomCode: selectedRoom?.code,
       mealPlan: selectedRoom?.mealPlan,
       request: bookRequest != "" ? bookRequest + ';' + request : request,
       rateKey: selectedRoom?.rooms?.room?.[0]?.rateKey,
       cancelPolicyType: selectedRoom?.cancellationPolicyType,
       guests: guestData,
+      contact:{
+        nameFirst:"Agung",
+        nameLast:"Wicaksono",
+        phone:"6281233661927",
+        email:"wicaksono1404@gmail.com",
+
+      },
       agent: selectedAgent
+
     };
     delete body.codeHotel;
 
     await createBook(body);
 
-    setTimeout(() => {
-      Swal.close();
-      setSelectedHotel({});
-      setSelectedRoom({});
-      setRecheckData(null);
-      setSelectedAgent({});
-      setGuestData([]);
-      setForm(initialForm);
-    }, 4500);
+    // setTimeout(() => {
+    //   Swal.close();
+    //   setSelectedHotel({});
+    //   setSelectedRoom({});
+    //   setRecheckData(null);
+    //   setSelectedAgent({});
+    //   setGuestData([]);
+    //   setForm(initialForm);
+    // }, 4500);
   };
 
   const handleReset = () => {
@@ -344,32 +372,32 @@ const Index = (props) => {
   }, []);
 
   useEffect(() => {
-    let current = [...guestData];
-    if (+form.adults < current.length) {
+    // let current = [...guestData];
+    // if (+form.adults < current.length) {
 
-      current =
-        current.length === 0 ? [] : current.slice(0, current.length - 1);
-    } else {
+    //   current =
+    //     current.length === 0 ? [] : current.slice(0, current.length - 1);
+    // } else {
 
-      if (+form.adults !== 0) {
-        for (let i = current.length; i < +form.adults; i++) {
-          current.push({
-            room: "",
-            salutation: "",
-            firstName: "",
-            lastName: "",
-            age: "",
-          });
-        }
-      }
-    }
+    //   if (+form.adults !== 0) {
+    //     for (let i = current.length; i < +form.adults; i++) {
+    //       current.push({
+    //         room: "",
+    //         salutation: "",
+    //         firstName: "",
+    //         lastName: "",
+    //         age: "",
+    //       });
+    //     }
+    //   }
+    // }
 
-    setGuestData(current);
+    // setGuestData(current);
   }, [form.adults]);
 
   return (
     <div className="mx-3">
-      {console.log({ guestData })}
+      
       <div className="row p-3">
         <div className="col-lg-6">
           <div className="text-dark mb-1">Booking</div>
@@ -625,9 +653,11 @@ const Index = (props) => {
 
                         if (data.roomDetails.length == 0) {
                           handleRoomGet(data, data.supplierId)
+                          setSupplierCode(data.supplierCode);
                         } else {
                           setRoomHotelData(data.roomDetails)
                           setSupplierCode(data.supplierCode);
+                          setSessionId(data.sessionId)
                         }
                       }}
                       className={`${isSelected ? "bg-selected" : ""} pointer`}
@@ -676,8 +706,7 @@ const Index = (props) => {
               <tbody>
                 {roomHotelData?.map((data) => {
                   const isSelected = data.id === selectedRoom?.id;
-                  console.log("data room : ")
-                  console.log(data)
+               
                   return (
                     <tr
                       onClick={() => handleRecheck(data)}
@@ -858,7 +887,7 @@ const Index = (props) => {
             <table className="table table-bordered table-hover table-striped">
               <thead>
                 <tr>
-                  <th className="bg-blue text-white" width="5%">
+                  <th className="bg-blue text-white" width="2%">
                     Room
                   </th>
                   <th className="bg-blue text-white" width="5%">
@@ -870,7 +899,7 @@ const Index = (props) => {
                   <th className="bg-blue text-white" width="5%">
                     Salutation
                   </th>
-                  <th className="bg-blue text-white" width="5%">
+                  <th className="bg-blue text-white" width="1%">
                     Age
                   </th>
                 </tr>

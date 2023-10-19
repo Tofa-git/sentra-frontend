@@ -34,7 +34,7 @@ const BookDetail = (props) => {
               <div className="col-6">
                 <Input
                   label={"MG Booking ID"}
-                  value={data?.mgBookingID || "-"}
+                  value={data?.bookingId || "-"}
                   disabled
                 />
               </div>

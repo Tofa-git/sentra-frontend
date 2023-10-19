@@ -34,20 +34,24 @@ const namesData = [
         name: "Country"
     },
     {
-        id: "Hotel",
-        name: "Hotel"
-    },
-    {
         id: "Bed",
         name: "Bed Type"
     },
     {
         id: "Meal",
         name: "Meal Type"
-    },    
+    },
+    {
+        id: "Hotel",
+        name: "Hotel"
+    },
     {
         id: "Search",
         name: "Search"
+    },
+    {
+        id: "Search Room",
+        name: "Search Room"
     },
     {
         id: "Confirm",
@@ -58,9 +62,18 @@ const namesData = [
         name: "Book"
     },
     {
-        id: "Search Room",
-        name: "Search Room"
+        id: "Cancel",
+        name: "Cancel"
+    },
+    {
+        id: "cancelConfirm",
+        name: "Cancel Confirm"
+    },
+    {
+        id: "bookingList",
+        name: "Booking List"
     }
+
 ];
 
 const methodData = [
@@ -160,10 +173,10 @@ const SchemaForm = (props) => {
 
         if (isEdit) {
             console.log(form)
-            await updateSuppEndPoint(selectedData.id, form);            
+            await updateSuppEndPoint(selectedData.id, form);
         } else {
             await createSuppEndPoint(form);
-        }                
+        }
     };
 
     const handleCancel = () => {

@@ -50,7 +50,7 @@ const Index = (props) => {
     }
   };
 
-  const handleDetail = async (bookId) => {
+  const handleDetail = async (bookId,supplierId) => {
     setDetailBooking({});
 
     Swal.fire({
@@ -64,7 +64,7 @@ const Index = (props) => {
       },
     });
 
-    const book = await getDetailBook(dispatch, bookId);
+    const book = await getDetailBook(dispatch, bookId,supplierId);
     if (book.status === 401) {
       authDispatch({ type: AUTH_401 });
       authDispatch({ type: AUTH_LOGOUT });
@@ -79,7 +79,7 @@ const Index = (props) => {
     }, 1500);
   };
 
-  const handleCancel = async (id) => {
+  const handleCancel = async (id, supplierId) => {
     Swal.fire({
       title: "Are you sure?",
       text: `You will cancel ${id}, you won't revert this`,
@@ -100,7 +100,7 @@ const Index = (props) => {
             Swal.showLoading();
           },
         });
-        const res = await cancelBooking(id);
+        const res = await cancelBooking(id, supplierId);
 
         if (res.status === 500) {
           Swal.fire("Error Canceling Book", res.message, "error");
@@ -249,64 +249,77 @@ const Index = (props) => {
             <table className="table table-bordered table-hover table-striped">
               <thead>
                 <tr>
-                  <th className="bg-blue text-white" width="5%">
+                  <th className="bg-blue text-white" width="auto">
                     Booking ID
                   </th>
-                  <th className="bg-blue text-white" width="5%">
+                  <th className="bg-blue text-white" width="auto">
+                    Supplier
+                  </th>
+                  <th className="bg-blue text-white" width="auto">
                     Check In
                   </th>
-                  <th className="bg-blue text-white" width="5%">
+                  <th className="bg-blue text-white" width="auto">
                     Check Out
                   </th>
                   <th className="bg-blue text-white" width="15%">
                     Hotel Name
                   </th>
-                  <th className="bg-blue text-white" width="5%">
+                  <th className="bg-blue text-white" width="auto">
                     Gross Price
                   </th>
-                  <th className="bg-blue text-white" width="5%">
+                  <th className="bg-blue text-white" width="auto">
                     Policy Type
                   </th>
-                  <th className="bg-blue text-white" width="5%">
+                  <th className="bg-blue text-white" width="auto">
                     Room Name
                   </th>
-                  <th className="bg-blue text-white" width="5%">
+                  <th className="bg-blue text-white" width="auto">
+                    Status
+                  </th>
+                  <th className="bg-blue text-white" width="auto">
                     Action
                   </th>
-                  
+
                 </tr>
               </thead>
               <tbody>
                 {state?.dataList?.rows?.map((data) => {
                   return (
                     <tr
-                      // onClick={() => handleDetail(data?.mgBookingID)}
-                      // className="pointer"
+                    // onClick={() => handleDetail(data?.bookingId)}
+                    // className="pointer"
                     >
-                      <td>{data?.mgBookingID}</td>
+                      <td>{data?.bookingId}</td>
+                      <td>{data?.supplier.code}</td>
                       <td>{data?.checkIn}</td>
                       <td>{data?.checkOut}</td>
                       <td>{data?.hotelName}</td>
                       <td>{data?.grossPrice}</td>
                       <td>{data?.cancellationPolicyType}</td>
                       <td>{data?.roomName}</td>
+                      <td>{data?.bookingStatus}</td>
                       <td className="d-flex flex-row justify-content-center align-items-center">
                         <button
                           type="button"
                           className="btn btn-primary bg-blue"
-                          onClick={() => handleDetail(data?.mgBookingID)}
+                          onClick={() => handleDetail(data?.bookingId,data.supplierId)}
                         >
                           Detail
                         </button>
-                        <button
-                          type="button"
-                          className="btn btn-danger ms-2"
-                          onClick={() => {
-                            handleCancel(data?.mgBookingID);
-                          }}
-                        >
-                          Cancel
-                        </button>
+                        {data?.bookingStatus != "CANCELCONF" ?
+
+                          <button
+                            type="button"
+                            className="btn btn-danger ms-2"
+                            onClick={() => {
+                              handleCancel(data?.bookingId, data.supplierId);
+                            }}
+                          >
+                            Cancel
+                          </button>
+
+                          : ""}
+
                       </td>
                     </tr>
                   );
