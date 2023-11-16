@@ -157,7 +157,7 @@ export const createBook = async (body) => {
 
     Swal.fire(
       "Book Success",
-      `Successfully booked, your Booking ID is: ${book.data.data.mgBookingID}`,
+      `Successfully booked, your Booking ID is: ${book.data.data.mgBookingID ?? book.data.data.BookingID}`,
       "success"
     );
 

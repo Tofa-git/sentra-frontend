@@ -122,6 +122,8 @@ const Index = (props) => {
 
   useEffect(() => {
     calculateRoomNight();
+
+    console.log(details)
   }, [details]);
 
   const calculateRoomNight = () => {
@@ -142,7 +144,7 @@ const Index = (props) => {
               <Input
                 label={"Booking ID"}
                 disabled={true}
-                value={details?.bookingId}
+                value={details?.local.localBookingId}
               />
             </div>
             <div className="col-5">
@@ -494,10 +496,12 @@ const Index = (props) => {
               <Input label={"Manager"} />
             </div>
             <div className="col-6">
-              <Input label={"Markup"} />
+              <Input label={"Supplier"}
+                value={details?.status ?? "-"} />
             </div>
             <div className="col-6">
-              <Input label={"Credit"} />
+              <Input label={"Supply Other #"}
+                value={details?.status ?? "-"} />
             </div>
             <div className="col-6">
               <Input label={"Tel"} />

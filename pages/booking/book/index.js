@@ -80,6 +80,8 @@ const Index = (props) => {
   const [recheckData, setRecheckData] = useState(null);
   const [guestData, setGuestData] = useState([]);
   const [sessionId, setSessionId] = useState("");
+  const [supplierId, setSupplierId] = useState("");
+  const [hotelCode, setHotelCode] = useState("");
   const [request, setRequest] = useState("");
   const [bookRequest, setBookRequest] = useState('');
   const [supplierCode, setSupplierCode] = useState('');
@@ -241,6 +243,7 @@ const Index = (props) => {
 
   const handleRecheck = async (room) => {
     setSelectedRoom(room);
+    console.log(room);
     Swal.fire({
       icon: "info",
       title: "Checking Available Room",
@@ -253,13 +256,13 @@ const Index = (props) => {
     });
     const body = {
       ...form,
-      supplierId: selectedHotel.supplierId,
-      hotelCode: selectedHotel.code,
-      hotelName: selectedHotel.name,
-      sessionId: sessionId,
+      supplierId: room.supplierId,
+      hotelCode: room.hotelCode,
+      hotelName: room.hotelName,
+      sessionId: room.sessionId,
       roomCode: room?.code,
       mealPlan: room?.mealPlan,
-      rateKey: room?.rooms?.room?.[0]?.rateKey,
+      rateKey: room?.rooms?.room[0]?.rateKey,
       cancelPolicyType: room?.cancellationPolicyType,
     };
     delete body.codeHotel;
@@ -267,8 +270,10 @@ const Index = (props) => {
     const _recheck = await recheckBookSearch(body);
     setRecheckData(_recheck.data.data);
 
-    if(_recheck.data.data.sessionId){
+    if(_recheck.data){
       setSessionId(_recheck.data.data.sessionId)
+      setSupplierId(room.supplierId)
+      setHotelCode(_recheck.data.data.hotelCode)
     }
 
     setTimeout(() => {
@@ -290,8 +295,8 @@ const Index = (props) => {
 
     const body = {
       ...form,
-      hotelCode: selectedHotel.code,
-      supplierId: selectedHotel.supplierId,
+      hotelCode: hotelCode,
+      supplierId: supplierId,
       sessionId: sessionId,
       roomCode: selectedRoom?.code,
       mealPlan: selectedRoom?.mealPlan,
@@ -655,9 +660,10 @@ const Index = (props) => {
                           handleRoomGet(data, data.supplierId)
                           setSupplierCode(data.supplierCode);
                         } else {
-                          setRoomHotelData(data.roomDetails)
+                          handleRoomGet(data, data.supplierId)
+                          // setRoomHotelData(data.roomDetails)
                           setSupplierCode(data.supplierCode);
-                          setSessionId(data.sessionId)
+                          // setSessionId(data.sessionId)
                         }
                       }}
                       className={`${isSelected ? "bg-selected" : ""} pointer`}
@@ -717,7 +723,7 @@ const Index = (props) => {
                       <td>{toIDR(data.grossPrice)}</td>
                       <td>{toIDR(data.netPrice)}</td>
                       <td>{data.mealPlanName}</td>
-                      <td>{supplierCode}</td>
+                      <td>{data.supplierCode}</td>
                     </tr>
                   );
                 })}
