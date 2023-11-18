@@ -94,4 +94,5 @@ export const MAPPING_HOTEL_FAILED = "MAPPING_HOTEL_FAILED";
 
 // Another constant
 // export const baseUrl = "https://api-azone.link-webid.com";
-export const baseUrl = "http://localhost:4000";
+// export const baseUrl = "http://localhost:4000";
+export const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
