@@ -22,7 +22,7 @@ const Layout = ({ children, selectId }) => {
   const { state, dispatch } = useContext(AuthContext);
   const { state: countryState, dispatch: countryDispatch } =
     useContext(CountryContext);
-    const { state: currencyState, dispatch: currencyDispatch } =
+  const { state: currencyState, dispatch: currencyDispatch } =
     useContext(CurrencyContext);
   const { state: cityState, dispatch: cityDispatch } = useContext(CityContext);
   const { state: cityLocationState, dispatch: cityLocationDispatch } =
@@ -44,10 +44,8 @@ const Layout = ({ children, selectId }) => {
   };
 
   const getMasterData = () => {
-    if (
-      !countryState.hasOwnProperty("dropdownData") ||
-      countryState?.dropdownData.length === 0
-    ) {
+    if (!countryState.hasOwnProperty("dropdownData") ||
+      countryState?.dropdownData.length === 0) {
       getMaster("country");
     }
 
@@ -92,8 +90,8 @@ const Layout = ({ children, selectId }) => {
     } else if (name === "currency") {
       data = await getCurrencies(countryDispatch);
     } else if (name === "curr") {
-      data = await getAllCurrency(currencyDispatch,true);
-    }else if (name === "cityLocation") {
+      data = await getAllCurrency(currencyDispatch, true);
+    } else if (name === "cityLocation") {
       data = await getAllCityLocation(cityLocationDispatch, true);
     } else if (name === "nationality") {
       data = await getAllNationality(nationalityDispatch, true);
@@ -114,7 +112,11 @@ const Layout = ({ children, selectId }) => {
   useEffect(() => {
     recheckToken();
     setTimeout(() => {
-      getMasterData();
+      const token = localStorage.getItem("AUTH_TOKEN");
+      if (token) {
+        getMasterData();
+      }
+
     }, 5000);
   }, []);
 
