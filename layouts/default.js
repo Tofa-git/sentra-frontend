@@ -45,8 +45,12 @@ const Layout = ({ children, selectId }) => {
 
   const getMasterData = () => {
     if (!countryState.hasOwnProperty("dropdownData") ||
-      countryState?.dropdownData.length === 0) {
-      getMaster("country");
+      countryState?.dropdownData) {
+        
+        if(countryState.dropdownData.length === 0){
+          getMaster("country");
+        }
+      
     }
 
     if (
