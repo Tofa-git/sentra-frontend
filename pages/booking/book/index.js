@@ -85,6 +85,8 @@ const Index = (props) => {
   const [request, setRequest] = useState("");
   const [bookRequest, setBookRequest] = useState('');
   const [supplierCode, setSupplierCode] = useState('');
+  const [checkIn, setCheckIn] = useState(null);
+  const [checkOut, setCheckOut] = useState(null);
 
   const { state, dispatch } = useContext(BookContext);
   const { state: cityState } = useContext(CityContext);
@@ -117,7 +119,7 @@ const Index = (props) => {
         const db = name === "adultDB" ? value : form.adultDB;
 
         setForm({ ...form, [name]: value, adults: form.adults += db + 1 });
-        setForm({ ...form, [name]: value, adult: form.adult += db  });
+        setForm({ ...form, [name]: value, adult: form.adult += db });
 
         current.push({
           room: `DB ${value}`,
@@ -131,7 +133,7 @@ const Index = (props) => {
         const tw = name === "adultTW" ? value : form.adultTW;
 
         setForm({ ...form, [name]: value, adults: form.adults += tw + 1 });
-        setForm({ ...form, [name]: value, adult: form.adult += tw});
+        setForm({ ...form, [name]: value, adult: form.adult += tw });
         break;
       case "adultTP":
         const tp = name === "adultTP" ? value : form.adultTP;
@@ -158,7 +160,7 @@ const Index = (props) => {
     };
 
     setGuestData(current);
-  
+
   }
 
   const calculateNightCount = (checkInDate, checkOutDate) => {
@@ -235,7 +237,7 @@ const Index = (props) => {
 
     const _recheck = await getAllBookSearchRoom(body, supplierId);
     setRoomHotelData(_recheck.data.data.rooms);
-      
+
     setTimeout(() => {
       Swal.close();
     }, 1500);
@@ -270,7 +272,7 @@ const Index = (props) => {
     const _recheck = await recheckBookSearch(body);
     setRecheckData(_recheck.data.data);
 
-    if(_recheck.data){
+    if (_recheck.data) {
       setSessionId(_recheck.data.data.sessionId)
       setSupplierId(room.supplierId)
       setHotelCode(_recheck.data.data.hotelCode)
@@ -304,11 +306,11 @@ const Index = (props) => {
       rateKey: selectedRoom?.rooms?.room?.[0]?.rateKey,
       cancelPolicyType: selectedRoom?.cancellationPolicyType,
       guests: guestData,
-      contact:{
-        nameFirst:"Agung",
-        nameLast:"Wicaksono",
-        phone:"6281233661927",
-        email:"wicaksono1404@gmail.com",
+      contact: {
+        nameFirst: "Agung",
+        nameLast: "Wicaksono",
+        phone: "6281233661927",
+        email: "wicaksono1404@gmail.com",
 
       },
       agent: selectedAgent
@@ -402,7 +404,7 @@ const Index = (props) => {
 
   return (
     <div className="mx-3">
-      
+
       <div className="row p-3">
         <div className="col-lg-6">
           <div className="text-dark mb-1">Booking</div>
@@ -452,17 +454,23 @@ const Index = (props) => {
               <Input
                 type="date"
                 label="Check In"
-                value={form.checkIn}
-                onChange={(val) => handleInputChange("checkIn", val)}
+                value={checkIn}
+                onChange={(val) => {
+                  handleInputChange("checkIn", val);
+                  setCheckIn(val); // Track the selected Check In date
+                  // Reset Check Out date when Check In date changes
+                  setCheckOut(null);
+                }}
               />
             </div>
             <div className="col-3">
               <Input
                 type="date"
                 label="Check Out"
-                disabled={form.checkIn ? true : false}
-                value={form.checkOut}
+                disabled={checkIn === null} // Disable if Check In date is not selected
+                value={checkOut}
                 onChange={(val) => handleInputChange("checkOut", val)}
+                minDate={checkIn} // Pass the selected Check In date as minDate
               />
             </div>
             <div className="col-3">
@@ -712,7 +720,7 @@ const Index = (props) => {
               <tbody>
                 {roomHotelData?.map((data) => {
                   const isSelected = data.id === selectedRoom?.id;
-               
+
                   return (
                     <tr
                       onClick={() => handleRecheck(data)}

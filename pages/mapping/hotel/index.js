@@ -1,5 +1,6 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import { useRouter } from "next/router";
+import Select from "../../../components/select";
 import Layout from "../../../layouts/default";
 import StdForm from "../../../components/forms/stdForm";
 import { AuthContext } from "../../../context/auth/reducer";
@@ -9,8 +10,8 @@ import { getAllHotel } from "../../../context/hotel/actions";
 import { HotelContext } from "../../../context/hotel/reducer";
 import { SupplierContext } from "../../../context/supplier/reducer";
 import { getDDLSupp } from "../../../context/supplier/actions";
-import { getDDLCountry,getDDLFilterCountry } from "../../../context/mappingCountry/actions";
-import { getDDLCity,getDDLFilterCity } from "../../../context/mappingCity/actions";
+import { getDDLCountry, getDDLFilterCountry } from "../../../context/mappingCountry/actions";
+import { getDDLCity, getDDLFilterCity } from "../../../context/mappingCity/actions";
 import { getDDLIDHotel } from "../../../context/mappingHotel/actions";
 import { syncData, getData, createData, updateData } from "../../../context/mappingHotel/actions";
 import { MappingCityContext } from "../../../context/mappingCity/reducer";
@@ -39,6 +40,8 @@ const dummyData = [
 const Index = (props) => {
   const router = useRouter();
   const selectedId = "006";
+  const selectRef = useRef();
+
   const [selectedData, setSelectedData] = useState();
   const [isEdit, setIsEdit] = useState(false);
   const [isCollapsedMst, setIsCollapsedMst] = useState(true);
@@ -101,6 +104,7 @@ const Index = (props) => {
 
   useEffect(() => {
     handleDropDown();
+
   }, []);
 
   useEffect(() => {
@@ -129,7 +133,7 @@ const Index = (props) => {
 
   const handleDropDown = async () => {
     const ddl = await getDDLSupp(supplierDDLDispatch, true);
-    await getDDLFilterCountry(mappingCountryDispatch, 2, false,true);
+    await getDDLFilterCountry(mappingCountryDispatch, 2, false, true);
 
     if (ddl.status === 401) {
       authDispatch({ type: AUTH_401 });
@@ -144,7 +148,7 @@ const Index = (props) => {
   };
 
   const handleDropDownCityFilter = async () => {
-    await getDDLFilterCity(mappingCityDispatch, countryFilter, 2, false,true);
+    await getDDLFilterCity(mappingCityDispatch, countryFilter, 2, false, true);
   };
 
   const handleDropDownCountry = async () => {
@@ -191,6 +195,7 @@ const Index = (props) => {
   };
 
   const handleSupplierChange = (event) => {
+    console.log("Test Change")
     const selectedSupplierId = event.target.value;
     setSupplierId(selectedSupplierId);
     handleDropDownCountry();
@@ -626,70 +631,44 @@ const Index = (props) => {
 
             <div className="d-flex flex-column bg-light p-2 border">
               <div className="d-flex flex-row align-items-center">
-                <span className="flex-shrink-1 pe-1 small text-nowrap text-dark pe-2">
-                  Supplier
-                </span>
-                <div className="flex-fill input-group">
-                  <select
-                    className="form-select rounded-0"
-                    name="is_used"
+                
+                <div className="col-12">
+                  
+                  <Select
+                    label={"Supplier"}
+                    target="general"
                     value={supplierId}
-                    onChange={handleSupplierChange}
-                  >
-                    <option value="0">==SELECT==</option>
-                    {supplierDDLState?.dropdownData?.map((supplier) => {
-                      return (
-                        <option key={supplier.id} value={supplier.id}>
-                          {supplier.code + " - " + supplier.name}
-                        </option>
-                      );
-                    })}
-                  </select>
+                    options={supplierDDLState?.dropdownData || []}
+                    onChange={handleSupplierChange}  // Ensure correct binding here
+                    
+                  />
                 </div>
               </div>
 
               <div className="d-flex flex-row align-items-center mt-2">
-                <span className="flex-shrink-1 pe-2 small text-nowrap text-dark pe-2">
-                  Country
-                </span>
-                <div className="flex-fill input-group">
-                  <select
-                    className="form-select rounded-0"
-                    name="is_used"
+              <div className="col-6">
+                  <Select
+                    label={"Country"}
+                    target="general"
                     value={countrySync}
+                    options={mappingCountryState?.dropdownData || []}
                     onChange={handleCountryChange}
-                  >
-                    <option value="0">==SELECT==</option>
-                    {mappingCountryState?.dropdownData?.map((country) => {
-                      return (
-                        <option key={country.id} value={country.id}>
-                          {country.name}
-                        </option>
-                      );
-                    })}
-                  </select>
+                  />
                 </div>
-                <span className="flex-shrink-1 pe-2 small text-nowrap text-dark pe-2">
-                  City
-                </span>
-                <div className="flex-fill input-group ms-2">
-                  <select
-                    className="form-select rounded-0"
-                    name="is_used"
+                <div className="col-6">
+                  <Select
+                    label={"City"}
+                    target="general"
                     value={citySync}
+                    options={mappingCityState?.dropdownData}
                     onChange={handleCityChange}
-                  >
-                    <option value="0">==SELECT==</option>
-                    {mappingCityState?.dropdownData?.map((city) => {
-                      return (
-                        <option key={city.id} value={city.id}>
-                          {city.name}
-                        </option>
-                      );
-                    })}
-                  </select>
+                  />
                 </div>
+
+              
               </div>
+
+
               <div className="d-flex flex-row align-items-center mt-2">
                 <span className="flex-shrink-1 pe-2 small text-nowrap text-dark pe-2">
                   Show Only Mapped Hotel
@@ -925,26 +904,23 @@ const Index = (props) => {
             {isCollapsedSup ?
               <div className="d-flex flex-column bg-light p-2 border">
                 <div className="d-flex flex-row align-items-center mt-2">
-
-                  <span className="flex-shrink-1 pe-2 small text-nowrap text-dark pe-2">
-                    Master
-                  </span>
                   <div className="flex-fill input-group ms-2">
-                    <select
-                      className="form-select rounded-0"
-                      name="is_used"
-                      value={masterId}
-                      onChange={handleHotelChange}
-                    >
-                      <option value="0">==SELECT==</option>
-                      {mappingHotelState?.dropdownData?.map((hotel) => {
-                        return (
-                          <option key={hotel.id} value={hotel.id}>
-                            {hotel.code + " - " + hotel.name}
-                          </option>
-                        );
-                      })}
-                    </select>
+                    <div className="col-12">
+                      <Select
+                        label="Master"
+                        // isInvalid={/* pass your isInvalid value */}
+                        // required={/* pass your required value */}
+                        // errors={/* pass your errors array */}
+                        bgColor="/* pass your bgColor value */"
+                        options={mappingHotelState?.dropdownData || []}
+                        onChange={handleHotelChange}
+                        value={masterId}
+                        placeholder="Select Master Data"
+                        target="general"
+                      />
+                    </div>
+
+
                   </div>
                 </div>
 

@@ -8,10 +8,11 @@ export default function Input({
   required = true,
   errors = [],
   bgColor = "text-light",
-  onChange = () => {},
+  onChange = () => { },
   value = null,
   multiple = false,
   disabled = false,
+  minDate = null, // Add minDate prop to set the minimum allowed date
 }) {
   return (
     <div className="mt-2">
@@ -26,6 +27,10 @@ export default function Input({
             onChange={(val) => onChange(val.format("YYYY-MM-DD"))}
             value={value}
             disabled={disabled}
+            isValidDate={(current) => {
+              // Disable dates before the specified minimum date
+              return minDate ? current.isSameOrAfter(minDate, "day") : true;
+            }}
           />
         ) : type === "checkbox" ? (
           <input
