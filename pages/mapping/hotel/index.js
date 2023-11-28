@@ -307,7 +307,7 @@ const Index = (props) => {
 
     const initForm = {
       code: supplierId,
-      name: master,
+      name: nameSup,
       phone: phoneSup,
       star: starSup,
       address: addressSup,
@@ -352,11 +352,9 @@ const Index = (props) => {
       status: 1,
     };
     const mapping = await updateData(idMappingSup, initForm);
-
-    if (mapping?.status === 200) {
-      Swal.fire("Information", "Merge Success", "success");
-      handleGetMapping();
-    }
+    setMasterId("");
+    handleGetMapping();
+  
   };
 
   const toolbarForm = <></>;
