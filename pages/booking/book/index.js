@@ -272,8 +272,9 @@ const Index = (props) => {
     const _recheck = await recheckBookSearch(body);
     setRecheckData(_recheck.data.data);
 
-    if (_recheck.data) {
-      setSessionId(_recheck.data.data.sessionId)
+    if (_recheck) {      
+      setSessionId(_recheck.data.data.sessionId == null ?room.sessionId :  _recheck.data.data.sessionId)
+      console.log(sessionId)
       setSupplierId(room.supplierId)
       setHotelCode(_recheck.data.data.hotelCode)
     }
