@@ -271,11 +271,11 @@ const Index = (props) => {
 
     const _recheck = await recheckBookSearch(body);
     setRecheckData(_recheck.data.data);
-console.log(_recheck.data.data)
+
     if (_recheck) {      
       setSessionId(_recheck.data.data.sessionId == null ?room.sessionId :  _recheck.data.data.sessionId)      
       setSupplierId(room.supplierId)
-      setHotelCode(_recheck.data.data)
+      setHotelCode(_recheck.data.data.code)
     }
 
     setTimeout(() => {
