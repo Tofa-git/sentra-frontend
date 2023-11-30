@@ -10,7 +10,7 @@ on:
 jobs:
   build:
 
-    runs-on: AlmaLinux 9.3
+    runs-on: Alma Linux CI
 
     steps:
     - uses: actions/checkout@v3
