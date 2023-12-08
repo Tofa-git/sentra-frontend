@@ -21,11 +21,11 @@ jobs:
       # - uses: actions/checkout@v3
 
       - name: deploy using ssh
-        uses: appleboy/ssh-action@main
+        uses: appleboy/ssh-action@develop
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
-          #password: ${{ secrets.PASSWORD }}
+          password: ${{ secrets.PASSWORD }}
           key: ${{ secrets.PRIVATE_KEY }}
           port: 1945
           #passphrase:  ${{ secrets.PASSPHRASE }}
