@@ -6,7 +6,7 @@ name: CD
 # events but only for the main branch
 on:
   push:
-    branches: [main]
+    branches: [develop]
 
 # A workflow run is nade up of one or more jobs that can run sequentially or in parallel
 jobs:
