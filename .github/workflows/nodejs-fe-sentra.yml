@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CD-FE
+name: cd-fe-sentra
 
 # Controls when the action will run, Triggers the workflow on push or pull request
 # events but only for the main branch
@@ -25,10 +25,9 @@ jobs:
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.PASSWORD }}
-          # key: ${{ secrets.PRIVATE_KEY }}
           port: 1945
-          # passphrase:  ${{ secrets.PASSPHRASE }}
+          # password: ${{ secrets.PASSWORD }}
+          key: ${{ secrets.PRIVATE_KEY }}
           script: |
             cd /opt/frontend/sentra-frontend
             git pull origin main
