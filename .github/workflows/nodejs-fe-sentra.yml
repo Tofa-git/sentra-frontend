@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CD
+name: CD-FE
 
 # Controls when the action will run, Triggers the workflow on push or pull request
 # events but only for the main branch
@@ -25,7 +25,7 @@ jobs:
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
-          #password: ${{ secrets.PASSWORD }}
+          password: ${{ secrets.PASSWORD }}
           key: ${{ secrets.PRIVATE_KEY }}
           port: 1945
           passphrase:  ${{ secrets.PASSPHRASE }}
