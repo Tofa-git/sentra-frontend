@@ -28,7 +28,7 @@ jobs:
           #password: ${{ secrets.PASSWORD }}
           key: ${{ secrets.PRIVATE_KEY }}
           port: 1945
-          #passphrase:  ${{ secrets.PASSPHRASE }}
+          passphrase:  ${{ secrets.PASSPHRASE }}
           script: |
             cd /opt/frontend/sentra-frontend
             git pull origin main
