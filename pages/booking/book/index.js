@@ -245,7 +245,7 @@ const Index = (props) => {
 
   const handleRecheck = async (room) => {
     setSelectedRoom(room);
-    console.log(room);
+    // console.log(room);
     Swal.fire({
       icon: "info",
       title: "Checking Available Room",
