@@ -72,7 +72,6 @@ const roomData = new Array(Number(31))
 
 const Index = (props) => {
   const router = useRouter();
-
   const [selectedHotel, setSelectedHotel] = useState({});
   const [selectedRoom, setSelectedRoom] = useState({});
   const [selectedAgent, setSelectedAgent] = useState({});
@@ -87,7 +86,6 @@ const Index = (props) => {
   const [supplierCode, setSupplierCode] = useState('');
   const [checkIn, setCheckIn] = useState(null);
   const [checkOut, setCheckOut] = useState(null);
-
   const { state, dispatch } = useContext(BookContext);
   const { state: cityState } = useContext(CityContext);
   const { state: countryState } = useContext(CountryContext);

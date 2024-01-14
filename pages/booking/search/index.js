@@ -50,7 +50,7 @@ const Index = (props) => {
     }
   };
 
-  const handleDetail = async (bookId,supplierId) => {
+  const handleDetail = async (bookId, supplierId) => {
     setDetailBooking({});
 
     Swal.fire({
@@ -64,7 +64,7 @@ const Index = (props) => {
       },
     });
 
-    const book = await getDetailBook(dispatch, bookId,supplierId);
+    const book = await getDetailBook(dispatch, bookId, supplierId);
     if (book.status === 401) {
       authDispatch({ type: AUTH_401 });
       authDispatch({ type: AUTH_LOGOUT });
@@ -245,15 +245,36 @@ const Index = (props) => {
               </span>
             </span>
           </div>
-          <div style={{ background: "#fff" }}>
+          <div style={{ background: "#fff", maxWidth: 'auto', overflowX: 'auto' }}>
             <table className="table table-bordered table-hover table-striped">
               <thead>
                 <tr>
                   <th className="bg-blue text-white" width="auto">
-                    Booking ID
+                    EVT
                   </th>
                   <th className="bg-blue text-white" width="auto">
-                    Supplier
+                    Booking No
+                  </th>
+                  <th className="bg-blue text-white" width="auto">
+                    Booking Date
+                  </th>
+                  <th className="bg-blue text-white" width="auto">
+                    Booking Status
+                  </th>
+                  <th className="bg-blue text-white" width="auto">
+                    City
+                  </th>
+                  <th className="bg-blue text-white" width="auto">
+                    Hotel
+                  </th>
+                  <th className="bg-blue text-white" width="auto">
+                    Agent Manager
+                  </th>
+                  <th className="bg-blue text-white" width="auto">
+                    C-Day
+                  </th>
+                  <th className="bg-blue text-white" width="auto">
+                    CXL DeadLine
                   </th>
                   <th className="bg-blue text-white" width="auto">
                     Check In
@@ -262,19 +283,31 @@ const Index = (props) => {
                     Check Out
                   </th>
                   <th className="bg-blue text-white" width="15%">
-                    Hotel Name
+                    Bed Type
+                  </th>
+                  <th className="bg-blue text-white" width="15%">
+                    Guest Name
+                  </th>
+                  <th className="bg-blue text-white" width="15%">
+                    Profit (%)
                   </th>
                   <th className="bg-blue text-white" width="auto">
-                    Gross Price
+                    Sale
                   </th>
                   <th className="bg-blue text-white" width="auto">
-                    Policy Type
+                    Net
                   </th>
                   <th className="bg-blue text-white" width="auto">
-                    Room Name
+                    Type
                   </th>
                   <th className="bg-blue text-white" width="auto">
-                    Status
+                    BKG Income
+                  </th>
+                  <th className="bg-blue text-white" width="auto">
+                    XML
+                  </th>
+                  <th className="bg-blue text-white" width="auto">
+                    Last Operator
                   </th>
                   <th className="bg-blue text-white" width="auto">
                     Action
@@ -284,29 +317,49 @@ const Index = (props) => {
               </thead>
               <tbody>
                 {state?.dataList?.rows?.map((data) => {
+                  console.log(data)
                   return (
                     <tr
                     // onClick={() => handleDetail(data?.bookingId)}
                     // className="pointer"
                     >
+                      <td>{"-"}</td>
                       <td>{data?.bookingId}</td>
-                      <td>{data?.supplier.code}</td>
+                      <td>{data?.createdAt}</td>
+                      <td>{data?.bookingStatus}</td>
+                      <td>{data?.checkIn}</td>
+                      <td>{data?.hotelName}</td>
+                      <td>{"Agent Manager"}</td>
+                      <td>{" / "}</td>
+                      <td>{data?.cancellationPolicyType}</td>
                       <td>{data?.checkIn}</td>
                       <td>{data?.checkOut}</td>
-                      <td>{data?.hotelName}</td>
-                      <td>{data?.grossPrice}</td>
-                      <td>{data?.cancellationPolicyType}</td>
-                      <td>{data?.roomName}</td>
-                      <td>{data?.bookingStatus}</td>
+                      <td>{"Bed Type"}</td>
+                      <td>
+                        {
+                          data?.guest.length > 1 ?
+                            data.guest[0].salutation + " " + data.guest[0].firstName + " " + data.guest[0].lastName
+                            + "\n +" + (data.guest.length - 1)
+                            : data.guest[0].salutation + " " + data.guest[0].firstName + " " + data.guest[0].lastName
+                        }
+                      </td>
+                      <td>{data?.grossPrice - data?.netPrice}</td>
+                      <td>{data?.grossPrice.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
+                      <td>{data?.netPrice.toLocaleString("id-ID", { style: "currency", currency: "IDR" })}</td>
+                      <td>{"WEB"}</td>
+                      <td>{"OPEN "}</td>
+                      <td>{data?.supplier.name}</td>
+                      <td>{data.user.firstName + " " + data.user.lastName}</td>
+
                       <td className="d-flex flex-row justify-content-center align-items-center">
                         <button
                           type="button"
                           className="btn btn-primary bg-blue"
-                          onClick={() => handleDetail(data?.bookingId,data.supplierId)}
+                          onClick={() => handleDetail(data?.bookingId, data.supplierId)}
                         >
                           Detail
                         </button>
-                        {data?.bookingStatus != "CANCELCONF" ?
+                        {/* {data?.bookingStatus != "CANCELCONF" ?
 
                           <button
                             type="button"
@@ -318,7 +371,7 @@ const Index = (props) => {
                             Cancel
                           </button>
 
-                          : ""}
+                          : ""} */}
 
                       </td>
                     </tr>

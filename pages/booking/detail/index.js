@@ -4,25 +4,8 @@ import Select from "../../../components/select";
 import { BookContext } from "../../../context/book/reducer";
 import { memo, useEffect, useState, useCallback } from 'react'
 import { AuthContext } from "../../../context/auth/reducer";
+import { Button } from "bootstrap";
 
-const dummyData = [
-  {
-    id: 1,
-    checkIn: "07-07-2023",
-    sglSale: 0,
-    dblSale: 0,
-    twnSale: 0,
-    trpSale: 0,
-    quadSale: 0,
-    twnSale: 0,
-    sglNet: 0,
-    dblNet: 0,
-    twnNet: 0,
-    trpNet: 0,
-    quadNet: 0,
-    twnNet: 0,
-  }
-];
 
 const dropdownMrMrs = [
   {
@@ -92,7 +75,18 @@ const Index = (props) => {
   const [addGrossChargeIDR, setAddGrossChargeIDR] = useState(0);
   const [addNetCharge, setAddNetCharge] = useState(0);
   const [addNetChargeIDR, setAddNetChargeIDR] = useState(0);
+
+  const [roomGrossPriceRate, setRoomGrossPriceRate] = useState(0);
+  const [roomNetPriceRate, setRoomNetPriceRate] = useState(0);
+  const [typeRate, setTypeRate] = useState("");
+  const [addGrossChargeRate, setAddGrossChargeRate] = useState(0);
+  const [addGrossChargeIDRRate, setAddGrossChargeIDRRate] = useState(0);
+  const [addNetChargeRate, setAddNetChargeRate] = useState(0);
+  const [addNetChargeIDRRate, setAddNetChargeIDRRate] = useState(0);
+
   const [roomNight, setRoomNight] = useState(0);
+
+  const [selectedGuest, setSelectedGuest] = useState(null);
   const [selectedFirstOps, setSelectedFirstOps] = useState({});
 
   const bookingCreatedAt = details?.local.bookingCreatedAt ?? "-";
@@ -115,6 +109,16 @@ const Index = (props) => {
     };
     return date.toLocaleString(undefined, options);
   }
+
+  const handleRowGuestClick = (data) => {
+    setSelectedGuest(data);
+  };
+
+  const handleRowRateClick = (type,grossPrice,netPrice) => {
+    setRoomGrossPriceRate(grossPrice);
+    setRoomNetPriceRate(netPrice);
+    setTypeRate(type);
+  };
 
   const formatCurrency = (value) => {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(value);
@@ -490,36 +494,117 @@ const Index = (props) => {
                 value={formattedDateTime} disabled />
             </div>
             <div className="col-6">
-              <Input label={"Agent"} />
+              <Input label={"Agent"}
+                value={"-"} />
             </div>
             <div className="col-6">
-              <Input label={"Manager"} />
+              <Input label={"Manager"}
+                value={"-"} />
             </div>
             <div className="col-6">
               <Input label={"Supplier"}
-                value={details?.status ?? "-"} />
+                value={details?.supplier ?? "-"} />
             </div>
             <div className="col-6">
               <Input label={"Supply Other #"}
-                value={details?.status ?? "-"} />
+                value={details?.supplierOther ?? "-"} />
             </div>
             <div className="col-6">
-              <Input label={"Tel"} />
+              <Input label={"Confirm"}
+                value={details?.confirm ?? "-"} />
             </div>
             <div className="col-6">
-              <Input label={"Mobile"} />
+              <Input label={"Confirm Date"}
+                value={details?.confirmDate ?? "-"} />
+            </div>
+            <div className="col-4">
+              <Input label={"Invoice"}
+                value={details?.invoice ?? "-"} />
+            </div>
+            <div className="col-4">
+              <Input label={"Confirmed"}
+                value={details?.confirmed ?? "-"} />
+            </div>
+            <div className="col-4">
+              <Input label={"Voucher"}
+                value={details?.voucher ?? "-"} />
             </div>
             <div className="col-6">
-              <Input label={"Email"} />
+              <Input label={"Supplier DL"}
+                value={details?.supplierDl ?? "-"} />
             </div>
             <div className="col-6">
-              <Input label={"Operator"} />
+              <Input label={"Supplier CXL Change"}
+                value={details?.supplierCxl ?? "0"} />
+            </div>
+            <div className="col-4">
+              <Input label={"CXL DL"}
+                value={details?.cancellationPolicies.policy[0].toDate ?? "-"} />
+            </div>
+            <div className="col-4">
+              <Input label={"Cancelled"}
+                value={details?.cancelled ?? "-"} />
+            </div>
+            <div className="col-4">
+              <Input label={"CXL Charge"}
+                value={details?.cxlCharge ?? "0"} />
+            </div>
+            <div className="col-6">
+              <Input label={"CXL RQ"}
+                value={details?.cxlRq ?? "-"} />
+            </div>
+            <div className="col-6">
+              <Input label={"Cancelled By"}
+                value={details?.cancelBy ?? "-"} />
             </div>
             <div className="col-12">
-              <Input label={"If Over (no) Credit"} />
+              <Input label={"CXL Remark"}
+                value={details?.cxlRemark ?? "-"} />
+            </div>
+            <div className="col-12">
+              <Input label={"CXL Policy"} type={"textarea"}
+                value={details?.cxlPolicy ?? "-"} />
+            </div>
+            <div className="col-12">
+              <Input label={"Important Info"} type={"textarea"}
+                value={details?.info ?? "-"} />
+            </div>
+            <div className="col-4">
+              <Input label={"Amend RQ"}
+                value={details?.info ?? "-"} />
+            </div>
+            <div className="col-4">
+              <Input label={"Amended"} />
+            </div>
+            <div className="col-4">
+              <Input label={"Amended Confirmed By"} />
+            </div>
+            <div className="col-6">
+              <Input label={"Reject By"} />
+            </div>
+            <div className="col-6">
+              <Input label={"Reject Date"} />
+            </div>
+
+          </div>
+
+
+          <div className="text-dark mb-1 d-flex justify-content-between">
+            <span>Booking Close </span>
+          </div>
+          <div className="bg-white row mx-0 py-2">
+            <div className="col-4">
+              <Input label={"Booking Close"}
+                value={details?.status ?? "-"} />
+            </div>
+            <div className="col-4">
+              <Input label={"Closing Date"}
+                value={details?.status ?? "-"} />
             </div>
           </div>
+
         </div>
+
         <div className="col-lg-6">
           <div className="text-dark mb-1">Guest Name or Naming List</div>
           <div className="bg-white">
@@ -544,10 +629,13 @@ const Index = (props) => {
                 </tr>
               </thead>
               <tbody>
-                {details?.hotels?.hotel?.roomDetails?.rooms?.room[0].paxDetails?.pax?.map((data) => {
+                {details?.local?.guests?.map((data) => {
                   return (
-                    <tr key={data.salutation + data.firstName + data.lastName}>
-                      <td>{data.salutation}</td>
+                    <tr
+                      key={data.salutation + data.firstName + data.lastName}
+                      onClick={() => handleRowGuestClick(data)}
+                    >
+                      <td>{data.room}</td>
                       <td>{data.firstName}</td>
                       <td>{data.lastName}</td>
                       <td>{data.age ? data.age : ""}</td>
@@ -559,20 +647,19 @@ const Index = (props) => {
             </table>
             <div className="bg-white py-3 row">
               <div className="col-4">
-                <Select label="Type" />
+                <Input label="Type" value={selectedGuest?.room || ""} />
               </div>
               <div className="col-4">
-                <Input label="Age" />
+                <Input label="Age" value={selectedGuest?.age || ""} />
               </div>
               <div className="col-4">
-
-                <Select value="-" label="Mr/Mrs" options={dropdownMrMrs} />
+                <Select value={selectedGuest?.salutation || "-"} label="Mr/Mrs" options={dropdownMrMrs} />
               </div>
-              <div className="col-6">
-                <Select label="First Name" />
+              <div className="col-4">
+                <Input label="First Name" value={selectedGuest?.firstName || ""} />
               </div>
-              <div className="col-6">
-                <Select label="Family Name" />
+              <div className="col-4">
+                <Input label="Last Name" value={selectedGuest?.lastName || ""} />
               </div>
 
 
@@ -631,28 +718,147 @@ const Index = (props) => {
                 </tr>
               </thead>
               <tbody>
-                {dummyData.map((data) => {
-                  return (
-                    <tr>
-                      <td>{data.checkIn}</td>
-                      <td>{data.sglSale}</td>
-                      <td>{data.dblSale}</td>
-                      <td>{data.twnSale}</td>
-                      <td>{data.trpSale}</td>
-                      <td>{data.quadSale}</td>
-                      <td>{data.sglNet}</td>
-                      <td>{data.dblNet}</td>
-                      <td>{data.twnNet}</td>
-                      <td>{data.trpNet}</td>
-                      <td>{data.quadNet}</td>
-                    </tr>
-                  );
-                })}
+                {
+
+                  <tr                  
+                    onClick={() => handleRowRateClick(details.local.guests[0].room,details.local.bookingGrossPrice,details.local.bookingNetPrice)}
+                  >
+                    <td>{details.local.bookingCheckIn}</td>
+                    <td>{details.local.guests[0].room == "SG 1" ? formatCurrency(details.local.bookingGrossPrice) : 0}</td>
+                    <td>{details.local.guests[0].room == "DB 1" ? formatCurrency(details.local.bookingGrossPrice) : 0}</td>
+                    <td>{details.local.guests[0].room == "TW 1" ? formatCurrency(details.local.bookingGrossPrice) : 0}</td>
+                    <td>{details.local.guests[0].room == "TP 1" ? formatCurrency(details.local.bookingGrossPrice) : 0}</td>
+                    <td>{details.local.guests[0].room == "QD 1" ? formatCurrency(details.local.bookingGrossPrice) : 0}</td>
+                    <td>{details.local.guests[0].room == "SG 1" ? formatCurrency(details.local.bookingNetPrice) : 0}</td>
+                    <td>{details.local.guests[0].room == "DB 1" ? formatCurrency(details.local.bookingNetPrice) : 0}</td>
+                    <td>{details.local.guests[0].room == "TW 1" ? formatCurrency(details.local.bookingNetPrice) : 0}</td>
+                    <td>{details.local.guests[0].room == "TP 1" ? formatCurrency(details.local.bookingNetPrice) : 0}</td>
+                    <td>{details.local.guests[0].room == "QD 1" ? formatCurrency(details.local.bookingNetPrice) : 0}</td>
+                  </tr>
+
+                }
               </tbody>
             </table>
           </div>
 
           <div className="text-dark mb-1">Add Service</div>
+          <div className="bg-white py-3 row">
+            <div style={{ width: "auto" }}>
+              <div>
+                <table width="auto">
+                  <tbody>
+                    <tr>
+                      <th width="auto" rowspan="2"></th>
+                      <th width="250" colSpan="2"></th>
+                      <th width="250" colSpan="2"></th>
+                    </tr>
+                    <tr>
+                      <th width="auto"><span id="sCurr"></span></th>
+                      <th width="auto"><span id="rate1Curr1"></span></th>
+                      <th width="auto"><span id="nCurr"></span></th>
+                      <th width="auto"><span id="rate1Curr2"></span></th>
+                    </tr>
+                    <tr>
+                      <td>
+                        <Input
+                          disabled={true}
+                          value={details?.checkOut}
+                        />
+                      </td>
+                      <td>
+                        <Input value={typeRate == "SG 1" ? formatCurrency(roomGrossPriceRate) : "0"} onChange={(e) => setRoomGrossPriceRate(e.target.value)} />
+                      </td>
+                      <td>
+                        <Input value={typeRate == "DB 1" ? formatCurrency(roomGrossPriceRate) : "0"} onChange={(e) => setRoomGrossPriceRate(e.target.value)} />
+                      </td>
+                      <td>
+                        <Input value={typeRate == "TW 1" ? formatCurrency(roomGrossPriceRate) : "0"} onChange={(e) => setRoomGrossPriceRate(e.target.value)} />
+                      </td>
+                      <td>
+                        <Input value={typeRate == "TP 1" ? formatCurrency(roomGrossPriceRate) : "0"} disabled />
+                      </td>
+                      <td>
+                        <Input value={typeRate == "QD 1" ? formatCurrency(roomGrossPriceRate) : "0"} disabled />
+                      </td>
+                      <td>
+                        Sale (IDR)
+                      </td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td>
+                        <Input type="number" value={roomNetPriceRate} onChange={(e) => setAddGrossCharge(e.target.value)} />
+                      </td>
+                      <td>
+                        <Input type="number" value={roomNetPriceRate} onChange={(e) => setAddGrossChargeIDR(e.target.value)} disabled />
+                      </td>
+                      <td>
+                        <Input type="number" value={roomNetPriceRate} onChange={(e) => setAddNetCharge(e.target.value)} />
+                      </td>
+                      <td>
+                        <Input type="number" value={roomNetPriceRate} disabled onChange={(e) => setAddNetChargeIDR(e.target.value)} />
+                      </td>
+                      <td>
+                        <Input type="number" value={roomNetPriceRate} disabled onChange={(e) => setAddNetChargeIDR(e.target.value)} />
+                      </td>
+                      <td>
+                        Net (IDR)
+                      </td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td>
+                        <Input value={formatCurrency(totalGross)} disabled />
+                      </td>
+                      <td>
+                        <Input value={formatCurrency(totalGross)} disabled />
+                      </td>
+                      <td>
+                        <Input value={formatCurrency(totalNet)} disabled />
+                      </td>
+                      <td>
+                        <Input value={formatCurrency(totalNet)} disabled />
+                      </td>
+                      <td>
+                        <Input value={formatCurrency(totalNet)} disabled />
+                      </td>
+                      <td>
+                        Net (IDR)
+                      </td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td>
+                        <Input value={formatCurrency(totalGross)} disabled />
+                      </td>
+                      <td>
+                        <Input value={formatCurrency(totalGross)} disabled />
+                      </td>
+                      <td>
+                        <Input value={formatCurrency(totalNet)} disabled />
+                      </td>
+                      <td>
+                        <Input value={formatCurrency(totalNet)} disabled />
+                      </td>
+                      <td>
+                        <Input value={formatCurrency(totalNet)} disabled />
+                      </td>
+                      <td>
+                        Total :
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+
+              <div className="bg-white py-3 row">
+                <div className="col-4 align-items-end d-flex">
+                  <button className="bg-blue rounded">Save</button>
+                </div>
+              </div>
+            </div>
+          </div>
           <div className="bg-white mt-2">
             <table className="table table-bordered table-hover table-striped">
               <thead>
@@ -675,17 +881,13 @@ const Index = (props) => {
                 </tr>
               </thead>
               <tbody>
-                {dummyData.map((data) => {
-                  return (
-                    <tr>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                    </tr>
-                  );
-                })}
+                <tr>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
               </tbody>
             </table>
             <div className="bg-white py-3 row">
