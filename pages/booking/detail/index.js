@@ -1,10 +1,8 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Input from "../../../components/input";
 import Select from "../../../components/select";
 import { BookContext } from "../../../context/book/reducer";
-import { memo, useEffect, useState, useCallback } from 'react'
 import { AuthContext } from "../../../context/auth/reducer";
-import { Button } from "bootstrap";
 
 
 const dropdownMrMrs = [
@@ -67,10 +65,10 @@ const roomData = new Array(Number(31))
 const Index = (props) => {
   const { state } = useContext(BookContext);
   const { state: authState, dispatch: authDispatch } = useContext(AuthContext);
-  const details = state?.details;
+  const details = state?.details ?? null;
 
-  const [roomGrossPrice, setRoomGrossPrice] = useState(details?.hotels.hotel.roomDetails.grossPrice ?? 0);
-  const [roomNetPrice, setRoomNetPrice] = useState(details?.hotels.hotel.roomDetails.netPrice ?? 0);
+  const [roomGrossPrice, setRoomGrossPrice] = useState(details && details.local ? details?.hotels.hotel.roomDetails.grossPrice : 0);
+  const [roomNetPrice, setRoomNetPrice] = useState(details && details.local ? details?.hotels.hotel.roomDetails.netPrice : 0);
   const [addGrossCharge, setAddGrossCharge] = useState(0);
   const [addGrossChargeIDR, setAddGrossChargeIDR] = useState(0);
   const [addNetCharge, setAddNetCharge] = useState(0);
@@ -89,7 +87,7 @@ const Index = (props) => {
   const [selectedGuest, setSelectedGuest] = useState(null);
   const [selectedFirstOps, setSelectedFirstOps] = useState({});
 
-  const bookingCreatedAt = details?.local.bookingCreatedAt ?? "-";
+  const bookingCreatedAt = details && details.local ? details?.local?.bookingCreatedAt : "-";
   const formattedDateTime = formatDateTime(bookingCreatedAt);
 
   const totalGross = Number(roomGrossPrice) + Number(addGrossCharge);
@@ -114,7 +112,7 @@ const Index = (props) => {
     setSelectedGuest(data);
   };
 
-  const handleRowRateClick = (type,grossPrice,netPrice) => {
+  const handleRowRateClick = (type, grossPrice, netPrice) => {
     setRoomGrossPriceRate(grossPrice);
     setRoomNetPriceRate(netPrice);
     setTypeRate(type);
@@ -148,14 +146,14 @@ const Index = (props) => {
               <Input
                 label={"Booking ID"}
                 disabled={true}
-                value={details?.local.localBookingId}
+                value={details?.local?.localBookingId ?? ""}
               />
             </div>
             <div className="col-5">
               <Input
                 label={"Booking Version ID"}
                 disabled={true}
-                value={details?.mgBookingVersionID}
+                value={details?.mgBookingVersionID ?? ""}
               />
             </div>
             <div className="col-2">
@@ -165,61 +163,61 @@ const Index = (props) => {
               <Input
                 label={"Country"}
                 disabled={true}
-                value={details?.local.hotelCountryCode}
+                value={details?.local?.hotelCountryCode ?? ""}
               />
             </div>
             <div className="col-4">
               <Input
                 label={"City"}
                 disabled={true}
-                value={details?.local.hotelCityCode}
+                value={details?.local?.hotelCityCode ?? ""}
               />
             </div>
             <div className="col-6">
               <Input
                 label={"Master Hotel"}
                 disabled={true}
-                value={details?.hotels.hotel.name}
+                value={details?.hotels.hotel.name ?? ""}
               />
             </div>
             <div className="col-2">
               <Input
                 disabled={true}
-                value={details?.hotels.hotel.rating}
+                value={details?.hotels.hotel.rating ?? ""}
               />
             </div>
             <div className="col-4">
               <Input
                 label={"Tel"}
                 disabled={true}
-                value={details?.local.hotelPhone ?? "-"}
+                value={details?.local?.hotelPhone ?? "-"}
               />
             </div>
             <div className="col-6">
               <Input
                 label={"Supplier Hotel"}
                 disabled={true}
-                value={details?.local.bookingHotelName}
+                value={details?.local?.bookingHotelName ?? ""}
               />
             </div>
             <div className="col-2">
               <Input
                 disabled={true}
-                value={details?.hotels.hotel.rating}
+                value={details?.hotels.hotel.rating ?? ""}
               />
             </div>
             <div className="col-10">
               <Input
                 label={"Master Address"}
                 disabled={true}
-                value={details?.local.hotelAddress}
+                value={details?.local?.hotelAddress ?? ""}
               />
             </div>
             <div className="col-10">
               <Input
                 label={"Supplier Address"}
                 disabled={true}
-                value={details?.local.hotelAddress}
+                value={details?.local?.hotelAddress ?? ""}
               />
             </div>
             <div className="col-5">
@@ -263,45 +261,45 @@ const Index = (props) => {
               <Input
                 type="text"
                 label="XML Ref #"
-                value={details?.local.xmlRef ?? "-"} />
+                value={details?.local?.xmlRef ?? "-"} />
             </div>
             <div className="col-6">
               <Input
                 type="text"
                 label="Agent (XO) Ref No"
-                value={details?.local.agentRef ?? "-"} />
+                value={details?.local?.agentRef ?? "-"} />
             </div>
 
             <div className="col-6">
               <Input type="text" label="Agent"
-                value={details?.local.userFirstName ?? "-"} />
+                value={details?.local?.userFirstName ?? "-"} />
             </div>
             <div className="col-6">
               <Input type="text" label="ID"
-                value={details?.local.userUsername ?? "-"} />
+                value={details?.local?.userUsername ?? "-"} />
             </div>
 
             <div className="col-6">
               <Input type="text" label="Phone"
-                value={details?.local.userMobile ?? "-"} />
+                value={details?.local?.userMobile ?? "-"} />
             </div>
             <div className="col-6">
               <Input type="text" label="Mail"
-                value={details?.local.userEmail ?? "-"} />
+                value={details?.local?.userEmail ?? "-"} />
             </div>
 
             <div className="col-7">
               <Input label="Sales Office"
-                value={details?.local.userSalesOffice ?? "-"} />
+                value={details?.local?.userSalesOffice ?? "-"} />
             </div>
 
             <div className="col-6">
               <Input label="Manager"
-                value={details?.local.userManager ?? "-"} />
+                value={details?.local?.userManager ?? "-"} />
             </div>
             <div className="col-6">
               <Input label="ID"
-                value={details?.local.userManagerId ?? "-"} />
+                value={details?.local?.userManagerId ?? "-"} />
             </div>
 
             <div className="col-6">
@@ -309,14 +307,14 @@ const Index = (props) => {
                 type="text"
                 label="Phone"
                 disabled={true}
-                value={details?.local.userManagerMobile ?? "-"} />
+                value={details?.local?.userManagerMobile ?? "-"} />
             </div>
             <div className="col-6">
               <Input
                 type="text"
                 label="Mail"
                 disabled={true}
-                value={details?.local.userManagerEmail ?? "-"} />
+                value={details?.local?.userManagerEmail ?? "-"} />
             </div>
 
 
@@ -324,20 +322,20 @@ const Index = (props) => {
               <Input
                 type="text"
                 label="Sub Name"
-                value={details?.local.userSubName ?? "-"} />
+                value={details?.local?.userSubName ?? "-"} />
             </div>
             <div className="col-6">
               <Input type="text" label="Email"
-                value={details?.local.userManagerEmail ?? "-"} />
+                value={details?.local?.userManagerEmail ?? "-"} />
             </div>
 
             <div className="col-6">
               <Input type="text" label="Mobile"
-                value={details?.local.userManagerMobile ?? "-"} />
+                value={details?.local?.userManagerMobile ?? "-"} />
             </div>
             <div className="col-6">
               <Input type="text" label="Phone"
-                value={details?.local.userManagerPhone ?? "-"} />
+                value={details?.local?.userManagerPhone ?? "-"} />
             </div>
 
             <div className="col-6">
@@ -350,13 +348,13 @@ const Index = (props) => {
                   );
                   setSelectedFirstOps(user);
                 }}
-                value={details?.local.userCreatedBy ?? "-"} />
+                value={details?.local?.userCreatedBy ?? "-"} />
             </div>
             <div className="col-6">
               <Input
                 label="Last Operator"
                 disabled={true}
-                value={details?.local.userFirstName ?? "-"} />
+                value={details?.local?.userFirstName ?? "-"} />
             </div>
 
             <div className="col-12 d-flex justify-content-end py-2">
@@ -629,8 +627,8 @@ const Index = (props) => {
                 </tr>
               </thead>
               <tbody>
-                {details?.local?.guests?.map((data) => {
-                  return (
+                {details?.local?.guests && details.local.guests.length > 0 ? (
+                  details.local.guests.map((data) => (
                     <tr
                       key={data.salutation + data.firstName + data.lastName}
                       onClick={() => handleRowGuestClick(data)}
@@ -641,8 +639,12 @@ const Index = (props) => {
                       <td>{data.age ? data.age : ""}</td>
                       <td></td>
                     </tr>
-                  );
-                })}
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="5">No guest data available</td>
+                  </tr>
+                )}
               </tbody>
             </table>
             <div className="bg-white py-3 row">
@@ -668,6 +670,7 @@ const Index = (props) => {
               </div>
             </div>
           </div>
+
           <div className="text-dark mb-1">Hotel Rate</div>
           <div className="bg-white">
             <table className="table table-bordered table-hover table-striped">
@@ -719,23 +722,33 @@ const Index = (props) => {
               </thead>
               <tbody>
                 {
-
-                  <tr                  
-                    onClick={() => handleRowRateClick(details.local.guests[0].room,details.local.bookingGrossPrice,details.local.bookingNetPrice)}
-                  >
-                    <td>{details.local.bookingCheckIn}</td>
-                    <td>{details.local.guests[0].room == "SG 1" ? formatCurrency(details.local.bookingGrossPrice) : 0}</td>
-                    <td>{details.local.guests[0].room == "DB 1" ? formatCurrency(details.local.bookingGrossPrice) : 0}</td>
-                    <td>{details.local.guests[0].room == "TW 1" ? formatCurrency(details.local.bookingGrossPrice) : 0}</td>
-                    <td>{details.local.guests[0].room == "TP 1" ? formatCurrency(details.local.bookingGrossPrice) : 0}</td>
-                    <td>{details.local.guests[0].room == "QD 1" ? formatCurrency(details.local.bookingGrossPrice) : 0}</td>
-                    <td>{details.local.guests[0].room == "SG 1" ? formatCurrency(details.local.bookingNetPrice) : 0}</td>
-                    <td>{details.local.guests[0].room == "DB 1" ? formatCurrency(details.local.bookingNetPrice) : 0}</td>
-                    <td>{details.local.guests[0].room == "TW 1" ? formatCurrency(details.local.bookingNetPrice) : 0}</td>
-                    <td>{details.local.guests[0].room == "TP 1" ? formatCurrency(details.local.bookingNetPrice) : 0}</td>
-                    <td>{details.local.guests[0].room == "QD 1" ? formatCurrency(details.local.bookingNetPrice) : 0}</td>
-                  </tr>
-
+                  details?.local?.guests && details.local.guests.length > 0 ? (
+                    <tr
+                      onClick={() =>
+                        handleRowRateClick(
+                          details.local.guests[0].room,
+                          details.local.bookingGrossPrice,
+                          details.local.bookingNetPrice
+                        )
+                      }
+                    >
+                      <td>{details.local.bookingCheckIn}</td>
+                      <td>{details.local.guests[0].room === "SG 1" ? formatCurrency(details.local.bookingGrossPrice) : 0}</td>
+                      <td>{details.local.guests[0].room === "DB 1" ? formatCurrency(details.local.bookingGrossPrice) : 0}</td>
+                      <td>{details.local.guests[0].room === "TW 1" ? formatCurrency(details.local.bookingGrossPrice) : 0}</td>
+                      <td>{details.local.guests[0].room === "TP 1" ? formatCurrency(details.local.bookingGrossPrice) : 0}</td>
+                      <td>{details.local.guests[0].room === "QD 1" ? formatCurrency(details.local.bookingGrossPrice) : 0}</td>
+                      <td>{details.local.guests[0].room === "SG 1" ? formatCurrency(details.local.bookingNetPrice) : 0}</td>
+                      <td>{details.local.guests[0].room === "DB 1" ? formatCurrency(details.local.bookingNetPrice) : 0}</td>
+                      <td>{details.local.guests[0].room === "TW 1" ? formatCurrency(details.local.bookingNetPrice) : 0}</td>
+                      <td>{details.local.guests[0].room === "TP 1" ? formatCurrency(details.local.bookingNetPrice) : 0}</td>
+                      <td>{details.local.guests[0].room === "QD 1" ? formatCurrency(details.local.bookingNetPrice) : 0}</td>
+                    </tr>
+                  ) : (
+                    <tr>
+                      <td colSpan="11">No guest data available</td>
+                    </tr>
+                  )
                 }
               </tbody>
             </table>
@@ -859,6 +872,7 @@ const Index = (props) => {
               </div>
             </div>
           </div>
+
           <div className="bg-white mt-2">
             <table className="table table-bordered table-hover table-striped">
               <thead>
