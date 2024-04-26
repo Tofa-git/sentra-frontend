@@ -327,7 +327,7 @@ const Index = (props) => {
                       <td>{data?.bookingId}</td>
                       <td>{data?.createdAt}</td>
                       <td>{data?.bookingStatus}</td>
-                      <td>{data?.checkIn}</td>
+                      <td>{"Jakarta"}</td>
                       <td>{data?.hotelName}</td>
                       <td>{"Agent Manager"}</td>
                       <td>{" / "}</td>
