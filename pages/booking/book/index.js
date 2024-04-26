@@ -95,6 +95,30 @@ const Index = (props) => {
 
   const [form, setForm] = useState(initialForm);
 
+  var itemsPerPage = 5;
+
+  var totalPage = 0//Math.ceil(roomHotelData.length / itemsPerPage);
+
+  var startIndex = 0//(currentPage - 1) * itemsPerPage;
+  var endIndex = 0//Math.min(startIndex + itemsPerPage, roomHotelData.length);
+
+  // Slice the array to get items for the current page
+  var currentPageItems = 0//roomHotelData.slice(startIndex, endIndex);
+
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const handlePreviousPageRoom = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const handleNextPageRoom = () => {
+    if (currentPage < totalPage) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
   const handleInputChange = (name, value) => {
     let current = [...guestData];
 
@@ -236,6 +260,16 @@ const Index = (props) => {
     const _recheck = await getAllBookSearchRoom(body, supplierId);
     setRoomHotelData(_recheck.data.data.rooms);
 
+    // Calculate the total number of pages
+    totalPage = Math.ceil(roomHotelData.length / itemsPerPage);
+
+    // Calculate the start and end index of the current page
+    startIndex = (currentPage - 1) * itemsPerPage;
+    endIndex = Math.min(startIndex + itemsPerPage, roomHotelData.length);
+
+    // Slice the array to get items for the current page
+    currentPageItems = roomHotelData.slice(startIndex, endIndex);
+
     setTimeout(() => {
       Swal.close();
     }, 1500);
@@ -270,8 +304,8 @@ const Index = (props) => {
     const _recheck = await recheckBookSearch(body);
     setRecheckData(_recheck.data.data);
 
-    if (_recheck) {      
-      setSessionId(_recheck.data.data.sessionId == null ?room.sessionId :  _recheck.data.data.sessionId)      
+    if (_recheck) {
+      setSessionId(_recheck.data.data.sessionId == null ? room.sessionId : _recheck.data.data.sessionId)
       setSupplierId(room.supplierId)
       setHotelCode(_recheck.data.data.code)
     }
@@ -718,7 +752,6 @@ const Index = (props) => {
               <tbody>
                 {roomHotelData?.map((data) => {
                   const isSelected = data.id === selectedRoom?.id;
-
                   return (
                     <tr
                       onClick={() => handleRecheck(data)}
@@ -735,6 +768,40 @@ const Index = (props) => {
                 })}
               </tbody>
             </table>
+            {/* "Search Hotel" section */}
+            <div className="col-3 d-flex align-items-center">
+              <span className="p-1 px-2 small text-primary">
+                Total Data: {roomHotelData?.data?.count}
+              </span>
+            </div>
+            {/* "Search Hotel Pagination" section */}
+            <div className="row w-100 mt-2">
+              <div className="col-md-6">
+                <div className="d-flex">
+                  <nav aria-label="Page navigation example">
+                    <ul className="pagination">
+                      {Array.from({ length: totalPage }).map((_, index) => (                        
+                        <li key={index} className={`page-item ${index + 1 === currentPage && "active"}`}>
+                          <a className="page-link" onClick={() => setCurrentPage(index + 1)}>
+                            {index + 1}
+                          </a>
+                        </li>
+                      ))}
+                      <li className={`page-item ${currentPage === 1 && "disabled"}`}>
+                        <a className="page-link" onClick={handlePreviousPageRoom}>
+                          Previous
+                        </a>
+                      </li>
+                      <li className={`page-item ${currentPage === totalPage && "disabled"}`}>
+                        <a className="page-link" onClick={handleNextPageRoom}>
+                          Next
+                        </a>
+                      </li>
+                    </ul>
+                  </nav>
+                </div>
+              </div>
+            </div>
           </div>
           <div className="text-dark mb-1">
             Rate: <span className="text-primary">{selectedRoom?.name}</span>
