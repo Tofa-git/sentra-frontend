@@ -102,6 +102,7 @@ const Index = (props) => {
   var startIndex = 0//(currentPage - 1) * itemsPerPage;
   var endIndex = 0//Math.min(startIndex + itemsPerPage, roomHotelData.length);
 
+  
   // Slice the array to get items for the current page
   var currentPageItems = 0//roomHotelData.slice(startIndex, endIndex);
 
