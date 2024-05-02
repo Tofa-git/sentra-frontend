@@ -708,20 +708,20 @@ const Index = (props) => {
                   {currentPage > 2 && (
                     <li className="page-item disabled"><span className="page-link">...</span></li>
                   )}
-                  {Array.from({ length: Math.min(Math.ceil(state.data.hotels.length / hotelsPerPage), 3) }, (_, i) => {
+                  {Array.from({ length: Math.min(Math.ceil(state.data?.hotels.length / hotelsPerPage), 3) }, (_, i) => {
                     const pageNumber = currentPage - 1 + i;
                     return (
-                      (pageNumber >= 1 && pageNumber <= Math.ceil(state.data.hotels.length / hotelsPerPage)) && (
+                      (pageNumber >= 1 && pageNumber <= Math.ceil(state.data?.hotels.length / hotelsPerPage)) && (
                         <li key={i} className={`page-item ${currentPage === pageNumber ? 'active' : ''}`}>
                           <button onClick={() => handleClick(pageNumber)} className="page-link">{pageNumber}</button>
                         </li>
                       )
                     );
                   })}
-                  {currentPage + 1 < Math.ceil(state.data.hotels.length / hotelsPerPage) && (
+                  {currentPage + 1 < Math.ceil(state.data?.hotels.length / hotelsPerPage) && (
                     <li className="page-item disabled"><span className="page-link">...</span></li>
                   )}
-                  <li className={`page-item ${currentPage === Math.ceil(state.data.hotels.length / hotelsPerPage) ? 'disabled' : ''}`}>
+                  <li className={`page-item ${currentPage === Math.ceil(state.data?.hotels.length / hotelsPerPage) ? 'disabled' : ''}`}>
                     <button onClick={() => handleClick(currentPage + 1)} className="page-link">Next</button>
                   </li>
                 </ul>
@@ -731,7 +731,7 @@ const Index = (props) => {
               </div>
             </div>
           </div>
-          
+
       </div>
         <div className="col-lg-6">
           <div className="text-dark mb-1">Hotel</div>
