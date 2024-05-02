@@ -95,29 +95,19 @@ const Index = (props) => {
 
   const [form, setForm] = useState(initialForm);
 
-  var itemsPerPage = 5;
-
-  var totalPage = 0//Math.ceil(roomHotelData.length / itemsPerPage);
-
-  var startIndex = 0//(currentPage - 1) * itemsPerPage;
-  var endIndex = 0//Math.min(startIndex + itemsPerPage, roomHotelData.length);
-
-  // Slice the array to get items for the current page
-  var currentPageItems = 0//roomHotelData.slice(startIndex, endIndex);
-
+  // PAGINATION
   const [currentPage, setCurrentPage] = useState(1);
+  const hotelsPerPage = 10;
 
-  const handlePreviousPageRoom = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
+  const indexOfLastHotel = currentPage * hotelsPerPage;
+  const indexOfFirstHotel = indexOfLastHotel - hotelsPerPage;
+  const currentHotels = state?.data?.hotels.slice(indexOfFirstHotel, indexOfLastHotel);
+
+  const handleClick = (pageNumber) => {
+    setCurrentPage(pageNumber);
   };
 
-  const handleNextPageRoom = () => {
-    if (currentPage < totalPage) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
+  // PAGINATION
 
   const handleInputChange = (name, value) => {
     let current = [...guestData];
@@ -661,65 +651,98 @@ const Index = (props) => {
               <span className="text-dark ms-2">MGJ</span>
             </div>
           </div>
-          <div className="text-dark mb-1 mt-4">Hotel List</div>
-          <div className="bg-white">
-            <table className="table table-bordered table-hover table-striped">
-              <thead>
-                <tr>
-                  <th className="bg-blue text-white" width="5%">
-                    Code
-                  </th>
-                  <th className="bg-blue text-white" width="30%">
-                    Hotel
-                  </th>
-                  <th className="bg-blue text-white" width="5%">
-                    ★
-                  </th>
-                  <th className="bg-blue text-white" width="5%">
-                    Net Price
-                  </th>
-                  <th className="bg-blue text-white" width="5%">
-                    Supplier
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {state?.data?.hotels.map((data) => {
-                  const isSelected = data.code === selectedHotel?.code;
-                  const sortedData = data?.roomDetails?.sort(
-                    (a, b) => a.grossPrice - b.grossPrice
-                  )[0];
-                  return (
-                    <tr
-                      onClick={() => {
-                        setSelectedHotel(data);
-                        setSelectedRoom({});
-                        setRecheckData(null);
 
-                        if (data.roomDetails.length == 0) {
-                          handleRoomGet(data, data.supplierId)
-                          setSupplierCode(data.supplierCode);
-                        } else {
-                          handleRoomGet(data, data.supplierId)
-                          // setRoomHotelData(data.roomDetails)
-                          setSupplierCode(data.supplierCode);
-                          // setSessionId(data.sessionId)
-                        }
-                      }}
-                      className={`${isSelected ? "bg-selected" : ""} pointer`}
-                    >
-                      <td>{data.code}</td>
-                      <td>{data.name}</td>
-                      <td>{data.rating}</td>
-                      <td>{toIDR(data.netPrice)}</td>
-                      <td>{data.supplierCode}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+        
+          <div>
+            <div className="text-dark mb-1 mt-4">Hotel List</div>
+            <div className="bg-white">
+              <table className="table table-bordered table-hover table-striped">
+                <thead>
+                  <tr>
+                    <th className="bg-blue text-white" width="5%">
+                      Code
+                    </th>
+                    <th className="bg-blue text-white" width="30%">
+                      Hotel
+                    </th>
+                    <th className="bg-blue text-white" width="5%">
+                      ★
+                    </th>
+                    <th className="bg-blue text-white" width="5%">
+                      Net Price
+                    </th>
+                    <th className="bg-blue text-white" width="5%">
+                      Supplier
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentHotels?.map((data) => {
+                    const isSelected = data.code === selectedHotel?.code;
+                    const sortedData = data?.roomDetails?.sort((a, b) => a.grossPrice - b.grossPrice)[0];
+                    return (
+                      <tr
+                        key={data.code}
+                        onClick={() => {
+                          setSelectedHotel(data);
+                          setSelectedRoom({});
+                          setRecheckData(null);
+
+                          if (data.roomDetails.length === 0) {
+                            handleRoomGet(data, data.supplierId);
+                            setSupplierCode(data.supplierCode);
+                          } else {
+                            handleRoomGet(data, data.supplierId);
+                            setSupplierCode(data.supplierCode);
+                          }
+                        }}
+                        className={`${isSelected ? "bg-selected" : ""} pointer`}
+                      >
+                        <td>{data.code}</td>
+                        <td>{data.name}</td>
+                        <td>{data.rating}</td>
+                        <td>{toIDR(data.netPrice)}</td>
+                        <td>{data.supplierCode}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <div className=" d-flex justify-content-between align-items-center" style={{ height: "50px" }}>
+            <nav>
+                <ul className="pagination">
+                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                    <button onClick={() => handleClick(currentPage - 1)} className="page-link">Previous</button>
+                  </li>
+                  {currentPage > 2 && (
+                    <li className="page-item disabled"><span className="page-link">...</span></li>
+                  )}
+                  {Array.from({ length: Math.min(Math.ceil(state.data?.hotels.length / hotelsPerPage), 3) }, (_, i) => {
+                    const pageNumber = currentPage - 1 + i;
+                    return (
+                      (pageNumber >= 1 && pageNumber <= Math.ceil(state.data?.hotels.length / hotelsPerPage)) && (
+                        <li key={i} className={`page-item ${currentPage === pageNumber ? 'active' : ''}`}>
+                          <button onClick={() => handleClick(pageNumber)} className="page-link">{pageNumber}</button>
+                        </li>
+                      )
+                    );
+                  })}
+                  {currentPage + 1 < Math.ceil(state.data?.hotels.length / hotelsPerPage) && (
+                    <li className="page-item disabled"><span className="page-link">...</span></li>
+                  )}
+                  <li className={`page-item ${currentPage === Math.ceil(state.data?.hotels.length / hotelsPerPage) ? 'disabled' : ''}`}>
+                    <button onClick={() => handleClick(currentPage + 1)} className="page-link">Next</button>
+                  </li>
+                </ul>
+              </nav>
+              <div>
+                <p style={{ color: "ccc" }}>Total Rows: {state?.data?.hotels.length}</p>
+              </div>
+            </div>
           </div>
-        </div>
+
+      </div>
         <div className="col-lg-6">
           <div className="text-dark mb-1">Hotel</div>
           <div className="bg-white">

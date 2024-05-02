@@ -16,6 +16,7 @@ const Login = (props) => {
   const { state, dispatch } = useContext(AuthContext);
 
   const loginHandler = async (e) => {
+    console.log('test')
     e.preventDefault();
     await login(dispatch, email, password);
   };
